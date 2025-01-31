@@ -1,6 +1,7 @@
 class Calendar {
     constructor(diaryEditor) {
         this.editor = diaryEditor;
+        this.app = window.app;  // App 인스턴스 참조 추가
         this.currentDate = new Date();
         this.calendarGrid = document.querySelector('.calendar-grid');
         this.currentDateDisplay = document.querySelector('.current-date');
@@ -48,14 +49,14 @@ class Calendar {
     }
 
     updateDateDisplay() {
-        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
         if (this.isExpanded) {
             // 달력이 펼쳐져 있을 때는 년월만 표시
-            this.currentDateDisplay.textContent = `${this.currentDate.getFullYear()}년 ${this.currentDate.getMonth() + 1}월`;
+            this.currentDateDisplay.textContent = 
+                `${this.currentDate.getFullYear()}년 ${this.currentDate.getMonth() + 1}월`;
         } else {
             // 달력이 접혀있을 때는 전체 날짜 표시
-            const selectedDate = new Date(this.editor.currentDate);
-            this.currentDateDisplay.textContent = selectedDate.toLocaleDateString('ko-KR', options);
+            this.currentDateDisplay.textContent = 
+                this.app.formatDate(this.editor.currentDate);
         }
     }
 
@@ -129,13 +130,17 @@ class Calendar {
                 dayElement.classList.add('selected');
             }
 
-            dayElement.addEventListener('click', () => {
+            dayElement.addEventListener('click', async () => {
                 const selectedDate = new Date(year, month, i, 12, 0, 0);
                 const dateStr = selectedDate.toISOString().split('T')[0];
-                this.editor.loadEntry(dateStr);
-                document.querySelectorAll('.calendar-day').forEach(el => 
-                    el.classList.remove('selected'));
-                dayElement.classList.add('selected');
+
+                // 저장 중인 경우 처리 (메서드 이름 수정)
+                if (await this.editor.saveCurrentEntry()) {
+                    this.editor.loadEntry(dateStr);
+                    document.querySelectorAll('.calendar-day').forEach(el => 
+                        el.classList.remove('selected'));
+                    dayElement.classList.add('selected');
+                }
             });
 
             this.calendarGrid.appendChild(dayElement);

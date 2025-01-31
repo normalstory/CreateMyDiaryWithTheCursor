@@ -121,15 +121,9 @@ class DiaryDB {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction(['entries'], 'readonly');
             const store = transaction.objectStore('entries');
-            const request = store.getAll();
+            const request = store.getAll(IDBKeyRange.bound(startDate, endDate));
 
-            request.onsuccess = () => {
-                const entries = request.result;
-                const filteredEntries = entries.filter(entry => {
-                    return entry.date >= startDate && entry.date <= endDate;
-                });
-                resolve(filteredEntries);
-            };
+            request.onsuccess = () => resolve(request.result);
             request.onerror = () => reject(request.error);
         });
     }
@@ -153,6 +147,27 @@ class DiaryDB {
 
             request.onsuccess = () => resolve();
             request.onerror = () => reject(request.error);
+        });
+    }
+
+    // 모든 엔트리 가져오기
+    async getAllEntries() {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(['entries'], 'readonly');
+            const store = transaction.objectStore('entries');
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                // 날짜 기준 내림차순 정렬 (최신순)
+                const entries = request.result.sort((a, b) => 
+                    new Date(b.date) - new Date(a.date)
+                );
+                resolve(entries);
+            };
+
+            request.onerror = () => {
+                reject(new Error('데이터 조회 실패'));
+            };
         });
     }
 } 

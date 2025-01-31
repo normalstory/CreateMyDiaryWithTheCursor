@@ -1,10 +1,12 @@
 class DiaryEditor {
     constructor(diaryDB) {
         this.db = diaryDB;
-        this.editor = document.getElementById('editor');
+        this.app = window.app;  // App 인스턴스 참조 추가
+        this.editor = document.querySelector('#editor');
+        this.editorToolbar = document.querySelector('.editor-toolbar');
         this.saveStatus = document.querySelector('.save-status');
-        this.tagsInput = document.getElementById('tags');
-        this.deleteBtn = document.getElementById('deleteEntry');
+        this.tagsInput = document.querySelector('#tags');
+        this.deleteBtn = document.querySelector('.delete-btn');
         this.saveTimeout = null;
         this.currentDate = new Date().toISOString().split('T')[0];
         
@@ -13,8 +15,16 @@ class DiaryEditor {
         this.currentMood = 'sunny';  // 기본값
         
         // URL 정규식 패턴
-        this.urlPattern = /https?:\/\/\S+/gi;
+        this.urlPattern = /https?:\/\/[^\s]+/g;
         
+        // 요소 존재 여부 확인
+        if (!this.editor || !this.editorToolbar || !this.tagsInput || !this.saveStatus) {
+            console.error('필수 요소를 찾을 수 없습니다.');
+            return;
+        }
+
+        this.isSaving = false;
+
         this.initializeEventListeners();
     }
 
@@ -64,6 +74,9 @@ class DiaryEditor {
                 this.autoSave();
             });
         });
+
+        // 이미지 업로드 초기화
+        this.initializeImageUpload();
     }
 
     executeCommand(command) {
@@ -78,29 +91,126 @@ class DiaryEditor {
                     document.execCommand('createLink', false, url);
                 }
                 break;
-            case 'image':
-                const imageInput = document.createElement('input');
-                imageInput.type = 'file';
-                imageInput.accept = 'image/*';
-                imageInput.onchange = (e) => this.handleImageUpload(e);
-                imageInput.click();
-                break;
         }
     }
 
-    async handleImageUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
+    // 이미지 업로드 초기화
+    initializeImageUpload() {
+        const imageBtn = this.editorToolbar.querySelector('[data-command="image"]');
+        if (!imageBtn) {
+            console.warn('이미지 업로드 버튼을 찾을 수 없습니다.');
+            return;
+        }
+
+        // 기존 리스너 제거 (중복 방지)
+        const oldInput = this.editorToolbar.querySelector('input[type="file"]');
+        if (oldInput) {
+            oldInput.remove();
+        }
+
+        // 파일 입력 요소 생성
+        const imageInput = document.createElement('input');
+        imageInput.type = 'file';
+        imageInput.accept = 'image/*';
+        imageInput.capture = 'environment';
+        imageInput.multiple = false;
+        imageInput.style.display = 'none';
+        this.editorToolbar.appendChild(imageInput);
+
+        // 이미지 버튼 클릭 이벤트
+        imageBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            imageInput.click();
+        });
+
+        // 파일 선택 이벤트
+        imageInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                // 파일 타입 체크 개선
+                const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validImageTypes.includes(file.type)) {
+                    throw new Error('지원되는 이미지 형식이 아닙니다. (JPEG, PNG, GIF, WEBP)');
+                }
+
+                await this.handleImageUpload(file);
+            } catch (error) {
+                console.error('이미지 업로드 실패:', error);
+                alert(error.message);
+            } finally {
+                imageInput.value = '';
+            }
+        });
+    }
+
+    // 이미지 업로드 처리
+    async handleImageUpload(file) {
+        try {
+            // 파일 크기 체크 (10MB)
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                throw new Error('파일 크기는 10MB를 초과할 수 없습니다.');
+            }
+
+            // 로딩 표시
+            this.showSavingStatus('이미지 처리 중...');
+
+            // 이미지 최적화
+            const optimizedImage = await this.optimizeImage(file);
+            
+            // Base64로 변환
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onloadend = () => {
                 const img = document.createElement('img');
-                img.src = e.target.result;
+                img.src = reader.result;
                 img.style.maxWidth = '100%';
                 this.editor.appendChild(img);
                 this.autoSave();
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(optimizedImage);
+
+        } catch (error) {
+            throw error;
+        } finally {
+            this.showSavingStatus();
         }
+    }
+
+    // 이미지 최적화
+    async optimizeImage(file) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                // 브라우저 화면 폭 기준으로 최대 너비 설정
+                const maxWidth = Math.min(800, window.innerWidth);
+                
+                // 비율 계산
+                let width = img.width;
+                let height = img.height;
+                if (width > maxWidth) {
+                    height = (height * maxWidth) / width;
+                    width = maxWidth;
+                }
+
+                // 캔버스에 리사이즈된 이미지 그리기
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // 압축된 이미지 생성
+                canvas.toBlob(
+                    (blob) => resolve(blob),
+                    'image/jpeg',
+                    0.7  // 품질 설정 (0.7 = 70%)
+                );
+            };
+            img.onerror = () => reject(new Error('이미지 처리 중 오류가 발생했습니다.'));
+            img.src = URL.createObjectURL(file);
+        });
     }
 
     showSavingStatus() {
@@ -108,18 +218,24 @@ class DiaryEditor {
         this.saveStatus.classList.add('saving');
     }
 
-    showSavedStatus() {
-        this.saveStatus.textContent = '자동 저장됨';
-        this.saveStatus.classList.remove('saving');
-        
-        // 마지막 수정 시간 업데이트
-        this.updateLastModified(new Date());
-        
-        // 달력의 has-entry 상태 업데이트
-        this.updateCalendarEntry();
-        
-        // 달력 업데이트 이벤트 발생
-        document.dispatchEvent(new CustomEvent('entryUpdated'));
+    showSavedStatus(saved = true) {
+        if (saved) {
+            this.saveStatus.textContent = '자동 저장됨';
+            this.saveStatus.classList.remove('saving');
+            
+            // 마지막 수정 시간 업데이트
+            this.updateLastModified(new Date());
+            
+            // 달력의 has-entry 상태 업데이트
+            this.updateCalendarEntry();
+            
+            // 달력 업데이트 이벤트 발생
+            document.dispatchEvent(new CustomEvent('entryUpdated'));
+        } else {
+            this.saveStatus.textContent = '';  // 저장할 내용 없음
+            this.saveStatus.classList.remove('saving');
+            this.deleteBtn.style.display = 'none';
+        }
     }
 
     // 마지막 수정 시간 업데이트 메서드
@@ -141,70 +257,124 @@ class DiaryEditor {
         }
     }
 
+    // 내용 변경 감지 메서드 추가
+    hasContent() {
+        const content = this.editor.innerHTML.trim();
+        const tags = this.tagsInput.value.trim();
+        const hasRealContent = content !== '' && content !== '<br>' && content !== '<div><br></div>';
+        
+        return hasRealContent || tags !== '';
+    }
+
+    // 자동 저장 함수 수정
     autoSave() {
         if (this.saveTimeout) {
             clearTimeout(this.saveTimeout);
         }
 
         this.saveTimeout = setTimeout(async () => {
-            const tags = this.tagsInput.value
-                .split(',')
-                .map(tag => tag.trim())
-                .filter(tag => tag)
-                .map(tag => tag.startsWith('#') ? tag : `#${tag}`);
+            if (this.isSaving) return;
+            
+            // 실제 내용이 있는 경우에만 저장
+            if (!this.hasContent()) {
+                this.showSavedStatus(false);  // 저장할 내용 없음
+                return;
+            }
 
-            const entry = {
-                date: this.currentDate,
-                content: this.editor.innerHTML,
-                mood: this.currentMood,
-                backgroundColor: this.editor.style.backgroundColor,
-                tags: tags,
-                lastModified: new Date().toISOString()
-            };
-
+            this.isSaving = true;
             try {
+                const tags = this.tagsInput.value
+                    .split(',')
+                    .map(tag => tag.trim())
+                    .filter(tag => tag)
+                    .map(tag => tag.startsWith('#') ? tag : `#${tag}`);
+
+                const entry = {
+                    date: this.currentDate,
+                    content: this.editor.innerHTML,
+                    mood: this.currentMood,
+                    tags: tags,
+                    lastModified: new Date().toISOString()
+                };
+
                 await this.db.saveEntry(entry);
-                this.showSavedStatus();
-                // 달력 업데이트를 위한 이벤트는 showSavedStatus에서 처리되므로 제거
-                this.deleteBtn.style.display = 'block'; // 저장된 엔트리가 있으므로 삭제 버튼 표시
+                this.showSavedStatus(true);  // 저장 성공
+                this.deleteBtn.style.display = 'block';
             } catch (error) {
                 console.error('저장 실패:', error);
                 this.saveStatus.textContent = '저장 실패';
+            } finally {
+                this.isSaving = false;
             }
         }, 1000);
     }
 
-    async loadEntry(date) {
-        try {
-            this.currentDate = date;
-            const entry = await this.db.getEntry(date);
-            
-            // 달력의 모든 날짜에서 has-entry 상태 업데이트
-            await this.updateAllCalendarEntries();
-            
-            if (entry) {
-                this.editor.innerHTML = entry.content;
-                this.setMood(entry.mood);
-                this.tagsInput.value = entry.tags.join(', ');
-
-                // 마지막 수정 시간 표시
-                const lastModified = new Date(entry.lastModified);
-                const timeString = lastModified.toLocaleTimeString('ko-KR', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                const modifiedString = `${lastModified.toLocaleDateString()} ${timeString} 작성`;
-                document.querySelector('.last-modified').textContent = modifiedString;
-                this.deleteBtn.style.display = 'block';  // 엔트리가 있으면 삭제 버튼 표시
-            } else {
-                this.editor.innerHTML = '';
-                this.setMood('sunny');
-                this.tagsInput.value = '';
-                document.querySelector('.last-modified').textContent = '';
-                this.deleteBtn.style.display = 'none';   // 엔트리가 없으면 삭제 버튼 숨김
+    // 날짜 변경 전 저장 체크 수정
+    async saveCurrentEntry() {
+        if (this.isSaving) {
+            const confirmed = confirm('데이터를 저장하는 중입니다. 저장이 완료될 때까지 기다리시겠습니까?');
+            if (!confirmed) {
+                return false;
             }
-        } catch (error) {
-            console.error('일기 로드 실패:', error);
+            while (this.isSaving) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
+
+        // 실제 내용이 있는 경우에만 저장
+        if (this.hasContent()) {
+            if (this.saveTimeout) {
+                clearTimeout(this.saveTimeout);
+            }
+
+            try {
+                await this.autoSave();
+                await new Promise(resolve => setTimeout(resolve, 100));
+            } catch (error) {
+                console.error('저장 실패:', error);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // 날짜 변경
+    async loadEntry(date) {
+        // 현재 내용 저장
+        if (!(await this.saveCurrentEntry())) {
+            return;
+        }
+
+        this.currentDate = date;
+        const entry = await this.db.getEntry(date);
+        
+        // 날짜 표시 업데이트
+        document.querySelector('.current-date').textContent = 
+            this.app.formatDate(date);
+
+        // 달력의 모든 날짜에서 has-entry 상태 업데이트
+        await this.updateAllCalendarEntries();
+        
+        if (entry) {
+            this.editor.innerHTML = entry.content;
+            this.setMood(entry.mood);
+            this.tagsInput.value = entry.tags.join(', ');
+
+            // 마지막 수정 시간 표시
+            const lastModified = new Date(entry.lastModified);
+            const timeString = lastModified.toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            const modifiedString = `${lastModified.toLocaleDateString()} ${timeString} 작성`;
+            document.querySelector('.last-modified').textContent = modifiedString;
+            this.deleteBtn.style.display = 'block';  // 엔트리가 있으면 삭제 버튼 표시
+        } else {
+            this.editor.innerHTML = '';
+            this.setMood('sunny');
+            this.tagsInput.value = '';
+            document.querySelector('.last-modified').textContent = '';
+            this.deleteBtn.style.display = 'none';   // 엔트리가 없으면 삭제 버튼 숨김
         }
     }
 

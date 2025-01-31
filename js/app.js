@@ -1,5 +1,8 @@
 class App {
     constructor() {
+        // 전역 참조 설정
+        window.app = this;
+
         this.db = new DiaryDB();
         // DB 초기화를 먼저 수행
         this.db.init().then(() => {
@@ -221,135 +224,133 @@ class App {
     }
 
     initializeSearch() {
-        const searchBtn = document.querySelector('.search-btn');
-        const header = document.querySelector('.header');
         const searchContainer = document.querySelector('.search-container');
         const searchInput = document.querySelector('.search-input');
-        const closeSearchBtn = document.querySelector('.close-search');
         const searchResults = document.querySelector('.search-results');
+        const searchBtn = document.querySelector('.search-btn');
+        const closeSearchBtn = document.querySelector('.close-search');
 
+        // 검색 버튼 클릭 시 검색창 표시
         searchBtn.addEventListener('click', () => {
             searchContainer.classList.add('active');
             searchInput.focus();
         });
 
+        // 검색창 닫기
         closeSearchBtn.addEventListener('click', () => {
             searchContainer.classList.remove('active');
             searchInput.value = '';
             searchResults.innerHTML = '';
         });
 
+        // 검색어 입력 시 실시간 검색
         searchInput.addEventListener('input', async () => {
-            const query = searchInput.value.trim();
-            if (query.length < 1) {
+            const query = searchInput.value.trim().toLowerCase();
+            
+            // 검색어가 없으면 결과 초기화
+            if (!query) {
                 searchResults.innerHTML = '';
                 return;
             }
 
             try {
-                const results = await this.db.searchEntries(query);
+                const entries = await this.db.getAllEntries();
+                const results = entries.filter(entry => {
+                    // HTML 태그와 이미지를 제거한 순수 텍스트 콘텐츠 추출
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = entry.content;
+                    
+                    // 이미지 태그 제거
+                    tempDiv.querySelectorAll('img').forEach(img => img.remove());
+                    
+                    // HTML을 순수 텍스트로 변환
+                    const content = tempDiv.textContent.toLowerCase().trim();
+                    const tags = entry.tags.join(' ').toLowerCase();
+                    
+                    // 검색어 분리 및 필터링
+                    const keywords = query.split(' ')
+                        .filter(k => k.length > 0)
+                        .map(k => k.toLowerCase());
+
+                    // 모든 키워드가 콘텐츠나 태그에 포함되어야 함
+                    return keywords.every(keyword => 
+                        content.includes(keyword) || tags.includes(keyword)
+                    );
+                });
+
+                // 검색 결과 표시
                 if (results.length === 0) {
-                    searchResults.innerHTML = '<div class="search-empty">검색 결과가 없습니다.</div>';
+                    searchResults.innerHTML = `
+                        <div class="search-empty">
+                            "${query}"에 대한 검색 결과가 없습니다.
+                        </div>
+                    `;
                     return;
                 }
 
                 searchResults.innerHTML = results.map(entry => `
                     <div class="search-result-item" data-date="${entry.date}">
-                        <div class="result-date">${new Date(entry.date).toLocaleDateString('ko-KR', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            weekday: 'long'
-                        })}</div>
-                        <div class="result-content">${this.highlightText(entry.content, query)}</div>
-                        <div class="result-tags">
-                            ${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        <div class="result-date">${this.formatDate(entry.date)}</div>
+                        <div class="result-content">
+                            ${this.highlightText(entry.content, query)}
                         </div>
+                        ${entry.tags.length ? `
+                            <div class="result-tags">
+                                ${entry.tags.map(tag => 
+                                    `<span class="tag">${tag}</span>`
+                                ).join('')}
+                            </div>
+                        ` : ''}
                     </div>
                 `).join('');
 
-                // 검색 결과 클릭 이벤트
+                // 검색 결과 클릭 이벤트 추가
                 document.querySelectorAll('.search-result-item').forEach(item => {
                     item.addEventListener('click', () => {
                         const date = item.dataset.date;
                         this.editor.loadEntry(date);
-                        this.calendar.render(); // 캘린더 업데이트
                         searchContainer.classList.remove('active');
-                        searchInput.value = '';
-                        searchResults.innerHTML = '';
                     });
                 });
+
             } catch (error) {
                 console.error('검색 실패:', error);
-                searchResults.innerHTML = '<div class="search-error">검색에 실패했습니다.</div>';
+                searchResults.innerHTML = '<div class="search-error">검색 중 오류가 발생했습니다.</div>';
             }
         });
     }
 
-    displaySearchResults(results, query) {
-        const content = document.querySelector('.content-section');
-        content.innerHTML = `
-            <div class="search-results">
-                <h3>검색 결과 (${results.length}건)</h3>
-                ${results.map(entry => `
-                    <div class="search-result-item" data-date="${entry.date}">
-                        <div class="result-date">${new Date(entry.date).toLocaleDateString()}</div>
-                        <div class="result-content">
-                            ${this.highlightText(entry.content, query)}
-                        </div>
-                        <div class="result-tags">
-                            ${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ')}
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-
-        // 검색 결과 클릭 이벤트
-        document.querySelectorAll('.search-result-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const date = item.dataset.date;
-                this.editor.loadEntry(date);
-                this.clearSearchResults();
-            });
-        });
-    }
-
-    clearSearchResults() {
-        const content = document.querySelector('.content-section');
-        content.innerHTML = `
-            <div class="mood-selector">
-                <label>오늘의 기분:</label>
-                <select id="moodSelect">
-                    <option value="sunny">☀️ 맑음</option>
-                    <option value="cloudy">☁️ 흐림</option>
-                    <option value="rainy">🌧️ 비</option>
-                    <option value="happy">😊 행복</option>
-                    <option value="sad">😢 슬픔</option>
-                </select>
-            </div>
-            <div class="editor-container">
-                <div class="editor-toolbar">
-                    <button data-command="bold">B</button>
-                    <button data-command="italic">I</button>
-                    <button data-command="link">🔗</button>
-                    <button data-command="image">📷</button>
-                </div>
-                <div id="editor" contenteditable="true"></div>
-                <div class="save-status">자동 저장됨</div>
-            </div>
-            <div class="tags-container">
-                <label for="tags">태그:</label>
-                <input type="text" id="tags" placeholder="#태그1, #태그2, #태그3">
-            </div>
-        `;
-    }
-
+    // 검색어 하이라이트 처리 개선
     highlightText(content, query) {
-        // HTML 태그 제거
-        const text = content.replace(/<[^>]*>/g, '');
-        const regex = new RegExp(`(${query})`, 'gi');
-        return text.replace(regex, '<mark>$1</mark>');
+        // HTML 태그와 이미지를 제거한 순수 텍스트 추출
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        tempDiv.querySelectorAll('img').forEach(img => img.remove());
+        const text = tempDiv.textContent.trim();
+        
+        // 검색어로 분할하여 하이라이트 처리
+        const keywords = query.split(' ')
+            .filter(k => k.length > 0)
+            .map(k => k.toLowerCase());
+        
+        let highlighted = text;
+        keywords.forEach(keyword => {
+            const regex = new RegExp(`(${keyword})`, 'gi');
+            highlighted = highlighted.replace(regex, '<mark>$1</mark>');
+        });
+
+        // 검색 결과 미리보기 (앞뒤 100자)
+        const previewLength = 100;
+        const firstMatch = highlighted.indexOf('<mark>');
+        if (firstMatch > -1) {
+            const start = Math.max(0, firstMatch - previewLength);
+            const end = Math.min(highlighted.length, firstMatch + previewLength);
+            highlighted = (start > 0 ? '...' : '') + 
+                         highlighted.substring(start, end) + 
+                         (end < highlighted.length ? '...' : '');
+        }
+
+        return highlighted;
     }
 
     initializeIntro() {
@@ -397,6 +398,17 @@ class App {
                 intro.style.display = 'none';
             }, 500);
         }
+    }
+
+    // 날짜 포맷팅 함수 추가
+    formatDate(dateStr) {
+        const date = new Date(dateStr);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const weekday = new Intl.DateTimeFormat('ko-KR', { weekday: 'long' }).format(date);
+        
+        return `${year}년 ${month}월 ${day}일 ${weekday}`;
     }
 }
 
