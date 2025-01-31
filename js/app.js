@@ -15,6 +15,8 @@ class App {
             today.setHours(12, 0, 0, 0);  // 정오로 설정
             const todayStr = today.toISOString().split('T')[0];
             this.editor.loadEntry(todayStr);
+
+            this.initializeIntro();
         });
     }
 
@@ -247,6 +249,53 @@ class App {
         const text = content.replace(/<[^>]*>/g, '');
         const regex = new RegExp(`(${query})`, 'gi');
         return text.replace(regex, '<mark>$1</mark>');
+    }
+
+    initializeIntro() {
+        // 버블에 인덱스 설정
+        document.querySelectorAll('.intro-shapes span').forEach((span, i) => {
+            span.style.setProperty('--i', i);
+        });
+
+        // 스킵 버튼 이벤트
+        const skipBtn = document.querySelector('.skip-intro');
+        if (skipBtn) {
+            skipBtn.addEventListener('click', () => {
+                this.endIntro();
+            });
+        }
+
+        // 5초 후 자동 종료
+        this.introTimeout = setTimeout(() => {
+            this.endIntro();
+        }, 5000);
+    }
+
+    endIntro() {
+        // 이미 종료된 경우 중복 실행 방지
+        if (this.introEnded) return;
+        this.introEnded = true;
+
+        // 타임아웃 클리어
+        if (this.introTimeout) {
+            clearTimeout(this.introTimeout);
+        }
+
+        const intro = document.querySelector('.intro-overlay');
+        if (intro) {
+            intro.classList.add('hide');
+            
+            // 본문 컨텐츠 표시
+            document.querySelectorAll('main, .header, .side-nav-container')
+                .forEach(el => {
+                    el.classList.add('content-visible');
+                });
+
+            // 완전히 제거 (애니메이션 완료 후)
+            setTimeout(() => {
+                intro.style.display = 'none';
+            }, 500);
+        }
     }
 }
 
