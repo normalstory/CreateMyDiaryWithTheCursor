@@ -1,0 +1,720 @@
+/* 기본 스타일 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+/* 헤더 스타일 */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    color: var(--text);
+}
+
+/* 메뉴 버튼 스타일 수정 */
+.menu-btn, .search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text);
+    padding: 0.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1001;
+}
+
+/* 햄버거 메뉴 아이콘 스타일 수정 */
+.hamburger {
+    position: relative;
+    width: 20px;
+    height: 2px;
+    background: var(--text);
+    transition: all 0.3s ease;
+}
+
+.hamburger::before,
+.hamburger::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background: var(--text);
+    transition: all 0.3s ease;
+    left: 0;
+}
+
+.hamburger::before {
+    top: -6px;
+    transform-origin: center;
+}
+
+.hamburger::after {
+    bottom: -6px;
+    transform-origin: center;
+}
+
+/* 메뉴 버튼 활성화 상태 - 햄버거를 X로 변환 */
+.menu-btn.active .hamburger {
+    background: transparent;
+}
+
+.menu-btn.active .hamburger::before {
+    top: 0;
+    transform: rotate(45deg);
+}
+
+.menu-btn.active .hamburger::after {
+    bottom: 0;
+    transform: rotate(-45deg);
+}
+
+/* 사이드 네비게이션 컨테이너 스타일 수정 */
+.side-nav-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1000;
+    visibility: hidden;
+    transition: visibility 0.3s;
+}
+
+.side-nav-container:not(.hidden) {
+    visibility: visible;
+}
+
+/* 오버레이 스타일 수정 */
+.side-nav-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+.side-nav-container:not(.hidden) .side-nav-overlay {
+    opacity: 1;
+}
+
+/* 사이드 네비게이션 패널 스타일 수정 */
+.side-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 70%;
+    height: 100%;
+    background-color: var(--surface);
+    padding: 3rem 1.5rem;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.side-nav-container:not(.hidden) .side-nav {
+    transform: translateX(0);
+}
+
+/* 닫기 버튼 스타일 수정 */
+.close-nav {
+    display: none; /* X 버튼 숨기기 */
+}
+
+/* 사이드 네비게이션 메뉴 스타일 수정 */
+.side-nav ul {
+    list-style: none;
+    margin-top: 1rem;
+}
+
+.side-nav ul li {
+    margin-bottom: 1rem;
+}
+
+.side-nav button {
+    width: 100%;
+    padding: 1rem;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.side-nav button:hover {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* 캘린더 스타일 */
+.calendar-section {
+    padding: 1rem;
+    background-color: var(--surface);
+    margin: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.calendar-header h2 {
+    font-size: 1.3rem;
+    color: var(--text);
+}
+
+.calendar-header button {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.calendar-header button:hover {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.prev-month, .next-month {
+    font-size: 0.9rem;
+    width: 40px;
+    padding: 0.5rem !important;
+}
+
+.toggle-calendar {
+    font-size: 0.9rem;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-weekday {
+    text-align: center;
+    padding: 0.5rem;
+    font-weight: bold;
+    color: var(--text-secondary);
+}
+
+.calendar-day {
+    text-align: center;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 4px;
+    position: relative;
+}
+
+.calendar-day:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.calendar-day.today {
+    background-color: transparent;
+    color: var(--text);
+    border: 1px solid var(--primary);
+    position: relative;
+}
+
+/* today 텍스트 추가 (선택사항) */
+.calendar-day.today::before {
+    content: 'today';
+    position: absolute;
+    top: -0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    color: var(--primary);
+    background-color: var(--surface);
+    padding: 0 0.2rem;
+}
+
+.calendar-day.selected {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+}
+
+/* 선택된 날짜에 마우스 오버 시 효과 */
+.calendar-day.selected:hover {
+    background-color: var(--primary);
+    opacity: 0.9;
+}
+
+/* 일기가 있는 날짜 표시 수정 */
+.calendar-day.has-entry::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background-color: var(--primary);
+    border-radius: 50%;
+}
+
+/* 오늘이면서 선택된 날짜인 경우 */
+.calendar-day.today.selected {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+}
+
+/* 오늘이면서 선택된 날짜의 today 텍스트 
+.calendar-day.today.selected::before {
+    color: white;
+}*/
+
+/* 에디터 스타일 */
+.content-section {
+    padding: 1rem;
+    margin: 0.5rem 1rem 1rem;
+    background-color: var(--surface);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.mood-selector {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.editor-container {
+    margin: 1rem 0;
+}
+
+.editor-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.editor-toolbar button {
+    padding: 0.5rem 1rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#editor {
+    min-height: 300px;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background-color: var(--background);
+    position: relative;
+    z-index: 0;
+}
+
+#editor * {
+    position: relative;
+    z-index: inherit;
+}
+
+/* 저장 상태 컨테이너 스타일 */
+.save-status-container {
+    text-align: right;
+    padding: 0 1rem;
+    margin-top: -0.5rem;
+}
+
+.save-status {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.save-status.saving {
+    color: var(--primary);
+}
+
+/* 태그 스타일 */
+.tags-container {
+    margin-top: 1rem;
+}
+
+#tags {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background-color: var(--background);
+    color: var(--text);
+}
+
+/* 검색 아이콘 스타일 */
+.search-icon {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--text);
+    border-radius: 50%;
+}
+
+.search-icon::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 8px;
+    background: var(--text);
+    bottom: -6px;
+    right: -6px;
+    transform: rotate(-45deg);
+}
+
+/* 검색 컨테이너 스타일 */
+.search-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--surface);
+    z-index: 2000;
+    display: none;
+}
+
+.search-container.active {
+    display: block;
+}
+
+.search-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.search-input {
+    flex: 1;
+    margin: 0 1rem;
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    font-size: 1.1rem;
+    color: var(--text);
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.close-search {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.search-results {
+    padding: 1rem;
+    overflow-y: auto;
+    height: calc(100vh - 60px);
+}
+
+.search-result-item {
+    padding: 1rem;
+    margin: 0.5rem 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-result-item:hover {
+    background-color: var(--background);
+    border-color: var(--primary);
+}
+
+.result-date {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.result-content {
+    margin: 0.5rem 0;
+}
+
+.result-tags .tag {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    margin: 0.2rem;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+mark {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.1rem 0.3rem;
+    border-radius: 2px;
+}
+
+/* 테마 모달 스타일 */
+.theme-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.theme-modal-content {
+    background-color: var(--surface);
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.theme-modal h2 {
+    margin-bottom: 1.5rem;
+    color: var(--text);
+    text-align: center;
+}
+
+.theme-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.theme-option {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theme-option:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.theme-option.active {
+    border-color: var(--primary);
+    background-color: var(--primary);
+    color: white;
+}
+
+.theme-preview {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    border: 2px solid var(--border);
+}
+
+.close-modal {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: opacity 0.2s ease;
+}
+
+.close-modal:hover {
+    opacity: 0.9;
+}
+
+/* 테마 프리뷰 색상 */
+.theme-preview.light {
+    background-color: var(--light-background);
+    border-color: var(--light-primary);
+}
+
+.theme-preview.dark {
+    background-color: var(--dark-background);
+    border-color: var(--dark-primary);
+}
+
+.theme-preview.cheerful {
+    background-color: var(--cheerful-background);
+    border-color: var(--cheerful-primary);
+}
+
+.theme-preview.calm {
+    background-color: var(--calm-background);
+    border-color: var(--calm-primary);
+}
+
+/* 콘텐츠 헤더 스타일 */
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.current-date {
+    font-size: 1.3rem;
+    color: var(--text);
+    font-weight: bold;
+}
+
+.last-modified {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    text-align: right;
+}
+
+/* URL 프리뷰 스타일 수정 */
+.url-preview {
+    display: inline-block;
+    margin: 0.5rem 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--background);
+    transition: all 0.2s ease;
+}
+
+.url-preview a {
+    display: block;
+    text-decoration: none;
+    color: var(--text);
+    padding: 1rem;
+}
+
+.preview-image {
+    flex: 0 0 150px;
+    margin-right: 1rem;
+}
+
+.preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.preview-content {
+    flex: 1;
+    overflow: hidden;
+    user-select: text;
+}
+
+.preview-title, 
+.preview-description, 
+.preview-url {
+    user-select: text;
+}
+
+.preview-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.preview-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.preview-url {
+    font-size: 0.8rem;
+    color: var(--primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-empty {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.delete-btn {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: auto;
+    font-size: 0.9rem;
+    transition: opacity 0.2s ease;
+}
+
+.delete-btn:hover {
+    opacity: 0.9;
+}

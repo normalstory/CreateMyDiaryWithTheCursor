@@ -1,0 +1,111 @@
+:root {
+    /* 라이트 모드 기본 테마 */
+    --light-primary: #4a90e2;
+    --light-background: #ffffff;
+    --light-surface: #f5f5f5;
+    --light-text: #333333;
+    --light-text-secondary: #666666;
+    --light-border: #dddddd;
+
+    /* 다크 모드 테마 */
+    --dark-primary: #90caf9;
+    --dark-background: #121212;
+    --dark-surface: #1e1e1e;
+    --dark-text: #ffffff;
+    --dark-text-secondary: #b0b0b0;
+    --dark-border: #333333;
+
+    /* 명랑 톤 테마 */
+    --cheerful-primary: #ff9800;
+    --cheerful-background: #fff3e0;
+    --cheerful-surface: #ffe0b2;
+    --cheerful-text: #4a4a4a;
+    --cheerful-text-secondary: #757575;
+    --cheerful-border: #ffcc80;
+
+    /* 차분한 톤 테마 */
+    --calm-primary: #80cbc4;
+    --calm-background: #e0f2f1;
+    --calm-surface: #b2dfdb;
+    --calm-text: #37474f;
+    --calm-text-secondary: #546e7a;
+    --calm-border: #80cbc4;
+}
+
+/* 테마 클래스 */
+.theme-light {
+    --primary: var(--light-primary);
+    --background: var(--light-background);
+    --surface: var(--light-surface);
+    --text: var(--light-text);
+    --text-secondary: var(--light-text-secondary);
+    --border: var(--light-border);
+}
+
+.theme-dark {
+    --primary: var(--dark-primary);
+    --background: var(--dark-background);
+    --surface: var(--dark-surface);
+    --text: var(--dark-text);
+    --text-secondary: var(--dark-text-secondary);
+    --border: var(--dark-border);
+}
+
+.theme-cheerful {
+    --primary: var(--cheerful-primary);
+    --background: var(--cheerful-background);
+    --surface: var(--cheerful-surface);
+    --text: var(--cheerful-text);
+    --text-secondary: var(--cheerful-text-secondary);
+    --border: var(--cheerful-border);
+}
+
+.theme-calm {
+    --primary: var(--calm-primary);
+    --background: var(--calm-background);
+    --surface: var(--calm-surface);
+    --text: var(--calm-text);
+    --text-secondary: var(--calm-text-secondary);
+    --border: var(--calm-border);
+}
+
+/* 다크 모드에서 테마 옵션 텍스트 색상 수정 */
+.theme-dark .theme-option {
+    color: #e0e0e0;  /* 밝은 회색으로 설정 */
+}
+
+/* 선택된 테마 옵션은 흰색으로 유지 */
+.theme-dark .theme-option.active {
+    color: white;
+}
+
+/* 테마 모달 제목도 밝은 색상으로 설정 */
+.theme-dark .theme-modal h2 {
+    color: #e0e0e0;
+}
+
+/* 다크 모드에서 에디터 툴바 스타일 수정 */
+.theme-dark .editor-toolbar button {
+    color: var(--text);  /* 다크 모드의 텍스트 색상 사용 */
+    background-color: var(--surface);  /* 다크 모드의 표면 색상 사용 */
+    border-color: var(--border);
+}
+
+.theme-dark .editor-toolbar button:hover {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* 에디터 자체의 스타일도 수정 */
+.theme-dark #editor {
+    background-color: var(--surface);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+/* 링크와 이미지 아이콘도 수정 */
+.theme-dark .editor-toolbar [data-command="link"],
+.theme-dark .editor-toolbar [data-command="image"] {
+    color: var(--text);
+} 

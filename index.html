@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>다이어리</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/themes.css">
+</head>
+<body class="theme-light">
+    <header class="header">
+        <button class="menu-btn" aria-label="메뉴">
+            <span class="hamburger"></span>
+        </button>
+        <h1>다이어리</h1>
+        <button class="search-btn" aria-label="검색">
+            <span class="search-icon"></span>
+        </button>
+    </header>
+
+    <div class="side-nav-container hidden">
+        <div class="side-nav-overlay"></div>
+        <nav class="side-nav">
+            <ul>
+                <li><button id="themeBtn">테마 변경</button></li>
+                <li><button id="exportBtn">JSON 내보내기</button></li>
+                <li><button id="resetBtn">초기화</button></li>
+                <li><button id="importBtn">JSON 가져오기</button></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <section class="calendar-section">
+            <div class="calendar-header">
+                <button class="prev-month">◀</button>
+                <h2 class="current-date">2024년 3월</h2>
+                <button class="next-month">▶</button>
+                <button class="toggle-calendar">접기</button>
+            </div>
+            <div class="calendar-grid"></div>
+        </section>
+
+        <div class="save-status-container">
+            <span class="save-status">자동 저장됨</span>
+        </div>
+
+        <section class="content-section">
+            <div class="mood-selector">
+                <label>오늘의 기분:</label>
+                <select id="moodSelect">
+                    <option value="sunny">☀️ 맑음</option>
+                    <option value="cloudy">☁️ 흐림</option>
+                    <option value="rainy">🌧️ 비</option>
+                    <option value="happy">😊 행복</option>
+                    <option value="sad">😢 슬픔</option>
+                </select>
+                <button id="deleteEntry" class="delete-btn">삭제</button>
+            </div>
+            
+            <div class="editor-container">
+                <div class="editor-toolbar">
+                    <button data-command="bold">B</button>
+                    <button data-command="italic">I</button>
+                    <button data-command="link">🔗</button>
+                    <button data-command="image">📷</button>
+                </div>
+                <div id="editor" contenteditable="true"></div>
+            </div>
+
+            <div class="tags-container">
+                <label for="tags">태그:</label>
+                <input type="text" id="tags" placeholder="#태그1, #태그2, #태그3">
+            </div>
+            <div class="last-modified"></div>
+        </section>
+    </main>
+
+    <!-- 검색 컨테이너 추가 -->
+    <div class="search-container">
+        <div class="search-header">
+            <button class="close-search">←</button>
+            <input type="text" class="search-input" placeholder="검색어를 입력하세요">
+        </div>
+        <div class="search-results"></div>
+    </div>
+
+    <script src="js/database.js"></script>
+    <script src="js/editor.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html> 
