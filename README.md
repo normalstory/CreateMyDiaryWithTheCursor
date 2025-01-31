@@ -49,6 +49,17 @@ git clone https://github.com/YOUR_USERNAME/CreateMyDiaryWithTheCursor.git
 
 이 프로젝트는 MIT 라이선스를 따릅니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
+## 개발 프로세스
+
+이 프로젝트는 LLM(Large Language Model)을 활용한 프롬프트 엔지니어링을 통해 개발되었습니다. 
+전체 개발 과정에서 사용된 프롬프트와 그 결과물을 확인하실 수 있습니다:
+
+- [📝 프롬프트 히스토리](https://github.com/normalstory/CreateMyDiaryWithTheCursor/blob/master/resources/LLM-CUSOR-PROMPT.md)
+  - 초기 구조 설계부터 최종 최적화까지의 전체 프롬프트 기록
+  - 각 기능별 프롬프트-구현 매핑
+  - 효과적인 프롬프트 패턴 분석
+  - 개발 과정의 인사이트
+
 ## 기타 참고 SITE
 
 - [배포 | vercel](https://vercel.com/)
