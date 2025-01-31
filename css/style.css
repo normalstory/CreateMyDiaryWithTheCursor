@@ -191,7 +191,7 @@ body {
 }
 
 .calendar-header h2 {
-    font-size: 1.3rem;
+    font-size: 1rem;
     color: var(--text);
 }
 
@@ -217,6 +217,7 @@ body {
     padding: 0.5rem !important;
 }
 
+/* 캘린더 접기/펼치기 버튼 스타일 */
 .toggle-calendar {
     font-size: 0.9rem;
 }
@@ -893,6 +894,7 @@ mark {
     color: white;
     font-size: 1.5rem;  /* 크기 축소 */
     opacity: 0;
+    margin-bottom: 1em;
     letter-spacing: 0.2em;  /* 자간 추가 */
     animation: dancingText 0.8s ease 0.7s forwards;
 }
@@ -1034,10 +1036,10 @@ mark {
     }
 }
 
-/* 본문 컨텐츠 페이드인 수정 */
+/* 본문 컨텐츠 페이드인 - 2초 후에 시작 */
 main, .header, .side-nav-container {
     opacity: 0;
-    animation: fadeIn 0.5s ease 2s forwards;
+    animation: fadeIn 0.5s ease 2s forwards;  /* 2s: 시작 지연 시간, 0.5s: 애니메이션 지속 시간 */
 }
 
 @keyframes fadeIn {
@@ -1056,7 +1058,7 @@ main, .header, .side-nav-container {
     color: white;
     border-radius: 25px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 1rem;
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
 }
@@ -1078,13 +1080,13 @@ main, .header, .side-nav-container {
 /* 각 버블의 시작 위치와 애니메이션 지연 설정 */
 .intro-shapes span {
     left: calc(var(--i) * 4%);  /* --i는 JavaScript로 설정 */
-    animation: bubble 3s ease-in-out infinite;
-    animation-delay: calc(var(--i) * 0.1s);
+    animation: bubble 3s ease-in-out infinite;  /* 3s: 한 번의 애니메이션 주기 */
+    animation-delay: calc(var(--i) * 0.1s);    /* 각 버블마다 0.1초씩 지연 */
 }
 
 /* 인트로 자동 종료를 위한 클래스 */
 .intro-overlay.hide {
-    animation: fadeOut 0.5s ease forwards;
+    animation: fadeOut 0.5s ease forwards;  /* 0.5s: 페이드아웃 지속 시간 */
 }
 
 /* 본문 컨텐츠는 처음부터 투명하게 */
@@ -1094,7 +1096,7 @@ main, .header, .side-nav-container {
 
 /* 본문 표시를 위한 클래스 */
 .content-visible {
-    animation: fadeIn 0.5s ease forwards;
+    animation: fadeIn 0.5s ease forwards;  /* 0.5s: 페이드인 지속 시간 */
 }
 
 /* fadeOut 애니메이션 추가 */
@@ -1108,4 +1110,122 @@ main, .header, .side-nav-container {
         visibility: hidden;
         display: none;  /* 완전히 숨기기 위해 추가 */
     }
+}
+
+/* 가져오기 다이얼로그 스타일 */
+.import-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.import-dialog-content {
+    background: var(--background);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 90%;
+    width: 400px;
+}
+
+.import-dialog h2 {
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.import-dialog p {
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.import-dialog-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.import-dialog button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: opacity 0.2s;
+}
+
+.import-dialog button.overwrite {
+    background: var(--primary);
+    color: white;
+}
+
+.import-dialog button.append {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.import-dialog button.cancel {
+    background: #ff4444;
+    color: white;
+}
+
+.import-dialog button:hover {
+    opacity: 0.9;
+}
+
+/* 사이드 네비게이션 푸터 스타일 */
+.side-nav-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    background: #ebebeb;
+}
+
+.side-nav-footer .divider {
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.side-nav-footer .divider::before,
+.side-nav-footer .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    margin: 0 0.5rem;
+}
+
+.side-nav-footer .copyright {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.side-nav-footer .credits {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.side-nav-footer a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.side-nav-footer a:hover {
+    opacity: 0.8;
 }

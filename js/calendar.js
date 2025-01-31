@@ -41,7 +41,7 @@ class Calendar {
     toggleCalendar() {
         this.isExpanded = !this.isExpanded;
         this.calendarGrid.style.display = this.isExpanded ? 'grid' : 'none';
-        this.toggleBtn.textContent = this.isExpanded ? '접기' : '펼치기';
+        this.toggleBtn.textContent = this.isExpanded ? '접기' : '펴기';
         
         // 날짜 표시 업데이트
         this.updateDateDisplay();

@@ -32,3 +32,12 @@ git clone https://github.com/YOUR_USERNAME/CreateMyDiaryWithTheCursor.git
 ## 라이선스
 
 이 프로젝트는 MIT 라이선스를 따릅니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+
+
+## 기타 참고 SITE
+
+- [배포 | vercel](https://vercel.com/)
+
+- [캐릭터 생성 | 노션 페이스](https://faces.notion.com/?face=s3e58y0b16n2m26h13a0)
+
+- [favicon 생성 | favicon-generator](https://www.favicon-generator.org/)

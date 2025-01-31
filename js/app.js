@@ -96,27 +96,128 @@ class App {
     }
 
     // 데이터 가져오기 기능
-    importData() {
+    async importData() {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json';
+        
         input.onchange = async (e) => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    await this.db.importData(data);
-                    alert('가져오기가 완료되었습니다.');
-                    location.reload();
-                } catch (error) {
-                    console.error('가져오기 실패:', error);
-                    alert('가져오기에 실패했습니다.');
+            try {
+                const file = e.target.files[0];
+                const text = await file.text();
+                const data = JSON.parse(text);
+                
+                // 기존 데이터와 충돌하는지 확인
+                const conflicts = await this.checkConflicts(data);
+                
+                if (conflicts.length > 0) {
+                    const choice = await this.showConflictDialog(conflicts.length);
+                    if (choice === 'cancel') return;
+                    
+                    // 선택에 따라 데이터 처리
+                    await this.processImport(data, choice);
+                } else {
+                    // 충돌 없는 경우 바로 가져오기
+                    await this.processImport(data, 'overwrite');
                 }
-            };
-            reader.readAsText(file);
+                
+                alert('데이터를 성공적으로 가져왔습니다.');
+                location.reload();
+            } catch (error) {
+                alert('데이터 가져오기 실패: ' + error.message);
+            }
         };
+        
         input.click();
+    }
+
+    // 충돌하는 날짜 확인
+    async checkConflicts(importData) {
+        const conflicts = [];
+        for (const entry of importData) {
+            const existingEntry = await this.db.getEntry(entry.date);
+            if (existingEntry) {
+                conflicts.push(entry.date);
+            }
+        }
+        return conflicts;
+    }
+
+    // 충돌 해결 다이얼로그 표시
+    showConflictDialog(conflictCount) {
+        return new Promise((resolve) => {
+            const dialog = document.createElement('div');
+            dialog.className = 'import-dialog';
+            dialog.innerHTML = `
+                <div class="import-dialog-content">
+                    <h2>데이터 충돌</h2>
+                    <p>${conflictCount}개의 날짜에 이미 데이터가 존재합니다.</p>
+                    <p>어떻게 처리하시겠습니까?</p>
+                    <div class="import-dialog-buttons">
+                        <button class="overwrite">덮어쓰기</button>
+                        <button class="append">내용 추가</button>
+                        <button class="cancel">취소</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(dialog);
+            
+            const buttons = dialog.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.onclick = () => {
+                    dialog.remove();
+                    resolve(button.className);
+                };
+            });
+        });
+    }
+
+    // 선택에 따른 데이터 처리
+    async processImport(importData, mode) {
+        // 배열이 아닌 경우 배열로 변환
+        const entries = Array.isArray(importData) ? importData : Object.values(importData);
+
+        for (const entry of entries) {
+            try {
+                // 날짜 형식 검증
+                if (!entry.date || !/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) {
+                    console.warn(`Invalid date format for entry:`, entry);
+                    continue;
+                }
+
+                // 필수 필드 확인 및 기본값 설정
+                const processedEntry = {
+                    date: entry.date,
+                    content: entry.content || '',
+                    tags: Array.isArray(entry.tags) ? entry.tags : [],
+                    mood: entry.mood || 'sunny',
+                    lastModified: new Date().toISOString()
+                };
+
+                const existingEntry = await this.db.getEntry(processedEntry.date);
+                
+                if (existingEntry) {
+                    if (mode === 'overwrite') {
+                        await this.db.saveEntry(processedEntry);
+                    } else if (mode === 'append') {
+                        const newContent = existingEntry.content + '\n\n---\n\n' + processedEntry.content;
+                        const newTags = [...new Set([...existingEntry.tags, ...processedEntry.tags])];
+                        await this.db.saveEntry({
+                            ...processedEntry,
+                            content: newContent,
+                            tags: newTags
+                        });
+                    }
+                } else {
+                    await this.db.saveEntry(processedEntry);
+                }
+            } catch (error) {
+                console.error(`Entry processing failed for date ${entry.date}:`, error);
+                console.error('Entry data:', entry);
+                throw new Error(`데이터 처리 중 오류가 발생했습니다: ${entry.date} - ${error.message}`);
+            }
+        }
     }
 
     initializeSearch() {
