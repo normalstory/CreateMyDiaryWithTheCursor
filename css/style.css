@@ -1186,46 +1186,71 @@ main, .header, .side-nav-container {
     bottom: 0;
     left: 0;
     width: 100%;
-    padding: 2rem;
+    padding: 1.5rem;
     text-align: center;
     border-top: 1px solid var(--border);
-    background: #ebebeb;
+    background: var(--surface);
+}
+
+.side-nav-footer .signature {
+    position: relative;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.side-nav-footer:hover .footer-logo {
+    transform: rotate(10deg);
 }
 
 .side-nav-footer .divider {
-    display: flex;
-    align-items: center;
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    margin-bottom: 1rem;
+    position: relative;
+    font-size: 0.9rem;
+    color: var(--primary);
+    letter-spacing: 1px;
+    font-weight: 500;
+    padding: 0 .5em;
 }
 
-.side-nav-footer .divider::before,
+/* 구분선 스타일 수정 */
 .side-nav-footer .divider::after {
     content: '';
-    flex: 1;
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 25px;
     height: 1px;
-    background: var(--border);
-    margin: 0 0.5rem;
-}
-
-.side-nav-footer .copyright {
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    margin-bottom: 0.5rem;
+    background: var(--primary);
+    opacity: 0.4;
 }
 
 .side-nav-footer .credits {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.side-nav-footer .source {
+    margin-top: 0.8rem;
+    font-size: 0.8rem;
 }
 
 .side-nav-footer a {
     color: var(--primary);
     text-decoration: none;
-    transition: opacity 0.2s;
+    transition: all 0.2s ease;
 }
 
 .side-nav-footer a:hover {
     opacity: 0.8;
+    text-decoration: underline;
 }
