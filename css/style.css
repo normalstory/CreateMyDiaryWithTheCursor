@@ -379,9 +379,11 @@ body {
 }
 
 .editor-toolbar button {
+    font-size: x-large;
+    margin: 0 .3em;
     color: var(--text);
     background-color: transparent;
-    border: 1px solid var(--border);
+    border: 0px;
     transition: all 0.2s ease;
 }
 
