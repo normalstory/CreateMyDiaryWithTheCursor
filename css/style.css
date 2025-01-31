@@ -395,7 +395,7 @@ body {
 #editor {
     min-height: 300px;
     padding: 1rem;
-    border: 1px solid var(--border);
+    border: 3px solid var(--border);
     border-radius: 4px;
     background-color: var(--background);
     position: relative;
