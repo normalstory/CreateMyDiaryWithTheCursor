@@ -3,13 +3,16 @@ class DiaryEditor {
         this.db = diaryDB;
         this.editor = document.getElementById('editor');
         this.saveStatus = document.querySelector('.save-status');
-        this.moodSelect = document.getElementById('moodSelect');
         this.tagsInput = document.getElementById('tags');
-        this.saveTimeout = null;
-        this.currentDate = new Date().toISOString().split('T')[0]; // 현재 선택된 날짜 저장
         this.deleteBtn = document.getElementById('deleteEntry');
+        this.saveTimeout = null;
+        this.currentDate = new Date().toISOString().split('T')[0];
         
-        // URL 정규식 패턴 단순화
+        // 감정 버튼 관련 초기화
+        this.moodButtons = document.querySelectorAll('.mood-btn');
+        this.currentMood = 'sunny';  // 기본값
+        
+        // URL 정규식 패턴
         this.urlPattern = /https?:\/\/\S+/gi;
         
         this.initializeEventListeners();
@@ -19,11 +22,6 @@ class DiaryEditor {
         // 에디터 내용 변경 감지
         this.editor.addEventListener('input', () => {
             this.showSavingStatus();
-            this.autoSave();
-        });
-
-        // 기분 선택 변경 감지
-        this.moodSelect.addEventListener('change', () => {
             this.autoSave();
         });
 
@@ -40,12 +38,11 @@ class DiaryEditor {
             });
         });
 
-        // 붙여넣기 이벤트 수정
+        // 붙여넣기 이벤트
         this.editor.addEventListener('paste', (e) => {
             const text = e.clipboardData.getData('text/plain');
             const html = e.clipboardData.getData('text/html');
             
-            // URL 체크
             if (text.match(this.urlPattern)) {
                 e.preventDefault();
                 this.handleUrlPaste(text);
@@ -53,11 +50,20 @@ class DiaryEditor {
                 e.preventDefault();
                 document.execCommand('insertHTML', false, html);
             }
-            // URL이나 HTML이 아닌 경우는 기본 붙여넣기 동작 허용
         });
 
         // 삭제 버튼 이벤트
-        this.deleteBtn.addEventListener('click', () => this.deleteEntry());
+        if (this.deleteBtn) {
+            this.deleteBtn.addEventListener('click', () => this.deleteEntry());
+        }
+
+        // 감정 버튼 이벤트
+        this.moodButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                this.setMood(button.dataset.mood);
+                this.autoSave();
+            });
+        });
     }
 
     executeCommand(command) {
@@ -105,6 +111,34 @@ class DiaryEditor {
     showSavedStatus() {
         this.saveStatus.textContent = '자동 저장됨';
         this.saveStatus.classList.remove('saving');
+        
+        // 마지막 수정 시간 업데이트
+        this.updateLastModified(new Date());
+        
+        // 달력의 has-entry 상태 업데이트
+        this.updateCalendarEntry();
+        
+        // 달력 업데이트 이벤트 발생
+        document.dispatchEvent(new CustomEvent('entryUpdated'));
+    }
+
+    // 마지막 수정 시간 업데이트 메서드
+    updateLastModified(date) {
+        const timeString = date.toLocaleTimeString('ko-KR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        const modifiedString = `${date.toLocaleDateString()} ${timeString} 작성`;
+        document.querySelector('.last-modified').textContent = modifiedString;
+    }
+
+    // 달력 엔트리 상태 업데이트 메서드
+    updateCalendarEntry() {
+        const currentDay = document.querySelector(`.calendar-day[data-date="${this.currentDate}"]`);
+        if (currentDay) {
+            // 현재 날짜의 달력 셀에 has-entry 클래스 추가
+            currentDay.classList.add('has-entry');
+        }
     }
 
     autoSave() {
@@ -120,9 +154,10 @@ class DiaryEditor {
                 .map(tag => tag.startsWith('#') ? tag : `#${tag}`);
 
             const entry = {
-                date: this.currentDate, // 현재 선택된 날짜 사용
+                date: this.currentDate,
                 content: this.editor.innerHTML,
-                mood: this.moodSelect.value,
+                mood: this.currentMood,
+                backgroundColor: this.editor.style.backgroundColor,
                 tags: tags,
                 lastModified: new Date().toISOString()
             };
@@ -130,8 +165,8 @@ class DiaryEditor {
             try {
                 await this.db.saveEntry(entry);
                 this.showSavedStatus();
-                // 캘린더 업데이트를 위한 이벤트 발생
-                document.dispatchEvent(new CustomEvent('entryUpdated'));
+                // 달력 업데이트를 위한 이벤트는 showSavedStatus에서 처리되므로 제거
+                this.deleteBtn.style.display = 'block'; // 저장된 엔트리가 있으므로 삭제 버튼 표시
             } catch (error) {
                 console.error('저장 실패:', error);
                 this.saveStatus.textContent = '저장 실패';
@@ -142,14 +177,14 @@ class DiaryEditor {
     async loadEntry(date) {
         try {
             this.currentDate = date;
-            
-            // 달력의 날짜 표시 업데이트를 위한 이벤트 발생
-            document.dispatchEvent(new CustomEvent('dateSelected', { detail: date }));
-
             const entry = await this.db.getEntry(date);
+            
+            // 달력의 모든 날짜에서 has-entry 상태 업데이트
+            await this.updateAllCalendarEntries();
+            
             if (entry) {
                 this.editor.innerHTML = entry.content;
-                this.moodSelect.value = entry.mood;
+                this.setMood(entry.mood);
                 this.tagsInput.value = entry.tags.join(', ');
 
                 // 마지막 수정 시간 표시
@@ -163,13 +198,30 @@ class DiaryEditor {
                 this.deleteBtn.style.display = 'block';  // 엔트리가 있으면 삭제 버튼 표시
             } else {
                 this.editor.innerHTML = '';
-                this.moodSelect.value = 'sunny';
+                this.setMood('sunny');
                 this.tagsInput.value = '';
                 document.querySelector('.last-modified').textContent = '';
                 this.deleteBtn.style.display = 'none';   // 엔트리가 없으면 삭제 버튼 숨김
             }
         } catch (error) {
             console.error('일기 로드 실패:', error);
+        }
+    }
+
+    // 모든 날짜의 has-entry 상태를 업데이트하는 메서드 추가
+    async updateAllCalendarEntries() {
+        try {
+            // 현재 표시된 달의 모든 날짜 요소
+            const allDays = document.querySelectorAll('.calendar-day[data-date]');
+            
+            // 각 날짜별로 엔트리 존재 여부 확인
+            for (const day of allDays) {
+                const date = day.dataset.date;
+                const entry = await this.db.getEntry(date);
+                day.classList.toggle('has-entry', !!entry);
+            }
+        } catch (error) {
+            console.error('달력 업데이트 실패:', error);
         }
     }
 
@@ -242,15 +294,129 @@ class DiaryEditor {
             try {
                 await this.db.deleteEntry(this.currentDate);
                 this.editor.innerHTML = '';
-                this.moodSelect.value = 'sunny';
+                this.setMood('sunny');
                 this.tagsInput.value = '';
                 document.querySelector('.last-modified').textContent = '';
+                
+                // 달력에서 has-entry 클래스 제거
+                const currentDay = document.querySelector(`.calendar-day[data-date="${this.currentDate}"]`);
+                if (currentDay) {
+                    currentDay.classList.remove('has-entry');
+                }
+                
+                this.deleteBtn.style.display = 'none';
+                
+                // 달력 업데이트 이벤트 발생
                 document.dispatchEvent(new CustomEvent('entryUpdated'));
+                
                 alert('삭제되었습니다.');
             } catch (error) {
                 console.error('삭제 실패:', error);
                 alert('삭제에 실패했습니다.');
             }
         }
+    }
+
+    setMood(mood) {
+        this.currentMood = mood;
+        
+        // 버튼 선택 상태 업데이트
+        this.moodButtons.forEach(button => {
+            button.classList.toggle('selected', button.dataset.mood === mood);
+        });
+
+        // 선택된 버튼의 색상 정보 가져오기
+        const selectedButton = Array.from(this.moodButtons)
+            .find(button => button.dataset.mood === mood);
+        
+        if (selectedButton) {
+            const baseColor = selectedButton.dataset.color;
+            const contentSection = document.querySelector('.content-section');
+            const editor = document.getElementById('editor');
+            
+            // 에디터 배경색 설정 (원래 색상 사용)
+            editor.style.backgroundColor = baseColor;
+            
+            // content-section의 배경색 설정 (다른 톤으로 변경)
+            const sectionColor = this.createContrastColor(baseColor);
+            contentSection.style.cssText = `background-color: ${sectionColor} !important`;
+        }
+    }
+
+    // 대비되는 색상 생성 헬퍼 함수
+    createContrastColor(baseColor) {
+        // hex to rgb
+        const rgb = baseColor.replace(/^#/, '').match(/.{2}/g)
+            .map(x => parseInt(x, 16));
+        
+        // HSL로 변환
+        const [h, s, l] = this.rgbToHsl(rgb[0], rgb[1], rgb[2]);
+        
+        // 명도와 채도 조정하여 대비 생성
+        const newL = Math.max(0, l - 0.1);  // 약간 어둡게
+        const newS = Math.min(1, s + 0.1);  // 약간 채도 높게
+        
+        // 다시 RGB로 변환
+        const [r, g, b] = this.hslToRgb(h, newS, newL);
+        
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // RGB to HSL 변환 함수
+    rgbToHsl(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0;
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+
+        return [h, s, l];
+    }
+
+    // HSL to RGB 변환 함수
+    hslToRgb(h, s, l) {
+        let r, g, b;
+
+        if (s === 0) {
+            r = g = b = l;
+        } else {
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+            
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+        }
+
+        return [
+            Math.round(r * 255),
+            Math.round(g * 255),
+            Math.round(b * 255)
+        ];
     }
 } 

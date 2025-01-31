@@ -99,8 +99,8 @@
 
 /* 에디터 자체의 스타일도 수정 */
 .theme-dark #editor {
-    background-color: var(--surface);
-    color: var(--text);
+    background-color: white;  /* 에디터 배경색을 흰색으로 */
+    color: #333;  /* 에디터 텍스트 색상을 어두운 색으로 */
     border-color: var(--border);
 }
 
@@ -108,4 +108,79 @@
 .theme-dark .editor-toolbar [data-command="link"],
 .theme-dark .editor-toolbar [data-command="image"] {
     color: var(--text);
+}
+
+/* 다크 모드에서 mood 버튼 스타일 */
+.theme-dark .mood-btn {
+    color: #e0e0e0;  /* 밝은 회색 */
+    border-color: #404040;
+}
+
+.theme-dark .mood-btn:hover {
+    background-color: var(--dark-surface);
+    color: white;
+}
+
+.theme-dark .mood-btn.selected {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* 다크 모드에서 에디터 내부 링크 색상 */
+.theme-dark #editor a {
+    color: #0066cc;  /* 링크 색상도 기본 파란색으로 */
+}
+
+/* 다크 모드에서 mood 레이블 색상 */
+.theme-dark .mood-label {
+    color: var(--text);  /* 다크 모드의 기본 텍스트 색상 사용 */
+}
+
+/* 테마별 content-section 스타일 */
+.theme-light .content-section,
+.theme-dark .content-section,
+.theme-cheerful .content-section,
+.theme-calm .content-section {
+    transition: background-color 0.3s ease;
+}
+
+/* 다크 모드 특화 스타일 */
+.theme-dark .mood-selector,
+.theme-dark .editor-toolbar,
+.theme-dark .tags-container {
+    background-color: var(--dark-surface);
+}
+
+.theme-dark .mood-label,
+.theme-dark .tags-container label {
+    color: var(--dark-text);
+}
+
+.theme-dark .editor-toolbar button {
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+}
+
+.theme-dark #tags {
+    background-color: var(--dark-background);
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+}
+
+/* 감정 색상에 따른 스타일 조정 */
+.theme-dark .editor-toolbar button:hover {
+    background-color: var(--dark-primary);
+    color: white;
+}
+
+.theme-dark .mood-btn {
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+    background-color: transparent;
+}
+
+.theme-dark .mood-btn:hover,
+.theme-dark .mood-btn.selected {
+    color: white;
 } 

@@ -294,6 +294,17 @@ body {
     height: 4px;
     background-color: var(--primary);
     border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+/* selected 상태일 때 has-entry 점의 색상을 흰색으로 변경 */
+.calendar-day.selected.has-entry::after {
+    background-color: white;
+}
+
+/* hover 상태일 때도 has-entry 점의 색상을 흰색으로 변경 */
+.calendar-day:hover.has-entry::after {
+    background-color: white;
 }
 
 /* 오늘이면서 선택된 날짜인 경우 */
@@ -312,16 +323,48 @@ body {
 .content-section {
     padding: 1rem;
     margin: 0.5rem 1rem 1rem;
-    background-color: var(--surface);
+    background-color: var(--surface) !important; /* 임시로 우선순위 확인용 */
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
 }
 
 .mood-selector {
+    background-color: var(--surface);
+    padding: 1rem;
+    border-radius: 8px;
     margin-bottom: 1rem;
+}
+
+.mood-label {
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.mood-buttons {
     display: flex;
-    align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.mood-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.mood-btn:hover {
+    background-color: var(--surface);
+}
+
+.mood-btn.selected {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
 }
 
 .editor-container {
@@ -329,17 +372,22 @@ body {
 }
 
 .editor-toolbar {
-    display: flex;
-    gap: 0.5rem;
+    background-color: var(--surface);
+    padding: 0.5rem;
+    border-radius: 4px;
     margin-bottom: 0.5rem;
 }
 
 .editor-toolbar button {
-    padding: 0.5rem 1rem;
-    background-color: var(--surface);
+    color: var(--text);
+    background-color: transparent;
     border: 1px solid var(--border);
-    border-radius: 4px;
-    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editor-toolbar button:hover {
+    background-color: var(--primary);
+    color: white;
 }
 
 #editor {
@@ -350,6 +398,7 @@ body {
     background-color: var(--background);
     position: relative;
     z-index: 0;
+    transition: background-color 0.3s ease;
 }
 
 #editor * {
@@ -375,16 +424,27 @@ body {
 
 /* 태그 스타일 */
 .tags-container {
+    background-color: var(--surface);
+    padding: 1rem;
+    border-radius: 8px;
     margin-top: 1rem;
 }
 
+.tags-container label {
+    color: var(--text);
+    margin-right: 0.5rem;
+}
+
 #tags {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
     background-color: var(--background);
     color: var(--text);
+    border: 1px solid var(--border);
+}
+
+/* 에디트 버튼 스타일 */
+.editor-footer{
+    display: flex;
+    align-items: baseline;
 }
 
 /* 검색 아이콘 스타일 */
@@ -631,7 +691,8 @@ mark {
 
 /* URL 프리뷰 스타일 수정 */
 .url-preview {
-    display: inline-block;
+    display: block;
+    width: 100%;
     margin: 0.5rem 0;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -641,15 +702,18 @@ mark {
 }
 
 .url-preview a {
-    display: block;
+    display: flex;
+    flex-direction: column;
     text-decoration: none;
     color: var(--text);
     padding: 1rem;
 }
 
 .preview-image {
-    flex: 0 0 150px;
-    margin-right: 1rem;
+    width: 100%;
+    max-height: 200px;
+    margin-bottom: 1rem;
+    overflow: hidden;
 }
 
 .preview-image img {
@@ -657,12 +721,6 @@ mark {
     height: 100%;
     object-fit: cover;
     border-radius: 4px;
-}
-
-.preview-content {
-    flex: 1;
-    overflow: hidden;
-    user-select: text;
 }
 
 .preview-title, 
@@ -717,4 +775,32 @@ mark {
 
 .delete-btn:hover {
     opacity: 0.9;
+}
+
+/* 태블릿 이상 크기에서는 가로 배치 */
+@media (min-width: 768px) {
+    .url-preview a {
+        flex-direction: row;
+    }
+
+    .preview-image {
+        width: 200px;
+        margin-right: 1rem;
+        margin-bottom: 0;
+    }
+}
+
+/* 작은 모바일 화면에서 여백 조정 */
+@media (max-width: 480px) {
+    .url-preview {
+        margin: 0.5rem -0.5rem;
+    }
+    
+    .preview-title {
+        font-size: 1rem;
+    }
+    
+    .preview-description {
+        font-size: 0.85rem;
+    }
 }

@@ -47,15 +47,14 @@
 
         <section class="content-section">
             <div class="mood-selector">
-                <label>오늘의 기분:</label>
-                <select id="moodSelect">
-                    <option value="sunny">☀️ 맑음</option>
-                    <option value="cloudy">☁️ 흐림</option>
-                    <option value="rainy">🌧️ 비</option>
-                    <option value="happy">😊 행복</option>
-                    <option value="sad">😢 슬픔</option>
-                </select>
-                <button id="deleteEntry" class="delete-btn">삭제</button>
+                <div class="mood-label">오늘의 기분:</div>
+                <div class="mood-buttons">
+                    <button class="mood-btn" data-mood="sunny" data-color="#fff3e0">☀️ 맑음</button>
+                    <button class="mood-btn" data-mood="cloudy" data-color="#eceff1">☁️ 흐림</button>
+                    <button class="mood-btn" data-mood="rainy" data-color="#e8eaf6">🌧️ 비</button>
+                    <button class="mood-btn" data-mood="happy" data-color="#e8f5e9">😊 행복</button>
+                    <button class="mood-btn" data-mood="sad" data-color="#fafafa">😢 슬픔</button>
+                </div>
             </div>
             
             <div class="editor-container">
@@ -72,7 +71,10 @@
                 <label for="tags">태그:</label>
                 <input type="text" id="tags" placeholder="#태그1, #태그2, #태그3">
             </div>
-            <div class="last-modified"></div>
+            <div class="editor-footer">
+                <div class="last-modified"></div>
+                <button id="deleteEntry" class="delete-btn">삭제</button>
+            </div>
         </section>
     </main>
 

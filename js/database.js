@@ -1,7 +1,7 @@
 class DiaryDB {
     constructor() {
         this.dbName = 'DiaryDB';
-        this.dbVersion = 1;
+        this.dbVersion = 2;
         this.db = null;
     }
 
@@ -25,7 +25,29 @@ class DiaryDB {
                 // 일기 저장소
                 if (!db.objectStoreNames.contains('entries')) {
                     const store = db.createObjectStore('entries', { keyPath: 'date' });
-                    store.createIndex('tags', 'tags', { multiEntry: true });
+                    store.createIndex('date', 'date', { unique: true });
+                }
+                // 기존 데이터의 배경색 마이그레이션
+                if (event.oldVersion < 2) {
+                    const store = request.transaction.objectStore('entries');
+                    store.openCursor().onsuccess = (e) => {
+                        const cursor = e.target.result;
+                        if (cursor) {
+                            const entry = cursor.value;
+                            if (!entry.backgroundColor) {
+                                const moodColors = {
+                                    sunny: '#fff3dc',
+                                    cloudy: '#f5f5f5',
+                                    rainy: '#e3f2fd',
+                                    happy: '#f1f8e9',
+                                    sad: '#fafafa'
+                                };
+                                entry.backgroundColor = moodColors[entry.mood] || '#ffffff';
+                                cursor.update(entry);
+                            }
+                            cursor.continue();
+                        }
+                    };
                 }
             };
         });
