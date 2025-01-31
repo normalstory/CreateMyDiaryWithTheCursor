@@ -45,10 +45,6 @@ git clone https://github.com/YOUR_USERNAME/CreateMyDiaryWithTheCursor.git
 
 배포된 사이트는 `https://your-project-name.vercel.app` 형식의 URL로 접근할 수 있습니다.
 
-## 라이선스
-
-이 프로젝트는 MIT 라이선스를 따릅니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
-
 ## 개발 프로세스
 
 이 프로젝트는 LLM(Large Language Model)을 활용한 프롬프트 엔지니어링을 통해 개발되었습니다. 
@@ -74,3 +70,7 @@ git clone https://github.com/YOUR_USERNAME/CreateMyDiaryWithTheCursor.git
 - [favicon 생성 | favicon-generator](https://www.favicon-generator.org/)
   - 다양한 크기의 favicon 일괄 생성 기능
 
+
+## 라이선스
+
+이 프로젝트는 MIT 라이선스를 따릅니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
