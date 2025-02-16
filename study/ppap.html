@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPA Private Tutoring - Practical Programming with AI</title>
+<meta property="og:title" content="PPA Private Tutoring - AI와 함께하는 실용적인 프로그래밍 학습">
+<meta property="og:description" content="개발자가 되지 않아도 일상의 문제를 해결할 수 있는 프로그래밍 능력을 키워보세요. 1:1 맞춤형 프로그래밍 교육을 통해 실무에서 바로 활용 가능한 실력을 키워드립니다.">
+<meta property="og:image" content="https://public.readdy.ai/ai/img_res/d868c8041c4051f9b850b0c72035f7df.jpg">
+<meta property="og:url" content="https://ppastudy.kr">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PPA Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PPA Private Tutoring - AI와 함께하는 실용적인 프로그래밍 학습">
+<meta name="twitter:description" content="개발자가 되지 않아도 일상의 문제를 해결할 수 있는 프로그래밍 능력을 키워보세요. 1:1 맞춤형 프로그래밍 교육을 통해 실무에서 바로 활용 가능한 실력을 키워드립니다.">
+<meta name="twitter:image" content="https://public.readdy.ai/ai/img_res/824aa037ec627cffb31393bf7be603e5.jpg">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: '#4F46E5',
+secondary: '#10B981'
+},
+borderRadius: {
+'none': '0px',
+'sm': '4px',
+DEFAULT: '8px',
+'md': '12px',
+'lg': '16px',
+'xl': '20px',
+'2xl': '24px',
+'3xl': '32px',
+'full': '9999px',
+'button': '8px'
+}
+}
+}
+}
+</script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body { font-family: 'Noto Sans KR', sans-serif; }
+</style>
+<script>
+// Firebase 초기화 코드 추가
+const firebaseConfig = {
+    apiKey: "AIzaSyCbu_1gbtSIVUvmmw5RyLYvjaYOG7RdCWw",
+    authDomain: "ppap-ea44a.firebaseapp.com",
+    projectId: "ppap-ea44a",
+    storageBucket: "ppap-ea44a.firebasestorage.app",
+    messagingSenderId: "811949338329",
+    appId: "1:811949338329:web:cda8d43a7aeb825ce258c8",
+    measurementId: "G-6QGZT6Y1TE"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+</script>
+</head>
+<body class="bg-white">
+<header class="fixed w-full bg-white/95 backdrop-blur-sm shadow-sm z-50">
+<nav class="container mx-auto px-6 py-4">
+<div class="flex items-center justify-between">
+<a href="#" class="text-2xl font-['Pacifico'] text-primary">PPA Tutoring</a>
+<div class="hidden md:flex items-center space-x-8">
+<a href="#intro" class="text-gray-700 hover:text-primary">소개</a>
+<a href="#schedule" class="text-gray-700 hover:text-primary">커리큘럼</a>
+<a href="#method" class="text-gray-700 hover:text-primary">스터디 방식</a>
+<a href="#reviews" class="text-gray-700 hover:text-primary">수강후기</a>
+<button onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})" class="bg-primary text-white px-6 py-2 !rounded-button hover:bg-primary/90 whitespace-nowrap">
+신청하기
+</button>
+</div>
+<button class="md:hidden w-10 h-10 flex items-center justify-center">
+<i class="ri-menu-line text-2xl"></i>
+</button>
+</div>
+</nav>
+</header>
+<main>
+<section id="hero" class="pt-28 pb-20 relative overflow-hidden">
+<div class="absolute inset-0 bg-[url('https://public.readdy.ai/ai/img_res/fb1068da5fcb5de2b1bbfc355f92d168.jpg')] bg-cover bg-center opacity-10"></div>
+<div class="container mx-auto px-6 relative">
+<div class="max-w-3xl">
+<h1 class="text-5xl font-bold mb-6 leading-tight">
+PPA Private Tutoring
+<span class="block text-2xl text-primary mt-2">Practical Programming with AI</span>
+</h1>
+<p class="text-xl text-gray-600 mb-8">Programming, Not Development</p>
+<p class="text-gray-700 mb-8 text-lg leading-relaxed">
+AI와 함께하는 실용적인 프로그래밍 학습으로, 개발자가 되지 않아도 일상의 문제를 해결할 수 있는
+프로그래밍 능력을 키워보세요.
+</p>
+<button class="bg-primary text-white px-8 py-3 !rounded-button hover:bg-primary/90 text-lg whitespace-nowrap">
+스터디 신청하기
+</button>
+</div>
+</div>
+</section>
+<section id="intro" class="py-20 bg-gray-50">
+<div class="container mx-auto px-6">
+<h2 class="text-3xl font-bold text-center mb-16">Why PPA?</h2>
+<div class="grid md:grid-cols-3 gap-8">
+<div class="bg-white p-8 rounded-lg shadow-sm">
+<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+<i class="ri-ai-generate-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-bold mb-4">AI 기반 실용적 프로그래밍</h3>
+<p class="text-gray-600 leading-relaxed">
+최신 AI 기술을 활용하여 프로그래밍을 더 쉽고 효율적으로 배울 수 있습니다.
+실제 문제 해결에 초점을 맞춘 학습을 진행합니다.
+</p>
+</div>
+<div class="bg-white p-8 rounded-lg shadow-sm">
+<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+<i class="ri-code-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-bold mb-4">생활 코딩 중심</h3>
+<p class="text-gray-600 leading-relaxed">
+일상생활에서 마주치는 문제들을 직접 코딩으로 해결해보며
+실질적인 프로그래밍 스킬을 향상시킵니다.
+</p>
+</div>
+<div class="bg-white p-8 rounded-lg shadow-sm">
+<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+<i class="ri-user-settings-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-bold mb-4">맞춤형 1:1 학습</h3>
+<p class="text-gray-600 leading-relaxed">
+개인의 학습 속도와 관심사에 맞춘 1:1 맞춤형 커리큘럼으로
+효과적인 학습을 보장합니다.
+</p>
+</div>
+</div>
+</div>
+</section>
+<section id="schedule" class="py-20 bg-gray-50">
+<div class="container mx-auto px-6">
+<h2 class="text-3xl font-bold text-center mb-16">교육 일정 및 비용</h2>
+<div class="max-w-3xl mx-auto space-y-12">
+<div class="bg-white p-8 rounded-lg shadow-sm">
+<h3 class="text-xl font-bold mb-4 text-primary">무료 티타임 상담</h3>
+<p class="text-gray-600 mb-4">30~40분 무료 상담을 통해 진행 방식과 실제 사례를 소개해드립니다.</p>
+<div class="text-sm text-gray-500">* 3명 한정 선착순 모집</div>
+</div>
+<div class="bg-white p-8 rounded-lg shadow-sm">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xl font-bold">Part 1. 
+    <span class="text-2xl">🖥️</span> 반응형 웹 애플리케이션 배포</h3>
+<span class="text-2xl">📱</span>
+</div>
+<p class="text-gray-600 mb-6">Vanilla JavaScript, CSS3, HTML5 를 활용한 반응형웹 애플리케이션을 구현하고 분석</p>
+<div class="space-y-4">
+<div class="flex justify-between items-center p-4 border-b group hover:bg-gray-50 transition-colors rounded-lg">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center text-xl">🌱</div>
+<div class="ml-2">
+<h4 class="font-bold">1주차 - 환경 세팅 및 결과물 도출</h4>
+<p class="text-sm text-gray-600">2시간 × 4회</p>
+</div>
+</div>
+<div class="text-primary font-bold">50만원</div>
+</div>
+<div class="flex justify-between items-center p-4 border-b group hover:bg-gray-50 transition-colors rounded-lg">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center text-xl">🌿</div>
+<div class="ml-2">
+<h4 class="font-bold">2주차 - 결과물 개선 01</h4>
+<p class="text-sm text-gray-600">2시간 × 3회</p>
+</div>
+</div>
+<div class="text-primary font-bold">40만원</div>
+</div>
+<div class="flex justify-between items-center p-4 border-b group hover:bg-gray-50 transition-colors rounded-lg">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center text-xl">🌳</div>
+<div class="ml-2">
+<h4 class="font-bold">3주차 - 결과물 분석</h4>
+<p class="text-sm text-gray-600">2시간 × 3회</p>
+</div>
+</div>
+<div class="text-primary font-bold">30만원</div>
+</div>
+<div class="flex justify-between items-center p-4 border-b group hover:bg-gray-50 transition-colors rounded-lg">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center text-xl">🌺</div>
+<div class="ml-2">
+<h4 class="font-bold">4주차 - 심화 분석</h4>
+<p class="text-sm text-gray-600">1시간 × 3회</p>
+</div>
+</div>
+<div class="text-primary font-bold">20만원</div>
+</div>
+<div class="flex justify-between items-center p-4 border-b group hover:bg-gray-50 transition-colors rounded-lg">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center text-xl">🌸</div>
+<div class="ml-2">
+<h4 class="font-bold">5주차 - 결과물 개선 02</h4>
+<p class="text-sm text-gray-600">1시간 × 3회</p>
+</div>
+</div>
+<div class="text-primary font-bold">10만원</div>
+</div>
+<div class="flex justify-between items-center p-4 group hover:bg-gray-50 transition-colors rounded-lg">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center text-xl">🌼</div>
+<div class="ml-2">
+<h4 class="font-bold">6주차 - 자기주도 학습 실습</h4>
+<p class="text-sm text-gray-600">1시간 × 3회</p>
+</div>
+</div>
+<div class="text-primary font-bold">10만원</div>
+</div>
+</div>
+</div>
+<div class="bg-white p-8 rounded-lg shadow-sm mt-8">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xl font-bold">Part 2. 
+    <span class="text-2xl">💾</span> 데이터베이스 연결 및 분석</h3>
+<span class="text-2xl">📊</span>
+</div>
+<p class="text-gray-600 mb-6">로컬 데이터베이스를 시작으로 온라인 기반 데이터베이스까지 구현하고 분석. 다양한 형태의 데이터베이스를 직접 구축하고 비교. 데이터를 분석하고 활용.</p>
+<div class="flex justify-between items-center p-4 group hover:bg-gray-50 transition-colors rounded-lg">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center text-xl">🏃</div>
+<div class="ml-2">
+<h4 class="font-bold">매주 진행</h4>
+<p class="text-sm text-gray-600">1시간 × 3회</p>
+</div>
+</div>
+<div class="text-primary font-bold">15만원/주</div>
+</div>
+</div>
+<div class="bg-white p-8 rounded-lg shadow-sm mt-8">
+<div class="flex items-center gap-2 mb-4">
+
+<h3 class="text-xl font-bold">Part 3. <span class="text-2xl">💁</span> 개별 프로젝트</h3>
+<span class="text-2xl">🚀</span>
+</div>
+<p class="text-gray-600 mb-6">깃허브를 활용한 협업 프로젝트 진행. 각종 OPEN API 및 AI API 활용.</p>
+<div class="flex justify-between items-center p-4 group hover:bg-gray-50 transition-colors rounded-lg">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center text-xl">🏃</div>
+<div class="ml-2">
+<h4 class="font-bold">매주 진행</h4>
+<p class="text-sm text-gray-600">2시간 × 5회</p>
+</div>
+</div>
+<div class="text-primary font-bold">50만원/주</div>
+</div>
+</div>
+<div class="bg-white p-8 rounded-lg shadow-sm">
+<h3 class="text-xl font-bold mb-4">수강 안내</h3>
+<ul class="space-y-3 text-gray-600">
+<li class="flex items-start">
+<i class="ri-check-line text-primary mt-1 mr-2"></i>
+<span>대상: 대전 지역 19세 이상 전공 불문 누구나</span>
+</li>
+<li class="flex items-start">
+<i class="ri-check-line text-primary mt-1 mr-2"></i>
+<span>결제: 계좌이체만 가능</span>
+</li>
+<li class="flex items-start">
+<i class="ri-check-line text-primary mt-1 mr-2"></i>
+<span>인원: 티타임을 통해 3명만 선정</span>
+</li>
+<li class="flex items-start">
+<i class="ri-check-line text-primary mt-1 mr-2"></i>
+<span>환불: 각 주차별 언제든 취소 가능 (취소 및 방문 당일 제외)</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="method" class="py-20">
+<div class="container mx-auto px-6">
+<h2 class="text-3xl font-bold text-center mb-16">차별화된 학습 방식</h2>
+<div class="grid md:grid-cols-2 gap-12 items-center">
+<div>
+<h3 class="text-2xl font-bold mb-6">Learning by Doing</h3>
+<div class="space-y-6 mb-8">
+<div class="flex items-start">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+<i class="ri-rocket-line text-primary text-xl"></i>
+</div>
+<div class="ml-4">
+<h4 class="text-lg font-bold mb-2">프로젝트 중심 학습</h4>
+<p class="text-gray-600">실제 프로젝트를 통해 배우는 실전 중심의 학습 방식</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+<i class="ri-ai-generate-line text-primary text-xl"></i>
+</div>
+<div class="ml-4">
+<h4 class="text-lg font-bold mb-2">AI 활용 코딩</h4>
+<p class="text-gray-600">AI를 활용한 효율적인 코드 작성과 문제 해결 방법 학습</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+<i class="ri-book-open-line text-primary text-xl"></i>
+</div>
+<div class="ml-4">
+<h4 class="text-lg font-bold mb-2">단계별 코드 분석</h4>
+<p class="text-gray-600">완성된 코드를 분석하며 이해하는 역순 학습 방식</p>
+</div>
+</div>
+</div>
+<div class="border-t pt-8 mt-8">
+<h3 class="text-2xl font-bold mb-6">단계별 학습 과정</h3>
+<div class="space-y-6">
+<div class="flex items-start">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+<span class="text-xl">1️⃣</span>
+</div>
+<div class="ml-4">
+<h4 class="text-lg font-bold mb-2">기초 개념 이해</h4>
+<p class="text-gray-600">프로그래밍의 기본 개념과 원리를 이해하고, 개발 환경을 설정합니다.</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+<span class="text-xl">2️⃣</span>
+</div>
+<div class="ml-4">
+<h4 class="text-lg font-bold mb-2">실전 코딩 실습</h4>
+<p class="text-gray-600">실제 프로젝트를 통해 코딩 실력을 향상시키고, AI 도구 활용법을 학습합니다.</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+<span class="text-xl">3️⃣</span>
+</div>
+<div class="ml-4">
+<h4 class="text-lg font-bold mb-2">프로젝트 완성</h4>
+<p class="text-gray-600">학습한 내용을 바탕으로 개인 프로젝트를 기획하고 완성합니다.</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+<span class="text-xl">4️⃣</span>
+</div>
+<div class="ml-4">
+<h4 class="text-lg font-bold mb-2">실무 적용</h4>
+<p class="text-gray-600">완성된 프로젝트를 실제 업무에 적용하고 개선하는 방법을 학습합니다.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-[url('https://public.readdy.ai/ai/img_res/7043bca1cbd9cd746db6e63ab18bd5bc.jpg')] bg-cover bg-center h-96 rounded-lg shadow-lg"></div>
+</div>
+</div>
+</section>
+<section id="reviews" class="py-20 bg-gray-50">
+<div class="container mx-auto px-6">
+<h2 class="text-3xl font-bold text-center mb-16">수강생 후기</h2>
+<div class="grid md:grid-cols-3 gap-8">
+<div class="bg-white p-8 rounded-lg shadow-sm">
+<div class="flex items-center mb-4">
+<div class="text-yellow-400 flex">
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+</div>
+<span class="ml-2 text-gray-600">5.0</span>
+</div>
+<p class="text-gray-700 mb-4">
+"프로그래밍을 처음 접하는 사람도 쉽게 이해할 수 있게 설명해주셔서 좋았습니다.
+AI와 함께하는 학습 방식이 매우 효율적이었어요."
+</p>
+<div class="flex items-center">
+<div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+<i class="ri-user-line text-primary"></i>
+</div>
+<div class="ml-3">
+<p class="font-bold">김지현</p>
+<p class="text-sm text-gray-500">마케팅 매니저</p>
+</div>
+</div>
+</div>
+<div class="bg-white p-8 rounded-lg shadow-sm">
+<div class="flex items-center mb-4">
+<div class="text-yellow-400 flex">
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+</div>
+<span class="ml-2 text-gray-600">5.0</span>
+</div>
+<p class="text-gray-700 mb-4">
+"실제 업무에서 필요한 자동화 프로그램을 만들 수 있게 되었습니다.
+1:1 맞춤형 학습이 정말 도움이 많이 되었어요."
+</p>
+<div class="flex items-center">
+<div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+<i class="ri-user-line text-primary"></i>
+</div>
+<div class="ml-3">
+<p class="font-bold">박서준</p>
+<p class="text-sm text-gray-500">사무직</p>
+</div>
+</div>
+</div>
+<div class="bg-white p-8 rounded-lg shadow-sm">
+<div class="flex items-center mb-4">
+<div class="text-yellow-400 flex">
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+</div>
+<span class="ml-2 text-gray-600">5.0</span>
+</div>
+<p class="text-gray-700 mb-4">
+"AI를 활용한 코딩 방식이 신선했고, 실제로 코드를 작성하면서
+프로그래밍의 원리를 이해할 수 있었습니다."
+</p>
+<div class="flex items-center">
+<div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+<i class="ri-user-line text-primary"></i>
+</div>
+<div class="ml-3">
+<p class="font-bold">이민지</p>
+<p class="text-sm text-gray-500">대학생</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="apply" class="py-20">
+<div class="container mx-auto px-6">
+<div class="max-w-2xl mx-auto text-center">
+<h2 class="text-3xl font-bold mb-8">스터디 신청하기</h2>
+<p class="text-gray-600 mb-12">
+1:1 맞춤형 프로그래밍 교육을 통해 실무에서 바로 활용 가능한
+실력을 키워보세요. 무료 티타임 상담을 신청하시고 시작하세요!
+</p>
+<form class="space-y-6">
+<div>
+<input type="text" name="name" placeholder="이름" required
+    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+</div>
+<div>
+<input type="email" name="email" placeholder="이메일" required
+    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+</div>
+<div>
+<input type="tel" name="phone" placeholder="연락처" required
+    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+</div>
+<div class="space-y-4">
+<p class="font-medium text-gray-700">희망 상담 일정 (1~3개 선택)</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="relative">
+<div class="flex items-center border border-gray-300 rounded-lg p-3 focus-within:border-primary">
+<i class="ri-calendar-line text-gray-400 mr-2"></i>
+<input type="date" class="w-full focus:outline-none" min="2025-02-16">
+</div>
+<div class="flex items-center border border-gray-300 rounded-lg p-3 mt-2 focus-within:border-primary">
+<i class="ri-time-line text-gray-400 mr-2"></i>
+<select class="w-full focus:outline-none pr-8">
+<option value="">시간 선택</option>
+<option value="10:00">10:00</option>
+<option value="11:00">11:00</option>
+<option value="14:00">14:00</option>
+<option value="15:00">15:00</option>
+<option value="16:00">16:00</option>
+<option value="17:00">17:00</option>
+</select>
+</div>
+</div>
+<div class="relative">
+<div class="flex items-center border border-gray-300 rounded-lg p-3 focus-within:border-primary">
+<i class="ri-calendar-line text-gray-400 mr-2"></i>
+<input type="date" class="w-full focus:outline-none" min="2025-02-16">
+</div>
+<div class="flex items-center border border-gray-300 rounded-lg p-3 mt-2 focus-within:border-primary">
+<i class="ri-time-line text-gray-400 mr-2"></i>
+<select class="w-full focus:outline-none pr-8">
+<option value="">시간 선택</option>
+<option value="10:00">10:00</option>
+<option value="11:00">11:00</option>
+<option value="14:00">14:00</option>
+<option value="15:00">15:00</option>
+<option value="16:00">16:00</option>
+<option value="17:00">17:00</option>
+</select>
+</div>
+</div>
+<div class="relative">
+<div class="flex items-center border border-gray-300 rounded-lg p-3 focus-within:border-primary">
+<i class="ri-calendar-line text-gray-400 mr-2"></i>
+<input type="date" class="w-full focus:outline-none" min="2025-02-16">
+</div>
+<div class="flex items-center border border-gray-300 rounded-lg p-3 mt-2 focus-within:border-primary">
+<i class="ri-time-line text-gray-400 mr-2"></i>
+<select class="w-full focus:outline-none pr-8">
+<option value="">시간 선택</option>
+<option value="10:00">10:00</option>
+<option value="11:00">11:00</option>
+<option value="14:00">14:00</option>
+<option value="15:00">15:00</option>
+<option value="16:00">16:00</option>
+<option value="17:00">17:00</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<div>
+<textarea name="message" placeholder="학습 목표나 궁금한 점을 자유롭게 작성해주세요." 
+    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary h-32"></textarea>
+</div>
+<button type="submit" class="bg-primary text-white px-8 py-3 !rounded-button hover:bg-primary/90 w-full">
+신청하기
+</button>
+</form>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-gray-900 text-white py-12">
+<div class="container mx-auto px-6">
+<div class="grid md:grid-cols-4 gap-8">
+<div>
+<a href="#" class="text-2xl font-['Pacifico'] text-white mb-4 block">PPA Study</a>
+<p class="text-gray-400">
+AI와 함께하는 실용적인 프로그래밍 학습
+</p>
+</div>
+<div>
+<h3 class="text-lg font-bold mb-4">Quick Links</h3>
+<ul class="space-y-2">
+<li><a href="#intro" class="text-gray-400 hover:text-white">소개</a></li>
+<li><a href="#schedule" class="text-gray-400 hover:text-white">커리큘럼</a></li>
+<li><a href="#method" class="text-gray-400 hover:text-white">스터디 방식</a></li>
+<li><a href="#reviews" class="text-gray-400 hover:text-white">수강후기</a></li>
+</ul>
+</div>
+<div>
+<h3 class="text-lg font-bold mb-4">Contact</h3>
+<ul class="space-y-2">
+<li class="flex items-center text-gray-400">
+<i class="ri-mail-line mr-2"></i>
+dev.chanwoo@gmail.com
+</li>
+<li class="flex items-center text-gray-400">
+<i class="ri-phone-line mr-2"></i>
+010-7108-6391
+</li>
+</ul>
+</div>
+<div>
+<h3 class="text-lg font-bold mb-4">Follow Us</h3>
+<div class="flex space-x-4">
+<a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
+<i class="ri-instagram-line"></i>
+</a>
+<a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
+<i class="ri-facebook-line"></i>
+</a>
+<a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
+<i class="ri-twitter-x-line"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+<p>&copy; 2025 PPA Private Tutoring. All rights reserved.</p>
+<a href="/study/admin.html" class="hover:text-white" style="color:#1c2b45;">admin</a>
+</div>
+</div>
+</footer>
+<script>
+const mobileMenuButton = document.querySelector('button.md\\:hidden');
+const mobileMenu = document.createElement('div');
+mobileMenu.className = 'fixed inset-0 bg-white z-50 transform transition-transform duration-300 translate-x-full md:hidden';
+mobileMenu.innerHTML = `
+<div class="p-6">
+<div class="flex justify-between items-center mb-8">
+<a href="#" class="text-2xl font-['Pacifico'] text-primary">PPA Tutoring</a>
+<button class="w-10 h-10 flex items-center justify-center">
+<i class="ri-close-line text-2xl"></i>
+</button>
+</div>
+<div class="space-y-6">
+<a href="#intro" class="block text-gray-700 hover:text-primary text-lg">소개</a>
+<a href="#schedule" class="block text-gray-700 hover:text-primary text-lg">커리큘럼</a>
+<a href="#method" class="block text-gray-700 hover:text-primary text-lg">스터디 방식</a>
+<a href="#reviews" class="block text-gray-700 hover:text-primary text-lg">수강후기</a>
+<button onclick="(() => { mobileMenu.classList.add('translate-x-full'); document.body.style.overflow = ''; document.getElementById('apply').scrollIntoView({behavior:'smooth'}); })()" class="w-full bg-primary text-white px-6 py-2 !rounded-button hover:bg-primary/90">
+신청하기
+</button>
+</div>
+</div>
+`;
+document.body.appendChild(mobileMenu);
+mobileMenuButton.addEventListener('click', () => {
+mobileMenu.classList.remove('translate-x-full');
+document.body.style.overflow = 'hidden';
+});
+mobileMenu.querySelector('button').addEventListener('click', () => {
+mobileMenu.classList.add('translate-x-full');
+document.body.style.overflow = '';
+});
+const links = mobileMenu.querySelectorAll('a');
+links.forEach(link => {
+link.addEventListener('click', () => {
+mobileMenu.classList.add('translate-x-full');
+document.body.style.overflow = '';
+});
+});
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+anchor.addEventListener('click', function (e) {
+e.preventDefault();
+const target = document.querySelector(this.getAttribute('href'));
+if (target) {
+const headerOffset = 80;
+const elementPosition = target.getBoundingClientRect().top;
+const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+window.scrollTo({
+top: offsetPosition,
+behavior: 'smooth'
+});
+}
+});
+});
+const form = document.querySelector('form');
+const dateInputs = form.querySelectorAll('input[type="date"]');
+const timeSelects = form.querySelectorAll('select');
+dateInputs.forEach(input => {
+input.min = new Date().toISOString().split('T')[0];
+});
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let isValid = true;
+    let errorMessage = '';
+
+    const dates = Array.from(dateInputs).map(input => input.value);
+    const times = Array.from(timeSelects).map(select => select.value);
+    
+    // 최소 1개의 날짜와 시간이 선택되었는지 확인
+    const validSchedules = dates.map((date, i) => ({
+        date,
+        time: times[i]
+    })).filter(schedule => schedule.date && schedule.time);
+
+    if (validSchedules.length === 0) {
+        isValid = false;
+        errorMessage = '최소 1개의 희망 일정을 선택해주세요.';
+    }
+
+    if (!isValid) {
+        showToast(errorMessage, 'error');
+        return;
+    }
+
+    try {
+        const formData = new FormData(form);
+        const data = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            schedules: validSchedules,  // 유효한 일정만 저장
+            message: formData.get('message'),
+            status: 'pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        await db.collection('teatimes').add(data);
+        showToast('신청이 완료되었습니다. 곧 연락드리겠습니다.', 'success');
+        form.reset();
+    } catch (error) {
+        showToast('신청 처리 중 오류가 발생했습니다.', 'error');
+        console.error('Error:', error);
+    }
+});
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 translate-y-full ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    } text-white`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('translate-y-full');
+    }, 100);
+    
+    setTimeout(() => {
+        toast.classList.add('translate-y-full');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+</script>
+</body>
+</html>

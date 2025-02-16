@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPA Admin - 신청 관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 로그인 섹션 -->
+    <div id="loginSection" class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-6 text-center">PPA Admin Login</h2>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">비밀번호</label>
+                    <input type="password" id="loginPassword" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="MMDD">
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90">
+                    로그인
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 관리자 대시보드 -->
+    <div id="adminSection" class="hidden">
+        <header class="bg-white shadow">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-900">PPA 신청 관리</h1>
+                <button id="logoutBtn" class="text-gray-600 hover:text-gray-900">
+                    <i class="ri-logout-box-r-line text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold">티타임 신청 목록</h2>
+                        <div class="flex space-x-4">
+                            <select id="statusFilter" class="border rounded-md px-3 py-1">
+                                <option value="all">전체</option>
+                                <option value="pending">대기중</option>
+                                <option value="confirmed">확정</option>
+                                <option value="completed">완료</option>
+                                <option value="cancelled">취소</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">신청일</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">연락처</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">희망일정</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="applicationList" class="bg-white divide-y divide-gray-200">
+                                <!-- 여기에 동적으로 데이터가 추가됩니다 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 상세 정보 모달 -->
+    <div id="detailModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">신청 상세 정보</h3>
+                <button onclick="closeModal()" class="text-gray-600 hover:text-gray-900">
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
+            </div>
+            <div id="modalContent" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500">이름</p>
+                        <p class="font-medium">${data.name}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">연락처</p>
+                        <p class="font-medium">${data.phone}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">이메일</p>
+                        <p class="font-medium">${data.email}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">신청일</p>
+                        <p class="font-medium">${new Date(data.createdAt.toDate()).toLocaleString()}</p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-sm text-gray-500">현재 상태</p>
+                        <p class="font-medium">
+                            <span class="status-display px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(data.status)}">
+                                ${getStatusText(data.status)}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <p class="text-sm text-gray-500">희망 일정</p>
+                    <ul class="list-disc list-inside space-y-1 mt-1">
+                        ${data.schedules.map(s => `
+                            <li>${s.date} ${s.time}</li>
+                        `).join('')}
+                    </ul>
+                </div>
+                <div class="mt-4">
+                    <p class="text-sm text-gray-500">메시지</p>
+                    <p class="mt-1">${data.message || '없음'}</p>
+                </div>
+            </div>
+            <div class="mt-6">
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button class="status-btn px-4 py-2 rounded-md border" data-status="pending">대기중</button>
+                    <button class="status-btn px-4 py-2 rounded-md border" data-status="confirmed">확정</button>
+                    <button class="status-btn px-4 py-2 rounded-md border" data-status="completed">완료</button>
+                    <button class="status-btn px-4 py-2 rounded-md border" data-status="cancelled">취소</button>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button id="deleteBtn" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                        삭제
+                    </button>
+                    <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+                        닫기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbu_1gbtSIVUvmmw5RyLYvjaYOG7RdCWw",
+            authDomain: "ppap-ea44a.firebaseapp.com",
+            projectId: "ppap-ea44a",
+            storageBucket: "ppap-ea44a.firebasestorage.app",
+            messagingSenderId: "811949338329",
+            appId: "1:811949338329:web:cda8d43a7aeb825ce258c8",
+            measurementId: "G-6QGZT6Y1TE"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // 로그인 처리
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('loginPassword').value;
+            
+            // 오늘 날짜의 MMDD 형식 구하기
+            const today = new Date();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayPassword = mm + dd;
+
+            if (password === todayPassword) {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('adminSection').classList.remove('hidden');
+                loadApplications();
+            } else {
+                alert('비밀번호가 일치하지 않습니다.');
+            }
+        });
+
+        // 로그아웃
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('adminSection').classList.add('hidden');
+        });
+
+        // 신청 목록 로드
+        async function loadApplications() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            let query = db.collection('teatimes').orderBy('createdAt', 'desc');
+            
+            if (statusFilter !== 'all') {
+                query = query.where('status', '==', statusFilter);
+            }
+
+            const snapshot = await query.get();
+            const tbody = document.getElementById('applicationList');
+            tbody.innerHTML = '';
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const row = `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">${new Date(data.createdAt.toDate()).toLocaleDateString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${data.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${data.phone}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${data.schedules[0].date} ${data.schedules[0].time}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                ${getStatusColor(data.status)}">
+                                ${getStatusText(data.status)}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button onclick="showDetail('${doc.id}')" 
+                                class="text-primary hover:text-primary/80">
+                                상세보기
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // 상태에 따른 색상 반환
+        function getStatusColor(status) {
+            const colors = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'confirmed': 'bg-green-100 text-green-800',
+                'completed': 'bg-blue-100 text-blue-800',
+                'cancelled': 'bg-red-100 text-red-800'
+            };
+            return colors[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        // 상태 텍스트 반환
+        function getStatusText(status) {
+            const texts = {
+                'pending': '대기중',
+                'confirmed': '확정',
+                'completed': '완료',
+                'cancelled': '취소'
+            };
+            return texts[status] || status;
+        }
+
+        // 상세 정보 표시
+        async function showDetail(docId) {
+            const doc = await db.collection('teatimes').doc(docId).get();
+            const data = doc.data();
+            
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500">이름</p>
+                        <p class="font-medium">${data.name}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">연락처</p>
+                        <p class="font-medium">${data.phone}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">이메일</p>
+                        <p class="font-medium">${data.email}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">신청일</p>
+                        <p class="font-medium">${new Date(data.createdAt.toDate()).toLocaleString()}</p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-sm text-gray-500">현재 상태</p>
+                        <p class="font-medium">
+                            <span class="status-display px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(data.status)}">
+                                ${getStatusText(data.status)}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <p class="text-sm text-gray-500">희망 일정</p>
+                    <ul class="list-disc list-inside space-y-1 mt-1">
+                        ${data.schedules.map(s => `
+                            <li>${s.date} ${s.time}</li>
+                        `).join('')}
+                    </ul>
+                </div>
+                <div class="mt-4">
+                    <p class="text-sm text-gray-500">메시지</p>
+                    <p class="mt-1">${data.message || '없음'}</p>
+                </div>
+            `;
+
+            // 상태 버튼 활성화 처리
+            const statusButtons = document.querySelectorAll('.status-btn');
+            statusButtons.forEach(btn => {
+                const status = btn.dataset.status;
+                if (status === data.status) {
+                    btn.classList.add('bg-primary', 'text-white');
+                    btn.classList.remove('border', 'hover:bg-gray-50');
+                } else {
+                    btn.classList.remove('bg-primary', 'text-white');
+                    btn.classList.add('border', 'hover:bg-gray-50');
+                }
+
+                // 버튼 클릭 이벤트
+                btn.onclick = async () => {
+                    try {
+                        await updateStatus(docId, status);
+                        
+                        // 버튼 스타일 업데이트
+                        statusButtons.forEach(b => {
+                            b.classList.remove('bg-primary', 'text-white');
+                            b.classList.add('border', 'hover:bg-gray-50');
+                        });
+                        btn.classList.add('bg-primary', 'text-white');
+                        btn.classList.remove('border', 'hover:bg-gray-50');
+
+                        // 현재 상태 표시 업데이트
+                        const statusDisplay = modalContent.querySelector('.status-display');
+                        if (statusDisplay) {
+                            statusDisplay.className = `px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(status)}`;
+                            statusDisplay.textContent = getStatusText(status);
+                        }
+
+                        showToast('상태가 변경되었습니다.', 'success');
+                        loadApplications(); // 목록 새로고침
+                    } catch (error) {
+                        showToast('상태 변경 실패', 'error');
+                    }
+                };
+            });
+
+            // 삭제 버튼 이벤트
+            const deleteBtn = document.getElementById('deleteBtn');
+            deleteBtn.onclick = async () => {
+                if (confirm('정말 이 신청을 삭제하시겠습니까?')) {
+                    try {
+                        await db.collection('teatimes').doc(docId).delete();
+                        showToast('신청이 삭제되었습니다.', 'success');
+                        closeModal();
+                        loadApplications();
+                    } catch (error) {
+                        showToast('삭제 실패', 'error');
+                    }
+                }
+            };
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        // 모달 닫기
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // 상태 업데이트
+        async function updateStatus(docId, newStatus) {
+            try {
+                await db.collection('teatimes').doc(docId).update({
+                    status: newStatus,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                closeModal();
+                loadApplications();
+            } catch (error) {
+                throw new Error('상태 업데이트 실패: ' + error.message);
+            }
+        }
+
+        // 토스트 메시지 함수 추가
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 translate-y-full ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white z-50`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-full');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-full');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // 필터 변경 이벤트
+        document.getElementById('statusFilter').addEventListener('change', loadApplications);
+    </script>
+</body>
+</html> 
