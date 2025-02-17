@@ -1,719 +1,1202 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PPA Private Tutoring - Practical Programming with AI</title>
-<meta property="og:title" content="PPA Private Tutoring - AI와 함께하는 실용적인 프로그래밍 학습">
-<meta property="og:description" content="개발자가 되지 않아도 일상의 문제를 해결할 수 있는 프로그래밍 능력을 키워보세요. 1:1 맞춤형 프로그래밍 교육을 통해 실무에서 바로 활용 가능한 실력을 키워드립니다.">
-<meta property="og:image" content="https://public.readdy.ai/ai/img_res/d868c8041c4051f9b850b0c72035f7df.jpg">
-<meta property="og:url" content="https://ppastudy.kr">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="PPA Study">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PPA Private Tutoring - AI와 함께하는 실용적인 프로그래밍 학습">
-<meta name="twitter:description" content="개발자가 되지 않아도 일상의 문제를 해결할 수 있는 프로그래밍 능력을 키워보세요. 1:1 맞춤형 프로그래밍 교육을 통해 실무에서 바로 활용 가능한 실력을 키워드립니다.">
-<meta name="twitter:image" content="https://public.readdy.ai/ai/img_res/824aa037ec627cffb31393bf7be603e5.jpg">
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script>
-tailwind.config = {
-theme: {
-extend: {
-colors: {
-primary: '#4F46E5',
-secondary: '#10B981'
-},
-borderRadius: {
-'none': '0px',
-'sm': '4px',
-DEFAULT: '8px',
-'md': '12px',
-'lg': '16px',
-'xl': '20px',
-'2xl': '24px',
-'3xl': '32px',
-'full': '9999px',
-'button': '8px'
-}
-}
-}
-}
-</script>
-<style>
-:where([class^="ri-"])::before { content: "\f3c2"; }
-body { font-family: 'Noto Sans KR', sans-serif; }
-</style>
-<script>
-// Firebase 초기화 코드 추가
-const firebaseConfig = {
-    apiKey: "AIzaSyCbu_1gbtSIVUvmmw5RyLYvjaYOG7RdCWw",
-    authDomain: "ppap-ea44a.firebaseapp.com",
-    projectId: "ppap-ea44a",
-    storageBucket: "ppap-ea44a.firebasestorage.app",
-    messagingSenderId: "811949338329",
-    appId: "1:811949338329:web:cda8d43a7aeb825ce258c8",
-    measurementId: "G-6QGZT6Y1TE"
-};
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPA Private Tutoring - Practical Programming with AI</title>
+    <meta property="og:title" content="PPA Private Tutoring - AI와 함께하는 실용적인 프로그래밍 학습">
+    <meta property="og:description"
+        content="개발자가 되지 않아도 일상의 문제를 해결할 수 있는 프로그래밍 능력을 키워보세요. 1:1 맞춤형 프로그래밍 교육을 통해 실무에서 바로 활용 가능한 실력을 키워드립니다.">
+    <meta property="og:image" content="https://public.readdy.ai/ai/img_res/d868c8041c4051f9b850b0c72035f7df.jpg">
+    <meta property="og:url" content="https://ppastudy.kr">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="PPA Study">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PPA Private Tutoring - AI와 함께하는 실용적인 프로그래밍 학습">
+    <meta name="twitter:description"
+        content="개발자가 되지 않아도 일상의 문제를 해결할 수 있는 프로그래밍 능력을 키워보세요. 1:1 맞춤형 프로그래밍 교육을 통해 실무에서 바로 활용 가능한 실력을 키워드립니다.">
+    <meta name="twitter:image" content="https://public.readdy.ai/ai/img_res/824aa037ec627cffb31393bf7be603e5.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :where([class^="ri-"])::before {
+            content: "\f3c2";
+        }
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-</script>
-</head>
-<body class="bg-white">
-<header class="fixed w-full bg-white/95 backdrop-blur-sm shadow-sm z-50">
-<nav class="container mx-auto px-6 py-4">
-<div class="flex items-center justify-between">
-<a href="#" class="text-2xl font-['Pacifico'] text-primary">PPA Tutoring</a>
-<div class="hidden md:flex items-center space-x-8">
-<a href="#intro" class="text-gray-700 hover:text-primary">소개</a>
-<a href="#schedule" class="text-gray-700 hover:text-primary">커리큘럼</a>
-<a href="#method" class="text-gray-700 hover:text-primary">스터디 방식</a>
-<a href="#reviews" class="text-gray-700 hover:text-primary">수강후기</a>
-<button onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})" class="bg-primary text-white px-6 py-2 !rounded-button hover:bg-primary/90 whitespace-nowrap">
-신청하기
-</button>
-</div>
-<button class="md:hidden w-10 h-10 flex items-center justify-center">
-<i class="ri-menu-line text-2xl"></i>
-</button>
-</div>
-</nav>
-</header>
-<main>
-<section id="hero" class="pt-28 pb-20 relative overflow-hidden">
-<div class="absolute inset-0 bg-[url('https://public.readdy.ai/ai/img_res/fb1068da5fcb5de2b1bbfc355f92d168.jpg')] bg-cover bg-center opacity-10"></div>
-<div class="container mx-auto px-6 relative">
-<div class="max-w-3xl">
-<h1 class="text-5xl font-bold mb-6 leading-tight">
-PPA Private Tutoring
-<span class="block text-2xl text-primary mt-2">Practical Programming with AI</span>
-</h1>
-<p class="text-xl text-gray-600 mb-8">Programming, Not Development</p>
-<p class="text-gray-700 mb-8 text-lg leading-relaxed">
-AI와 함께하는 실용적인 프로그래밍 학습으로, 개발자가 되지 않아도 일상의 문제를 해결할 수 있는
-프로그래밍 능력을 키워보세요.
-</p>
-<button class="bg-primary text-white px-8 py-3 !rounded-button hover:bg-primary/90 text-lg whitespace-nowrap">
-스터디 신청하기
-</button>
-</div>
-</div>
-</section>
-<section id="intro" class="py-20 bg-gray-50">
-<div class="container mx-auto px-6">
-<h2 class="text-3xl font-bold text-center mb-16">Why PPA?</h2>
-<div class="grid md:grid-cols-3 gap-8">
-<div class="bg-white p-8 rounded-lg shadow-sm">
-<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-<i class="ri-ai-generate-line text-primary text-2xl"></i>
-</div>
-<h3 class="text-xl font-bold mb-4">AI 기반 실용적 프로그래밍</h3>
-<p class="text-gray-600 leading-relaxed">
-최신 AI 기술을 활용하여 프로그래밍을 더 쉽고 효율적으로 배울 수 있습니다.
-실제 문제 해결에 초점을 맞춘 학습을 진행합니다.
-</p>
-</div>
-<div class="bg-white p-8 rounded-lg shadow-sm">
-<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-<i class="ri-code-line text-primary text-2xl"></i>
-</div>
-<h3 class="text-xl font-bold mb-4">생활 코딩 중심</h3>
-<p class="text-gray-600 leading-relaxed">
-일상생활에서 마주치는 문제들을 직접 코딩으로 해결해보며
-실질적인 프로그래밍 스킬을 향상시킵니다.
-</p>
-</div>
-<div class="bg-white p-8 rounded-lg shadow-sm">
-<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-<i class="ri-user-settings-line text-primary text-2xl"></i>
-</div>
-<h3 class="text-xl font-bold mb-4">맞춤형 1:1 학습</h3>
-<p class="text-gray-600 leading-relaxed">
-개인의 학습 속도와 관심사에 맞춘 1:1 맞춤형 커리큘럼으로
-효과적인 학습을 보장합니다.
-</p>
-</div>
-</div>
-</div>
-</section>
-<section id="schedule" class="py-20 bg-gray-50">
-<div class="container mx-auto px-6">
-<h2 class="text-3xl font-bold text-center mb-16">교육 일정 및 비용</h2>
-<div class="max-w-3xl mx-auto space-y-12">
-<div class="bg-white p-8 rounded-lg shadow-sm">
-<h3 class="text-xl font-bold mb-4 text-primary">무료 티타임 상담</h3>
-<p class="text-gray-600 mb-4">30~40분 무료 상담을 통해 진행 방식과 실제 사례를 소개해드립니다.</p>
-<div class="text-sm text-gray-500">* 3명 한정 선착순 모집</div>
-</div>
-<div class="bg-white p-8 rounded-lg shadow-sm">
-<div class="flex items-center gap-2 mb-4">
-<h3 class="text-xl font-bold">Part 1. 
-    <span class="text-2xl">🖥️</span> 반응형 웹 애플리케이션 배포</h3>
-<span class="text-2xl">📱</span>
-</div>
-<p class="text-gray-600 mb-6">Vanilla JavaScript, CSS3, HTML5 를 활용한 반응형웹 애플리케이션을 구현하고 분석</p>
-<div class="space-y-4">
-<div class="flex justify-between items-center p-4 border-b group hover:bg-gray-50 transition-colors rounded-lg">
-<div class="flex items-center">
-<div class="w-8 h-8 flex items-center justify-center text-xl">🌱</div>
-<div class="ml-2">
-<h4 class="font-bold">1주차 - 환경 세팅 및 결과물 도출</h4>
-<p class="text-sm text-gray-600">2시간 × 4회</p>
-</div>
-</div>
-<div class="text-primary font-bold">50만원</div>
-</div>
-<div class="flex justify-between items-center p-4 border-b group hover:bg-gray-50 transition-colors rounded-lg">
-<div class="flex items-center">
-<div class="w-8 h-8 flex items-center justify-center text-xl">🌿</div>
-<div class="ml-2">
-<h4 class="font-bold">2주차 - 결과물 개선 01</h4>
-<p class="text-sm text-gray-600">2시간 × 3회</p>
-</div>
-</div>
-<div class="text-primary font-bold">40만원</div>
-</div>
-<div class="flex justify-between items-center p-4 border-b group hover:bg-gray-50 transition-colors rounded-lg">
-<div class="flex items-center">
-<div class="w-8 h-8 flex items-center justify-center text-xl">🌳</div>
-<div class="ml-2">
-<h4 class="font-bold">3주차 - 결과물 분석</h4>
-<p class="text-sm text-gray-600">2시간 × 3회</p>
-</div>
-</div>
-<div class="text-primary font-bold">30만원</div>
-</div>
-<div class="flex justify-between items-center p-4 border-b group hover:bg-gray-50 transition-colors rounded-lg">
-<div class="flex items-center">
-<div class="w-8 h-8 flex items-center justify-center text-xl">🌺</div>
-<div class="ml-2">
-<h4 class="font-bold">4주차 - 심화 분석</h4>
-<p class="text-sm text-gray-600">1시간 × 3회</p>
-</div>
-</div>
-<div class="text-primary font-bold">20만원</div>
-</div>
-<div class="flex justify-between items-center p-4 border-b group hover:bg-gray-50 transition-colors rounded-lg">
-<div class="flex items-center">
-<div class="w-8 h-8 flex items-center justify-center text-xl">🌸</div>
-<div class="ml-2">
-<h4 class="font-bold">5주차 - 결과물 개선 02</h4>
-<p class="text-sm text-gray-600">1시간 × 3회</p>
-</div>
-</div>
-<div class="text-primary font-bold">10만원</div>
-</div>
-<div class="flex justify-between items-center p-4 group hover:bg-gray-50 transition-colors rounded-lg">
-<div class="flex items-center">
-<div class="w-8 h-8 flex items-center justify-center text-xl">🌼</div>
-<div class="ml-2">
-<h4 class="font-bold">6주차 - 자기주도 학습 실습</h4>
-<p class="text-sm text-gray-600">1시간 × 3회</p>
-</div>
-</div>
-<div class="text-primary font-bold">10만원</div>
-</div>
-</div>
-</div>
-<div class="bg-white p-8 rounded-lg shadow-sm mt-8">
-<div class="flex items-center gap-2 mb-4">
-<h3 class="text-xl font-bold">Part 2. 
-    <span class="text-2xl">💾</span> 데이터베이스 연결 및 분석</h3>
-<span class="text-2xl">📊</span>
-</div>
-<p class="text-gray-600 mb-6">로컬 데이터베이스를 시작으로 온라인 기반 데이터베이스까지 구현하고 분석. 다양한 형태의 데이터베이스를 직접 구축하고 비교. 데이터를 분석하고 활용.</p>
-<div class="flex justify-between items-center p-4 group hover:bg-gray-50 transition-colors rounded-lg">
-<div class="flex items-center">
-<div class="w-8 h-8 flex items-center justify-center text-xl">🏃</div>
-<div class="ml-2">
-<h4 class="font-bold">매주 진행</h4>
-<p class="text-sm text-gray-600">1시간 × 3회</p>
-</div>
-</div>
-<div class="text-primary font-bold">15만원/주</div>
-</div>
-</div>
-<div class="bg-white p-8 rounded-lg shadow-sm mt-8">
-<div class="flex items-center gap-2 mb-4">
-
-<h3 class="text-xl font-bold">Part 3. <span class="text-2xl">💁</span> 개별 프로젝트</h3>
-<span class="text-2xl">🚀</span>
-</div>
-<p class="text-gray-600 mb-6">깃허브를 활용한 협업 프로젝트 진행. 각종 OPEN API 및 AI API 활용.</p>
-<div class="flex justify-between items-center p-4 group hover:bg-gray-50 transition-colors rounded-lg">
-<div class="flex items-center">
-<div class="w-8 h-8 flex items-center justify-center text-xl">🏃</div>
-<div class="ml-2">
-<h4 class="font-bold">매주 진행</h4>
-<p class="text-sm text-gray-600">2시간 × 5회</p>
-</div>
-</div>
-<div class="text-primary font-bold">50만원/주</div>
-</div>
-</div>
-<div class="bg-white p-8 rounded-lg shadow-sm">
-<h3 class="text-xl font-bold mb-4">수강 안내</h3>
-<ul class="space-y-3 text-gray-600">
-<li class="flex items-start">
-<i class="ri-check-line text-primary mt-1 mr-2"></i>
-<span>대상: 대전 지역 19세 이상 전공 불문 누구나</span>
-</li>
-<li class="flex items-start">
-<i class="ri-check-line text-primary mt-1 mr-2"></i>
-<span>결제: 계좌이체만 가능</span>
-</li>
-<li class="flex items-start">
-<i class="ri-check-line text-primary mt-1 mr-2"></i>
-<span>인원: 티타임을 통해 3명만 선정</span>
-</li>
-<li class="flex items-start">
-<i class="ri-check-line text-primary mt-1 mr-2"></i>
-<span>환불: 각 주차별 언제든 취소 가능 (취소 및 방문 당일 제외)</span>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</section>
-<section id="method" class="py-20">
-<div class="container mx-auto px-6">
-<h2 class="text-3xl font-bold text-center mb-16">차별화된 학습 방식</h2>
-<div class="grid md:grid-cols-2 gap-12 items-center">
-<div>
-<h3 class="text-2xl font-bold mb-6">Learning by Doing</h3>
-<div class="space-y-6 mb-8">
-<div class="flex items-start">
-<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-<i class="ri-rocket-line text-primary text-xl"></i>
-</div>
-<div class="ml-4">
-<h4 class="text-lg font-bold mb-2">프로젝트 중심 학습</h4>
-<p class="text-gray-600">실제 프로젝트를 통해 배우는 실전 중심의 학습 방식</p>
-</div>
-</div>
-<div class="flex items-start">
-<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-<i class="ri-ai-generate-line text-primary text-xl"></i>
-</div>
-<div class="ml-4">
-<h4 class="text-lg font-bold mb-2">AI 활용 코딩</h4>
-<p class="text-gray-600">AI를 활용한 효율적인 코드 작성과 문제 해결 방법 학습</p>
-</div>
-</div>
-<div class="flex items-start">
-<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-<i class="ri-book-open-line text-primary text-xl"></i>
-</div>
-<div class="ml-4">
-<h4 class="text-lg font-bold mb-2">단계별 코드 분석</h4>
-<p class="text-gray-600">완성된 코드를 분석하며 이해하는 역순 학습 방식</p>
-</div>
-</div>
-</div>
-<div class="border-t pt-8 mt-8">
-<h3 class="text-2xl font-bold mb-6">단계별 학습 과정</h3>
-<div class="space-y-6">
-<div class="flex items-start">
-<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-<span class="text-xl">1️⃣</span>
-</div>
-<div class="ml-4">
-<h4 class="text-lg font-bold mb-2">기초 개념 이해</h4>
-<p class="text-gray-600">프로그래밍의 기본 개념과 원리를 이해하고, 개발 환경을 설정합니다.</p>
-</div>
-</div>
-<div class="flex items-start">
-<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-<span class="text-xl">2️⃣</span>
-</div>
-<div class="ml-4">
-<h4 class="text-lg font-bold mb-2">실전 코딩 실습</h4>
-<p class="text-gray-600">실제 프로젝트를 통해 코딩 실력을 향상시키고, AI 도구 활용법을 학습합니다.</p>
-</div>
-</div>
-<div class="flex items-start">
-<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-<span class="text-xl">3️⃣</span>
-</div>
-<div class="ml-4">
-<h4 class="text-lg font-bold mb-2">프로젝트 완성</h4>
-<p class="text-gray-600">학습한 내용을 바탕으로 개인 프로젝트를 기획하고 완성합니다.</p>
-</div>
-</div>
-<div class="flex items-start">
-<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-<span class="text-xl">4️⃣</span>
-</div>
-<div class="ml-4">
-<h4 class="text-lg font-bold mb-2">실무 적용</h4>
-<p class="text-gray-600">완성된 프로젝트를 실제 업무에 적용하고 개선하는 방법을 학습합니다.</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="bg-[url('https://public.readdy.ai/ai/img_res/7043bca1cbd9cd746db6e63ab18bd5bc.jpg')] bg-cover bg-center h-96 rounded-lg shadow-lg"></div>
-</div>
-</div>
-</section>
-<section id="reviews" class="py-20 bg-gray-50">
-<div class="container mx-auto px-6">
-<h2 class="text-3xl font-bold text-center mb-16">수강생 후기</h2>
-<div class="grid md:grid-cols-3 gap-8">
-<div class="bg-white p-8 rounded-lg shadow-sm">
-<div class="flex items-center mb-4">
-<div class="text-yellow-400 flex">
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-</div>
-<span class="ml-2 text-gray-600">5.0</span>
-</div>
-<p class="text-gray-700 mb-4">
-"프로그래밍을 처음 접하는 사람도 쉽게 이해할 수 있게 설명해주셔서 좋았습니다.
-AI와 함께하는 학습 방식이 매우 효율적이었어요."
-</p>
-<div class="flex items-center">
-<div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-<i class="ri-user-line text-primary"></i>
-</div>
-<div class="ml-3">
-<p class="font-bold">김지현</p>
-<p class="text-sm text-gray-500">마케팅 매니저</p>
-</div>
-</div>
-</div>
-<div class="bg-white p-8 rounded-lg shadow-sm">
-<div class="flex items-center mb-4">
-<div class="text-yellow-400 flex">
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-</div>
-<span class="ml-2 text-gray-600">5.0</span>
-</div>
-<p class="text-gray-700 mb-4">
-"실제 업무에서 필요한 자동화 프로그램을 만들 수 있게 되었습니다.
-1:1 맞춤형 학습이 정말 도움이 많이 되었어요."
-</p>
-<div class="flex items-center">
-<div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-<i class="ri-user-line text-primary"></i>
-</div>
-<div class="ml-3">
-<p class="font-bold">박서준</p>
-<p class="text-sm text-gray-500">사무직</p>
-</div>
-</div>
-</div>
-<div class="bg-white p-8 rounded-lg shadow-sm">
-<div class="flex items-center mb-4">
-<div class="text-yellow-400 flex">
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-<i class="ri-star-fill"></i>
-</div>
-<span class="ml-2 text-gray-600">5.0</span>
-</div>
-<p class="text-gray-700 mb-4">
-"AI를 활용한 코딩 방식이 신선했고, 실제로 코드를 작성하면서
-프로그래밍의 원리를 이해할 수 있었습니다."
-</p>
-<div class="flex items-center">
-<div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-<i class="ri-user-line text-primary"></i>
-</div>
-<div class="ml-3">
-<p class="font-bold">이민지</p>
-<p class="text-sm text-gray-500">대학생</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="apply" class="py-20">
-<div class="container mx-auto px-6">
-<div class="max-w-2xl mx-auto text-center">
-<h2 class="text-3xl font-bold mb-8">스터디 신청하기</h2>
-<p class="text-gray-600 mb-12">
-1:1 맞춤형 프로그래밍 교육을 통해 실무에서 바로 활용 가능한
-실력을 키워보세요. 무료 티타임 상담을 신청하시고 시작하세요!
-</p>
-<form class="space-y-6">
-<div>
-<input type="text" name="name" placeholder="이름" required
-    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
-</div>
-<div>
-<input type="email" name="email" placeholder="이메일" required
-    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
-</div>
-<div>
-<input type="tel" name="phone" placeholder="연락처" required
-    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
-</div>
-<div class="space-y-4">
-<p class="font-medium text-gray-700">희망 상담 일정 (1~3개 선택)</p>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-<div class="relative">
-<div class="flex items-center border border-gray-300 rounded-lg p-3 focus-within:border-primary">
-<i class="ri-calendar-line text-gray-400 mr-2"></i>
-<input type="date" class="w-full focus:outline-none" min="2025-02-16">
-</div>
-<div class="flex items-center border border-gray-300 rounded-lg p-3 mt-2 focus-within:border-primary">
-<i class="ri-time-line text-gray-400 mr-2"></i>
-<select class="w-full focus:outline-none pr-8">
-<option value="">시간 선택</option>
-<option value="10:00">10:00</option>
-<option value="11:00">11:00</option>
-<option value="14:00">14:00</option>
-<option value="15:00">15:00</option>
-<option value="16:00">16:00</option>
-<option value="17:00">17:00</option>
-</select>
-</div>
-</div>
-<div class="relative">
-<div class="flex items-center border border-gray-300 rounded-lg p-3 focus-within:border-primary">
-<i class="ri-calendar-line text-gray-400 mr-2"></i>
-<input type="date" class="w-full focus:outline-none" min="2025-02-16">
-</div>
-<div class="flex items-center border border-gray-300 rounded-lg p-3 mt-2 focus-within:border-primary">
-<i class="ri-time-line text-gray-400 mr-2"></i>
-<select class="w-full focus:outline-none pr-8">
-<option value="">시간 선택</option>
-<option value="10:00">10:00</option>
-<option value="11:00">11:00</option>
-<option value="14:00">14:00</option>
-<option value="15:00">15:00</option>
-<option value="16:00">16:00</option>
-<option value="17:00">17:00</option>
-</select>
-</div>
-</div>
-<div class="relative">
-<div class="flex items-center border border-gray-300 rounded-lg p-3 focus-within:border-primary">
-<i class="ri-calendar-line text-gray-400 mr-2"></i>
-<input type="date" class="w-full focus:outline-none" min="2025-02-16">
-</div>
-<div class="flex items-center border border-gray-300 rounded-lg p-3 mt-2 focus-within:border-primary">
-<i class="ri-time-line text-gray-400 mr-2"></i>
-<select class="w-full focus:outline-none pr-8">
-<option value="">시간 선택</option>
-<option value="10:00">10:00</option>
-<option value="11:00">11:00</option>
-<option value="14:00">14:00</option>
-<option value="15:00">15:00</option>
-<option value="16:00">16:00</option>
-<option value="17:00">17:00</option>
-</select>
-</div>
-</div>
-</div>
-</div>
-<div>
-<textarea name="message" placeholder="학습 목표나 궁금한 점을 자유롭게 작성해주세요." 
-    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary h-32"></textarea>
-</div>
-<button type="submit" class="bg-primary text-white px-8 py-3 !rounded-button hover:bg-primary/90 w-full">
-신청하기
-</button>
-</form>
-</div>
-</div>
-</section>
-</main>
-<footer class="bg-gray-900 text-white py-12">
-<div class="container mx-auto px-6">
-<div class="grid md:grid-cols-4 gap-8">
-<div>
-<a href="#" class="text-2xl font-['Pacifico'] text-white mb-4 block">PPA Study</a>
-<p class="text-gray-400">
-AI와 함께하는 실용적인 프로그래밍 학습
-</p>
-</div>
-<div>
-<h3 class="text-lg font-bold mb-4">Quick Links</h3>
-<ul class="space-y-2">
-<li><a href="#intro" class="text-gray-400 hover:text-white">소개</a></li>
-<li><a href="#schedule" class="text-gray-400 hover:text-white">커리큘럼</a></li>
-<li><a href="#method" class="text-gray-400 hover:text-white">스터디 방식</a></li>
-<li><a href="#reviews" class="text-gray-400 hover:text-white">수강후기</a></li>
-</ul>
-</div>
-<div>
-<h3 class="text-lg font-bold mb-4">Contact</h3>
-<ul class="space-y-2">
-<li class="flex items-center text-gray-400">
-<i class="ri-mail-line mr-2"></i>
-dev.chanwoo@gmail.com
-</li>
-<li class="flex items-center text-gray-400">
-<i class="ri-phone-line mr-2"></i>
-010-7108-6391
-</li>
-</ul>
-</div>
-<div>
-<h3 class="text-lg font-bold mb-4">Follow Us</h3>
-<div class="flex space-x-4">
-<a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
-<i class="ri-instagram-line"></i>
-</a>
-<a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
-<i class="ri-facebook-line"></i>
-</a>
-<a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
-<i class="ri-twitter-x-line"></i>
-</a>
-</div>
-</div>
-</div>
-<div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-<p>&copy; 2025 PPA Private Tutoring. All rights reserved.</p>
-<a href="/study/admin.html" class="hover:text-white" style="color:#1c2b45;">admin</a>
-</div>
-</div>
-</footer>
-<script>
-const mobileMenuButton = document.querySelector('button.md\\:hidden');
-const mobileMenu = document.createElement('div');
-mobileMenu.className = 'fixed inset-0 bg-white z-50 transform transition-transform duration-300 translate-x-full md:hidden';
-mobileMenu.innerHTML = `
-<div class="p-6">
-<div class="flex justify-between items-center mb-8">
-<a href="#" class="text-2xl font-['Pacifico'] text-primary">PPA Tutoring</a>
-<button class="w-10 h-10 flex items-center justify-center">
-<i class="ri-close-line text-2xl"></i>
-</button>
-</div>
-<div class="space-y-6">
-<a href="#intro" class="block text-gray-700 hover:text-primary text-lg">소개</a>
-<a href="#schedule" class="block text-gray-700 hover:text-primary text-lg">커리큘럼</a>
-<a href="#method" class="block text-gray-700 hover:text-primary text-lg">스터디 방식</a>
-<a href="#reviews" class="block text-gray-700 hover:text-primary text-lg">수강후기</a>
-<button onclick="(() => { mobileMenu.classList.add('translate-x-full'); document.body.style.overflow = ''; document.getElementById('apply').scrollIntoView({behavior:'smooth'}); })()" class="w-full bg-primary text-white px-6 py-2 !rounded-button hover:bg-primary/90">
-신청하기
-</button>
-</div>
-</div>
-`;
-document.body.appendChild(mobileMenu);
-mobileMenuButton.addEventListener('click', () => {
-mobileMenu.classList.remove('translate-x-full');
-document.body.style.overflow = 'hidden';
-});
-mobileMenu.querySelector('button').addEventListener('click', () => {
-mobileMenu.classList.add('translate-x-full');
-document.body.style.overflow = '';
-});
-const links = mobileMenu.querySelectorAll('a');
-links.forEach(link => {
-link.addEventListener('click', () => {
-mobileMenu.classList.add('translate-x-full');
-document.body.style.overflow = '';
-});
-});
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-anchor.addEventListener('click', function (e) {
-e.preventDefault();
-const target = document.querySelector(this.getAttribute('href'));
-if (target) {
-const headerOffset = 80;
-const elementPosition = target.getBoundingClientRect().top;
-const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-window.scrollTo({
-top: offsetPosition,
-behavior: 'smooth'
-});
-}
-});
-});
-const form = document.querySelector('form');
-const dateInputs = form.querySelectorAll('input[type="date"]');
-const timeSelects = form.querySelectorAll('select');
-dateInputs.forEach(input => {
-input.min = new Date().toISOString().split('T')[0];
-});
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    let isValid = true;
-    let errorMessage = '';
-
-    const dates = Array.from(dateInputs).map(input => input.value);
-    const times = Array.from(timeSelects).map(select => select.value);
-    
-    // 최소 1개의 날짜와 시간이 선택되었는지 확인
-    const validSchedules = dates.map((date, i) => ({
-        date,
-        time: times[i]
-    })).filter(schedule => schedule.date && schedule.time);
-
-    if (validSchedules.length === 0) {
-        isValid = false;
-        errorMessage = '최소 1개의 희망 일정을 선택해주세요.';
-    }
-
-    if (!isValid) {
-        showToast(errorMessage, 'error');
-        return;
-    }
-
-    try {
-        const formData = new FormData(form);
-        const data = {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            phone: formData.get('phone'),
-            schedules: validSchedules,  // 유효한 일정만 저장
-            message: formData.get('message'),
-            status: 'pending',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+    </style>
+    <script>
+        // Firebase 초기화 코드 추가
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbu_1gbtSIVUvmmw5RyLYvjaYOG7RdCWw",
+            authDomain: "ppap-ea44a.firebaseapp.com",
+            projectId: "ppap-ea44a",
+            storageBucket: "ppap-ea44a.firebasestorage.app",
+            messagingSenderId: "811949338329",
+            appId: "1:811949338329:web:cda8d43a7aeb825ce258c8",
+            measurementId: "G-6QGZT6Y1TE"
         };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+</head>
 
-        await db.collection('teatimes').add(data);
-        showToast('신청이 완료되었습니다. 곧 연락드리겠습니다.', 'success');
-        form.reset();
-    } catch (error) {
-        showToast('신청 처리 중 오류가 발생했습니다.', 'error');
-        console.error('Error:', error);
-    }
-});
+<body class="bg-white">
+    <header class="fixed w-full bg-white/95 backdrop-blur-sm shadow-sm z-50">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="#" class="text-2xl font-['Pacifico'] text-primary">PPA Tutoring</a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#intro" class="text-gray-700 hover:text-primary">소개</a>
+                    <a href="#schedule" class="text-gray-700 hover:text-primary">커리큘럼</a>
+                    <a href="#method" class="text-gray-700 hover:text-primary">스터디 방식</a>
+                    <a href="#reviews" class="text-gray-700 hover:text-primary">수강후기</a>
+                    <a href="javascript:void(0)" onclick="openCheckStatus(event)" class="text-gray-700 hover:text-primary">신청조회</a>
+                    <button onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})"
+                        class="bg-primary text-white px-6 py-2 !rounded-button hover:bg-primary/90 whitespace-nowrap">
+                        신청하기
+                    </button>
+                </div>
+            </div>
+            <button aria-label="메뉴 열기" class="md:hidden text-gray-600 hover:text-gray-900">
+                <i class="ri-menu-line text-2xl"></i>
+            </button>
+        </nav>
+    </header>
+    <main>
+        <section id="hero" class="pt-28 pb-20 relative overflow-hidden">
+            <div
+                class="absolute inset-0 bg-[url('https://public.readdy.ai/ai/img_res/fb1068da5fcb5de2b1bbfc355f92d168.jpg')] bg-cover bg-center opacity-10">
+            </div>
+            <div class="container mx-auto px-6 relative">
+                <div class="max-w-3xl">
+                    <h1 class="text-5xl font-bold mb-6 leading-tight">
+                        PPA Private Tutoring
+                        <span class="block text-2xl text-primary mt-2">Practical Programming with AI</span>
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8">Programming, Not Development</p>
+                    <p class="text-gray-700 mb-8 text-lg leading-relaxed">
+                        AI와 함께하는 실용적인 프로그래밍 학습으로, 개발자가 되지 않아도 일상의 문제를 해결할 수 있는
+                        프로그래밍 능력을 키워보세요.
+                    </p>
+                    <button onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})"
+                        class="bg-primary text-white px-8 py-3 !rounded-button hover:bg-primary/90 text-lg whitespace-nowrap">
+                        스터디 신청하기
+                    </button>
+                </div>
+            </div>
+        </section>
+        <section id="intro" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-16">Why PPA?</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-sm">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                            <i class="ri-ai-generate-line text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">AI 기반 실용적 프로그래밍</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            최신 AI 기술을 활용하여 프로그래밍을 더 쉽고 효율적으로 배울 수 있습니다.
+                            실제 문제 해결에 초점을 맞춘 학습을 진행합니다.
+                        </p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-sm">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                            <i class="ri-code-line text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">생활 코딩 중심</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            일상생활에서 마주치는 문제들을 직접 코딩으로 해결해보며
+                            실질적인 프로그래밍 스킬을 향상시킵니다.
+                        </p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-sm">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                            <i class="ri-user-settings-line text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">맞춤형 1:1 학습</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            개인의 학습 속도와 관심사에 맞춘 1:1 맞춤형 커리큘럼으로
+                            효과적인 학습을 보장합니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="schedule" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-16">교육 일정 및 비용</h2>
+                <div class="max-w-3xl mx-auto space-y-12">
+                    <div class="bg-white p-8 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-bold mb-4 text-primary">무료 티타임 상담</h3>
+                        <p class="text-gray-600 mb-4">30~40분 무료 상담을 통해 진행 방식과 실제 사례를 소개해드립니다.</p>
+                        <div class="text-sm text-gray-500">* 3명 한정 선착순 모집</div>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-sm">
+                        <h2 class="text-2xl font-bold mb-8">수강 요금제</h2>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="border border-gray-200 rounded-lg p-6 hover:border-primary transition-colors">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold">Standard Plan</h3>
+                                    <span
+                                        class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">주
+                                        2회</span>
+                                </div>
+                                <div class="text-3xl font-bold mb-4">월 80만원</div>
+                                <ul class="space-y-3 mb-6">
+                                    <li class="flex items-start">
+                                        <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                        <span class="text-gray-600">1회 2시간 수업</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                        <span class="text-gray-600">월 8회 수업 (주 2회)</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                        <span class="text-gray-600">시간대/요일 자유 선택</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                        <span class="text-gray-600">수업 일정 월 2회 변경 가능</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                        <span class="text-gray-600">최소 3개월 등록</span>
+                                    </li>
+                                </ul>
+                                <button
+                                    onclick="(() => {document.getElementById('apply').scrollIntoView({behavior:'smooth'}); document.querySelector('input[name=plan][value=standard]').checked = true;})()"
+                                    class="w-full bg-primary text-white px-6 py-3 !rounded-button hover:bg-primary/90">신청하기</button>
+                            </div>
+                            <div class="border border-gray-200 rounded-lg p-6 hover:border-primary transition-colors">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold">Intensive Plan</h3>
+                                    <span
+                                        class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">주
+                                        3회</span>
+                                </div>
+                                <div class="text-3xl font-bold mb-4">월 110만원</div>
+                                <ul class="space-y-3 mb-6">
+                                    <li class="flex items-start">
+                                        <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                        <span class="text-gray-600">1회 2시간 수업</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                        <span class="text-gray-600">월 12회 수업 (주 3회)</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                        <span class="text-gray-600">시간대/요일 자유 선택</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                        <span class="text-gray-600">수업 일정 월 3회 변경 가능</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                        <span class="text-gray-600">최소 3개월 등록</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                        <span class="text-gray-600">프로젝트 리뷰 월 1회 제공</span>
+                                    </li>
+                                </ul>
+                                <button
+                                    onclick="(() => {document.getElementById('apply').scrollIntoView({behavior:'smooth'}); document.querySelector('input[name=plan][value=intensive]').checked = true;})()"
+                                    class="w-full bg-primary text-white px-6 py-3 !rounded-button hover:bg-primary/90">신청하기</button>
+                            </div>
+                        </div>
+                        <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+                            <p class="text-sm text-gray-600">
+                                * 모든 수업은 1:1 맞춤형으로 진행됩니다.<br>
+                                * 수업 시작 전 커리큘럼 및 일정을 협의합니다.<br>
+                                * 수업 일정은 최소 24시간 전 변경 요청 가능합니다.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-bold mb-4">수강 안내</h3>
+                        <ul class="space-y-3 text-gray-600">
+                            <li class="flex items-start">
+                                <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                <span>대상: 19세 이상 전공 불문 누구나</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                <span>결제: 계좌이체만 가능</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                <span>인원: 티타임을 통해 3명만 선정</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="ri-check-line text-primary mt-1 mr-2"></i>
+                                <span>환불: 각 주차별 언제든 취소 가능 (취소 및 방문 당일 제외)</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="tutor" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-16">과외 선생님 소개</h2>
+                <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                    <div
+                        class="bg-[url('https://public.readdy.ai/ai/img_res/dba5b2fec50fa46b0926ec0f949e5089.jpg')] bg-cover bg-center h-[600px] rounded-lg shadow-lg">
+                    </div>
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4">이진우 선생님</h3>
+                            <p class="text-gray-600 leading-relaxed">
+                                10년차 현직 프로그래머이자 교육자로서, 복잡한 기술을 쉽게 설명하는 것을 전문으로 합니다.
+                                실무에서의 풍부한 경험을 바탕으로 실용적인 프로그래밍 교육을 제공합니다.
+                            </p>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div
+                                    class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="ri-code-box-line text-primary text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-lg font-bold mb-2">기술 스택</h4>
+                                    <p class="text-gray-600">JavaScript, Python, SQL, React, Node.js</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div
+                                    class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="ri-building-4-line text-primary text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-lg font-bold mb-2">경력</h4>
+                                    <p class="text-gray-600">네이버, 카카오 등 IT 기업 근무 경력</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div
+                                    class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="ri-graduation-cap-line text-primary text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-lg font-bold mb-2">교육 경력</h4>
+                                    <p class="text-gray-600">코딩 부트캠프 강사, 기업 실무 교육 진행</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-8 border-t">
+                            <h4 class="text-lg font-bold mb-4">교육 철학</h4>
+                            <p class="text-gray-600 leading-relaxed">
+                                "프로그래밍은 도구입니다. 개발자가 되는 것이 목표가 아닌 분들에게는,
+                                이 도구를 활용해 실제 문제를 해결하는 방법을 가르치는 것이 중요합니다.
+                                AI 시대에 맞춰 효율적인 학습 방법을 제시하고, 실무에서 바로 활용할 수 있는
+                                실용적인 지식을 전달하는 것을 목표로 합니다."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="method" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-16">차별화된 학습 방식</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                            <i class="ri-ai-generate-line text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-4">AI 기반 학습</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="ri-checkbox-circle-line text-primary mt-1 mr-2"></i>
+                                <span class="text-gray-600">ChatGPT를 활용한 코드 리뷰</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="ri-checkbox-circle-line text-primary mt-1 mr-2"></i>
+                                <span class="text-gray-600">AI 코파일럿 활용 실습</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="ri-checkbox-circle-line text-primary mt-1 mr-2"></i>
+                                <span class="text-gray-600">AI 프롬프트 엔지니어링</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                            <i class="ri-code-box-line text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-4">실전 중심 교육</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="ri-checkbox-circle-line text-primary mt-1 mr-2"></i>
+                                <span class="text-gray-600">실무 프로젝트 기반 학습</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="ri-checkbox-circle-line text-primary mt-1 mr-2"></i>
+                                <span class="text-gray-600">현업 개발자의 코드 리뷰</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="ri-checkbox-circle-line text-primary mt-1 mr-2"></i>
+                                <span class="text-gray-600">GitHub 협업 실습</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                            <i class="ri-user-settings-line text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-4">맞춤형 커리큘럼</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="ri-checkbox-circle-line text-primary mt-1 mr-2"></i>
+                                <span class="text-gray-600">1:1 학습 진도 조절</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="ri-checkbox-circle-line text-primary mt-1 mr-2"></i>
+                                <span class="text-gray-600">개인 프로젝트 지원</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="ri-checkbox-circle-line text-primary mt-1 mr-2"></i>
+                                <span class="text-gray-600">실시간 질의응답</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-16 grid md:grid-cols-2 gap-12 items-center">
+                    <div
+                        class="bg-[url('https://public.readdy.ai/ai/img_res/7043bca1cbd9cd746db6e63ab18bd5bc.jpg')] bg-cover bg-center h-96 rounded-lg shadow-lg">
+                    </div>
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4">학습 진행 방식</h3>
+                            <div class="space-y-6">
+                                <div class="flex items-center space-x-4 p-4 bg-primary/5 rounded-lg">
+                                    <div
+                                        class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-xl">1️⃣</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">기초 개념 학습</h4>
+                                        <p class="text-gray-600">프로그래밍 기본 개념과 개발 환경 설정</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4 p-4 bg-primary/5 rounded-lg">
+                                    <div
+                                        class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-xl">2️⃣</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">AI 도구 활용법</h4>
+                                        <p class="text-gray-600">ChatGPT, Copilot 등 AI 도구 실습</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4 p-4 bg-primary/5 rounded-lg">
+                                    <div
+                                        class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-xl">3️⃣</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">실전 프로젝트</h4>
+                                        <p class="text-gray-600">개인 맞춤형 프로젝트 실습</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4 p-4 bg-primary/5 rounded-lg">
+                                    <div
+                                        class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-xl">4️⃣</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">실무 적용</h4>
+                                        <p class="text-gray-600">학습 내용의 실무 응용 및 활용</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="reviews" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-16">수강생 후기</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <div class="text-yellow-400 flex">
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                            </div>
+                            <span class="ml-2 text-gray-600">5.0</span>
+                        </div>
+                        <p class="text-gray-700 mb-4">
+                            "프로그래밍을 처음 접하는 사람도 쉽게 이해할 수 있게 설명해주셔서 좋았습니다.
+                            AI와 함께하는 학습 방식이 매우 효율적이었어요."
+                        </p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                <i class="ri-user-line text-primary"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="font-bold">김지현</p>
+                                <p class="text-sm text-gray-500">마케팅 매니저</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <div class="text-yellow-400 flex">
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                            </div>
+                            <span class="ml-2 text-gray-600">5.0</span>
+                        </div>
+                        <p class="text-gray-700 mb-4">
+                            "실제 업무에서 필요한 자동화 프로그램을 만들 수 있게 되었습니다.
+                            1:1 맞춤형 학습이 정말 도움이 많이 되었어요."
+                        </p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                <i class="ri-user-line text-primary"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="font-bold">박서준</p>
+                                <p class="text-sm text-gray-500">사무직</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <div class="text-yellow-400 flex">
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                                <i class="ri-star-fill"></i>
+                            </div>
+                            <span class="ml-2 text-gray-600">5.0</span>
+                        </div>
+                        <p class="text-gray-700 mb-4">
+                            "AI를 활용한 코딩 방식이 신선했고, 실제로 코드를 작성하면서
+                            프로그래밍의 원리를 이해할 수 있었습니다."
+                        </p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                <i class="ri-user-line text-primary"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="font-bold">이민지</p>
+                                <p class="text-sm text-gray-500">대학생</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="apply" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="max-w-2xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold mb-8">스터디 신청하기</h2>
+                    <p class="text-gray-600 mb-12">
+                        1:1 맞춤형 프로그래밍 교육을 통해 실무에서 바로 활용 가능한
+                        실력을 키워보세요. 무료 티타임 상담을 신청하시고 시작하세요!
+                    </p>
+                    <form class="space-y-6">
+                        <div class="space-y-4">
+                            <p class="font-medium text-gray-700">강의 유형 선택</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="plan" value="standard" class="peer sr-only" checked>
+                                    <div
+                                        class="p-4 border rounded-lg peer-checked:border-primary peer-checked:bg-primary/5 transition-colors">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <h4 class="text-lg font-bold">Standard Plan</h4>
+                                            <span class="text-sm bg-primary/10 text-primary px-2 py-1 rounded-full">주
+                                                2회</span>
+                                        </div>
+                                        <p class="text-2xl font-bold mb-2">월 80만원</p>
+                                        <ul class="text-sm text-gray-600 space-y-1">
+                                            <li class="flex items-center"><i
+                                                    class="ri-check-line text-primary mr-2"></i>월 8회 수업</li>
+                                            <li class="flex items-center"><i
+                                                    class="ri-check-line text-primary mr-2"></i>1회 2시간 수업</li>
+                                            <li class="flex items-center"><i
+                                                    class="ri-check-line text-primary mr-2"></i>시간대/요일 자유 선택</li>
+                                        </ul>
+                                    </div>
+                                </label>
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="plan" value="intensive" class="peer sr-only">
+                                    <div
+                                        class="p-4 border rounded-lg peer-checked:border-primary peer-checked:bg-primary/5 transition-colors">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <h4 class="text-lg font-bold">Intensive Plan</h4>
+                                            <span class="text-sm bg-primary/10 text-primary px-2 py-1 rounded-full">주
+                                                3회</span>
+                                        </div>
+                                        <p class="text-2xl font-bold mb-2">월 110만원</p>
+                                        <ul class="text-sm text-gray-600 space-y-1">
+                                            <li class="flex items-center"><i
+                                                    class="ri-check-line text-primary mr-2"></i>월 12회 수업</li>
+                                            <li class="flex items-center"><i
+                                                    class="ri-check-line text-primary mr-2"></i>1회 2시간 수업</li>
+                                            <li class="flex items-center"><i
+                                                    class="ri-check-line text-primary mr-2"></i>프로젝트 리뷰 제공</li>
+                                        </ul>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <input type="text" name="name" placeholder="이름" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                        </div>
+                        <div>
+                            <input type="email" name="email" placeholder="이메일" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                        </div>
+                        <div>
+                            <input type="tel" name="phone" placeholder="연락처" required
+                                pattern="[0-9]*" 
+                                inputmode="numeric"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                        </div>
+                        <div class="space-y-4">
+                            <p class="font-medium text-gray-700">희망 상담 일정 (최소 1개 이상 선택)</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="relative">
+                                    <div
+                                        class="flex items-center border border-gray-300 rounded-lg p-3 focus-within:border-primary">
+                                        <i class="ri-calendar-line text-gray-400 mr-2"></i>
+                                        <input type="date" class="w-full focus:outline-none" min="2025-02-16">
+                                    </div>
+                                    <div
+                                        class="flex items-center border border-gray-300 rounded-lg p-3 mt-2 focus-within:border-primary">
+                                        <i class="ri-time-line text-gray-400 mr-2"></i>
+                                        <select class="w-full focus:outline-none pr-8">
+                                            <option value="">시간 선택</option>
+                                            <option value="10:00">10:00</option>
+                                            <option value="11:00">11:00</option>
+                                            <option value="14:00">14:00</option>
+                                            <option value="15:00">15:00</option>
+                                            <option value="16:00">16:00</option>
+                                            <option value="17:00">17:00</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="relative">
+                                    <div
+                                        class="flex items-center border border-gray-300 rounded-lg p-3 focus-within:border-primary">
+                                        <i class="ri-calendar-line text-gray-400 mr-2"></i>
+                                        <input type="date" class="w-full focus:outline-none" min="2025-02-16">
+                                    </div>
+                                    <div
+                                        class="flex items-center border border-gray-300 rounded-lg p-3 mt-2 focus-within:border-primary">
+                                        <i class="ri-time-line text-gray-400 mr-2"></i>
+                                        <select class="w-full focus:outline-none pr-8">
+                                            <option value="">시간 선택</option>
+                                            <option value="10:00">10:00</option>
+                                            <option value="11:00">11:00</option>
+                                            <option value="14:00">14:00</option>
+                                            <option value="15:00">15:00</option>
+                                            <option value="16:00">16:00</option>
+                                            <option value="17:00">17:00</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="relative">
+                                    <div
+                                        class="flex items-center border border-gray-300 rounded-lg p-3 focus-within:border-primary">
+                                        <i class="ri-calendar-line text-gray-400 mr-2"></i>
+                                        <input type="date" class="w-full focus:outline-none" min="2025-02-16">
+                                    </div>
+                                    <div
+                                        class="flex items-center border border-gray-300 rounded-lg p-3 mt-2 focus-within:border-primary">
+                                        <i class="ri-time-line text-gray-400 mr-2"></i>
+                                        <select class="w-full focus:outline-none pr-8">
+                                            <option value="">시간 선택</option>
+                                            <option value="10:00">10:00</option>
+                                            <option value="11:00">11:00</option>
+                                            <option value="14:00">14:00</option>
+                                            <option value="15:00">15:00</option>
+                                            <option value="16:00">16:00</option>
+                                            <option value="17:00">17:00</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <textarea placeholder="학습 목표나 궁금한 점을 자유롭게 작성해주세요."
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary h-32"></textarea>
+                        </div>
+                        <div class="space-y-4 mb-6">
+                            <div class="flex items-start space-x-2">
+                                <input type="checkbox" id="privacyConsent" class="mt-1">
+                                <div class="flex-1">
+                                    <label for="privacyConsent" class="text-sm font-medium text-gray-900 cursor-pointer">
+                                        개인정보 수집 및 이용에 동의합니다. (필수)
+                                    </label>
+                                    <button type="button" onclick="togglePrivacyDetails()" 
+                                        class="text-sm text-primary hover:text-primary/80 ml-2">
+                                        자세히 보기 <i class="ri-arrow-down-s-line align-middle transition-transform" id="privacyArrow"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 개인정보 상세 내용 (기본적으로 접혀있음)/// -->
+                            <div id="privacyDetails" class="hidden bg-gray-50 p-4 rounded-lg text-sm space-y-4">
+                                <div>
+                                    <h4 class="font-medium text-gray-900 mb-2">1. 개인정보의 수집·이용 목적</h4>
+                                    <p class="text-gray-600">
+                                        PPA Tutoring은 '프로그래밍 스터디 신청'을 목적으로 신청자의 개인정보를 수집하며, 
+                                        수집된 개인정보는 '스터디 상담 및 진행' 목적으로만 이용됩니다.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900 mb-2">2. 수집하려는 개인정보의 항목</h4>
+                                    <p class="text-gray-600">
+                                        성명, 연락처(휴대폰), 이메일 주소, 희망 스터디 일정 등에 대한 사항입니다.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900 mb-2">3. 개인정보의 보유 및 이용기간</h4>
+                                    <p class="text-gray-600">
+                                        수집된 개인정보는 스터디 상담 및 진행이 완료된 후 6개월간 보관되며, 
+                                        이후 즉시 파기됩니다. 단, 관계 법령에 따라 보존할 필요가 있는 경우 해당 기간 동안 보관됩니다.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900 mb-2">4. 동의를 거부할 권리 및 동의 거부에 따른 불이익</h4>
+                                    <p class="text-gray-600">
+                                        개인정보 수집 및 이용에 대하여 동의를 거부할 수 있으나, 
+                                        거부할 시 스터디 신청이 제한됩니다.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" id="submitButton" disabled
+                            class="bg-primary text-white px-8 py-3 !rounded-button hover:bg-primary/90 w-full disabled:opacity-50 disabled:cursor-not-allowed">
+                            신청하기
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <a href="#" class="text-2xl font-['Pacifico'] text-white mb-4 block">PPA Study</a>
+                    <p class="text-gray-400">
+                        AI와 함께하는 실용적인 프로그래밍 학습
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#intro" class="text-gray-400 hover:text-white">소개</a></li>
+                        <li><a href="#schedule" class="text-gray-400 hover:text-white">커리큘럼</a></li>
+                        <li><a href="#method" class="text-gray-400 hover:text-white">스터디 방식</a></li>
+                        <li><a href="#reviews" class="text-gray-400 hover:text-white">수강후기</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Contact</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center text-gray-400">
+                            <i class="ri-mail-line mr-2"></i>
+                            dev.chanwoo@gmail.com
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="ri-phone-line mr-2"></i>
+                            010-7108-6391
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Follow Us</h3>
+                    <div class="flex space-x-4">
+                        <a href="#"
+                            class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
+                            <i class="ri-instagram-line"></i>
+                        </a>
+                        <a href="#"
+                            class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
+                            <i class="ri-facebook-line"></i>
+                        </a>
+                        <a href="#"
+                            class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
+                            <i class="ri-twitter-x-line"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 PPA Private Tutoring. All rights reserved.</p>
+                <a href="/study/admin.html" class="hover:text-white" style="color:#1c2b45;">admin</a>
+            </div>
+        </div>
+    </footer>
+    <div id="checkStatusModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+            <div id="checkStatusLogin" class="space-y-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">신청 내역 조회</h3>
+                    <button onclick="closeCheckStatus()" class="text-gray-600 hover:text-gray-900">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                <form id="checkStatusForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일</label>
+                        <input type="email" id="checkEmail" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">연락처</label>
+                        <input type="tel" id="checkPhone" required pattern="[0-9]*"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90">
+                            조회하기
+                        </button>
+                        <button type="button" onclick="closeCheckStatus()" 
+                            class="flex-1 bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300">
+                            취소
+                        </button>
+                    </div>
+                </form>
+            </div>
 
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 translate-y-full ${
+            <div id="statusResult" class="hidden space-y-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">신청 정보</h3>
+                    <div class="flex space-x-2">
+                        <button onclick="refreshStatus()" class="text-gray-600 hover:text-gray-900">
+                            <i class="ri-refresh-line text-xl"></i>
+                        </button>
+                        <button onclick="closeCheckStatus()" class="text-gray-600 hover:text-gray-900">
+                            <i class="ri-close-line text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="statusContent" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                    <!-- 여기에 동적으로 내용이 추가됩니다 -->
+                </div>
+                <div class="pt-4 border-t">
+                    <button onclick="closeCheckStatus()" 
+                        class="w-full bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300">
+                        닫기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mobile-menu fixed inset-0 bg-white z-50 transform transition-transform duration-300 translate-x-full md:hidden">
+        <div class="p-6">
+            <div class="flex justify-end">
+                <button aria-label="메뉴 닫기" class="text-gray-600 hover:text-gray-900">
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
+            </div>
+            <nav class="mt-8 space-y-6">
+                <a href="#intro" class="block text-lg text-gray-700 hover:text-primary">소개</a>
+                <a href="#schedule" class="block text-lg text-gray-700 hover:text-primary">커리큘럼</a>
+                <a href="#method" class="block text-lg text-gray-700 hover:text-primary">스터디 방식</a>
+                <a href="#reviews" class="block text-lg text-gray-700 hover:text-primary">수강후기</a>
+                <a href="javascript:void(0)" onclick="openCheckStatus(event)" class="block text-lg text-gray-700 hover:text-primary">신청조회</a>
+                <button onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})"
+                    class="w-full bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90">
+                    신청하기
+                </button>
+            </nav>
+        </div>
+    </div>
+    <script>
+        const mobileMenuButton = document.querySelector('button[aria-label="메뉴 열기"]');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const mobileMenuClose = document.querySelector('button[aria-label="메뉴 닫기"]');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.remove('translate-x-full');
+            document.body.style.overflow = 'hidden';
+        });
+
+        mobileMenuClose.addEventListener('click', () => {
+            mobileMenu.classList.add('translate-x-full');
+            document.body.style.overflow = '';
+        });
+
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('translate-x-full');
+                document.body.style.overflow = '';
+            });
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return; // '#' 링크는 처리하지 않음
+                
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    // 모바일 메뉴가 열려있다면 닫기
+                    const mobileMenu = document.querySelector('.mobile-menu');
+                    if (mobileMenu && !mobileMenu.classList.contains('translate-x-full')) {
+                        mobileMenu.classList.add('translate-x-full');
+                        document.body.style.overflow = '';
+                    }
+                }
+            });
+        });
+
+        const form = document.querySelector('form');
+        const dateInputs = form.querySelectorAll('input[type="date"]');
+        const timeSelects = form.querySelectorAll('select');
+        dateInputs.forEach(input => {
+            input.min = new Date().toISOString().split('T')[0];
+        });
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!document.getElementById('privacyConsent').checked) {
+                showToast('개인정보 수집 및 이용에 동의해주세요.', 'error');
+                return;
+            }
+
+            let isValid = true;
+            let errorMessage = '';
+
+            const dates = Array.from(dateInputs).map(input => input.value);
+            const times = Array.from(timeSelects).map(select => select.value);
+            
+            // 최소 1개의 날짜와 시간이 선택되었는지 확인
+            const validSchedules = dates.map((date, i) => ({
+                date,
+                time: times[i]
+            })).filter(schedule => schedule.date && schedule.time);
+
+            if (validSchedules.length === 0) {
+                isValid = false;
+                errorMessage = '최소 1개의 희망 일정을 선택해주세요.';
+            }
+
+            if (!isValid) {
+                showToast(errorMessage, 'error');
+                return;
+            }
+
+            try {
+                const formData = new FormData(form);
+                const selectedPlan = formData.get('plan'); // 선택된 강의 유형
+                
+                // 선택된 플랜에 따른 상세 정보
+                const planDetails = {
+                    'standard': {
+                        name: 'Standard Plan',
+                        frequency: '주 2회',
+                        price: '월 80만원',
+                        sessions: '월 8회 수업',
+                        duration: '1회 2시간 수업'
+                    },
+                    'intensive': {
+                        name: 'Intensive Plan',
+                        frequency: '주 3회',
+                        price: '월 110만원',
+                        sessions: '월 12회 수업',
+                        duration: '1회 2시간 수업'
+                    }
+                };
+
+                const data = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    schedules: validSchedules,
+                    message: formData.get('message'),
+                    plan: {
+                        type: selectedPlan,
+                        ...planDetails[selectedPlan]
+                    },
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await db.collection('teatimes').add(data);
+                showToast('신청이 완료되었습니다. 곧 연락드리겠습니다.', 'success');
+                form.reset();
+            } catch (error) {
+                showToast('신청 처리 중 오류가 발생했습니다.', 'error');
+                console.error('Error:', error);
+            }
+        });
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 translate-y-full ${
         type === 'success' ? 'bg-green-500' : 'bg-red-500'
     } text-white`;
-    toast.textContent = message;
-    
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.remove('translate-y-full');
-    }, 100);
-    
-    setTimeout(() => {
-        toast.classList.add('translate-y-full');
-        setTimeout(() => {
-            toast.remove();
-        }, 300);
-    }, 3000);
-}
-</script>
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('translate-y-full');
+            }, 100);
+            setTimeout(() => {
+                toast.classList.add('translate-y-full');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        function openCheckStatus(e) {
+            e.preventDefault();
+            document.getElementById('checkStatusModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+        }
+
+        function closeCheckStatus() {
+            document.getElementById('checkStatusModal').classList.add('hidden');
+            document.getElementById('checkStatusLogin').classList.remove('hidden');
+            document.getElementById('statusResult').classList.add('hidden');
+            document.getElementById('checkStatusForm').reset();
+            document.body.style.overflow = ''; // 배경 스크롤 복원
+        }
+
+        document.getElementById('checkStatusModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCheckStatus();
+            }
+        });
+
+        document.getElementById('checkStatusForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('checkEmail').value;
+            const phone = document.getElementById('checkPhone').value.replace(/[^0-9]/g, '');
+
+            try {
+                // 로딩 상태 표시
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.textContent = '조회중...';
+
+                // 먼저 이메일로 검색
+                const snapshot = await db.collection('teatimes')
+                    .where('email', '==', email)
+                    .get();
+
+                // 결과 중에서 전화번호가 일치하는 것만 필터링
+                const results = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.phone === phone) {
+                        results.push({ id: doc.id, ...data });
+                    }
+                });
+
+                // 결과를 날짜순으로 정렬
+                results.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+
+                // 버튼 상태 복구
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+
+                const statusResult = document.getElementById('statusResult');
+                const statusContent = document.getElementById('statusContent');
+                
+                if (results.length === 0) {
+                    showToast('신청 내역을 찾을 수 없습니다.', 'error');
+                    return;
+                }
+
+                statusContent.innerHTML = '';
+                results.forEach(data => {
+                    // 취소 가능 여부 확인 (대기중 상태일 때만 취소 가능)
+                    const canCancel = data.status === 'pending';
+                    
+                    statusContent.innerHTML += `
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="font-medium">${data.name}</p>
+                                    <p class="text-sm text-gray-600">신청일: ${new Date(data.createdAt.toDate()).toLocaleDateString()}</p>
+                                </div>
+                                <span class="px-3 py-1 text-sm font-medium rounded-full ${getStatusBadgeColor(data.status)}">
+                                    ${getStatusText(data.status)}
+                                </span>
+                            </div>
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">강의 유형</p>
+                                    <p class="font-medium">${data.plan.name}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">수강료</p>
+                                    <p class="font-medium">${data.plan.price}</p>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500 mb-2">희망 일정</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    ${data.schedules.map(s => `
+                                        <li class="text-sm">${s.date} ${s.time}</li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                            <div class="flex justify-end space-x-2">
+                                ${canCancel ? `
+                                    <button onclick="cancelConsultation('${data.id}')" 
+                                        class="px-4 py-2 text-sm text-red-600 hover:text-red-800 font-medium">
+                                        상담 취소
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // 새로고침 버튼을 상단에 추가
+                document.getElementById('statusResult').querySelector('.flex.justify-between').innerHTML = `
+                    <h3 class="text-xl font-bold">신청 정보</h3>
+                    <div class="flex space-x-2">
+                        <button onclick="refreshStatus()" class="text-gray-600 hover:text-gray-900">
+                            <i class="ri-refresh-line text-xl"></i>
+                        </button>
+                        <button onclick="closeCheckStatus()" class="text-gray-600 hover:text-gray-900">
+                            <i class="ri-close-line text-2xl"></i>
+                        </button>
+                    </div>
+                `;
+
+                document.getElementById('checkStatusLogin').classList.add('hidden');
+                statusResult.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('조회 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
+                
+                // 에러 발생 시에도 버튼 상태 복구
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                submitButton.disabled = false;
+                submitButton.textContent = '조회하기';
+            }
+        });
+
+        function getStatusBadgeColor(status) {
+            const colors = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'confirmed': 'bg-green-100 text-green-800',
+                'completed': 'bg-blue-100 text-blue-800',
+                'cancelled': 'bg-red-100 text-red-800'
+            };
+            return colors[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'pending': '대기중',
+                'confirmed': '확정',
+                'completed': '완료',
+                'cancelled': '취소'
+            };
+            return texts[status] || status;
+        }
+
+        // 새로고침 함수 추가
+        async function refreshStatus() {
+            const email = document.getElementById('checkEmail').value;
+            const phone = document.getElementById('checkPhone').value;
+            
+            // 기존 조회 함수 재사용
+            const event = { preventDefault: () => {}, target: document.getElementById('checkStatusForm') };
+            await document.getElementById('checkStatusForm').dispatchEvent(new Event('submit'));
+        }
+
+        // 상담 취소 함수 추가
+        async function cancelConsultation(docId) {
+            if (!confirm('상담 신청을 취소하시겠습니까?')) return;
+
+            try {
+                await db.collection('teatimes').doc(docId).update({
+                    status: 'cancelled',
+                    cancelReason: '고객의 요청에 의한 상담 취소',
+                    cancelledAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showToast('상담 신청이 취소되었습니다.', 'success');
+                refreshStatus(); // 목록 새로고침
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('취소 처리 중 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        // 개인정보 상세 내용 토글
+        function togglePrivacyDetails() {
+            const details = document.getElementById('privacyDetails');
+            const arrow = document.getElementById('privacyArrow');
+            details.classList.toggle('hidden');
+            arrow.style.transform = details.classList.contains('hidden') ? '' : 'rotate(180deg)';
+        }
+
+        // 개인정보 동의 체크박스 이벤트
+        document.getElementById('privacyConsent').addEventListener('change', function(e) {
+            const submitButton = document.getElementById('submitButton');
+            submitButton.disabled = !e.target.checked;
+        });
+    </script>
 </body>
+
 </html>

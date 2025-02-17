@@ -64,6 +64,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">신청일</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">연락처</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">강의 유형</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">희망일정</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
@@ -107,11 +108,26 @@
                         <p class="font-medium">${new Date(data.createdAt.toDate()).toLocaleString()}</p>
                     </div>
                     <div class="col-span-2">
+                        <p class="text-sm text-gray-500">강의 유형</p>
+                        <div class="mt-1 p-3 bg-gray-50 rounded-lg">
+                            <p class="font-medium text-lg">${data.plan.name}</p>
+                            <div class="mt-2 grid grid-cols-2 gap-2 text-sm">
+                                <p><span class="text-gray-500">수업 빈도:</span> ${data.plan.frequency}</p>
+                                <p><span class="text-gray-500">수업 횟수:</span> ${data.plan.sessions}</p>
+                                <p><span class="text-gray-500">수업 시간:</span> ${data.plan.duration}</p>
+                                <p><span class="text-gray-500">수강료:</span> ${data.plan.price}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-2">
                         <p class="text-sm text-gray-500">현재 상태</p>
                         <p class="font-medium">
                             <span class="status-display px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(data.status)}">
                                 ${getStatusText(data.status)}
                             </span>
+                            ${data.status === 'cancelled' && data.cancelReason ? `
+                                <span class="ml-2 text-sm text-gray-600">(${data.cancelReason})</span>
+                            ` : ''}
                         </p>
                     </div>
                 </div>
@@ -126,6 +142,22 @@
                 <div class="mt-4">
                     <p class="text-sm text-gray-500">메시지</p>
                     <p class="mt-1">${data.message || '없음'}</p>
+                </div>
+                <div class="mt-6 border-t pt-4">
+                    <h4 class="text-lg font-bold mb-4">1:1 문의</h4>
+                    <div id="adminMessageList" class="h-[300px] overflow-y-auto space-y-4 mb-4">
+                        <!-- 메시지들이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                    <form id="adminMessageForm" class="flex space-x-2">
+                        <textarea 
+                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary resize-none"
+                            placeholder="메시지를 입력하세요"
+                            rows="3"></textarea>
+                        <button type="submit" 
+                            class="self-end bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90">
+                            전송
+                        </button>
+                    </form>
                 </div>
             </div>
             <div class="mt-6">
@@ -207,16 +239,19 @@
                         <td class="px-6 py-4 whitespace-nowrap">${new Date(data.createdAt.toDate()).toLocaleDateString()}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${data.name}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${data.phone}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary">
+                                ${data.plan?.name || 'Standard Plan'}
+                            </span>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">${data.schedules[0].date} ${data.schedules[0].time}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                ${getStatusColor(data.status)}">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(data.status)}">
                                 ${getStatusText(data.status)}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <button onclick="showDetail('${doc.id}')" 
-                                class="text-primary hover:text-primary/80">
+                            <button onclick="showDetail('${doc.id}')" class="text-primary hover:text-primary/80">
                                 상세보기
                             </button>
                         </td>
@@ -273,11 +308,26 @@
                         <p class="font-medium">${new Date(data.createdAt.toDate()).toLocaleString()}</p>
                     </div>
                     <div class="col-span-2">
+                        <p class="text-sm text-gray-500">강의 유형</p>
+                        <div class="mt-1 p-3 bg-gray-50 rounded-lg">
+                            <p class="font-medium text-lg">${data.plan.name}</p>
+                            <div class="mt-2 grid grid-cols-2 gap-2 text-sm">
+                                <p><span class="text-gray-500">수업 빈도:</span> ${data.plan.frequency}</p>
+                                <p><span class="text-gray-500">수업 횟수:</span> ${data.plan.sessions}</p>
+                                <p><span class="text-gray-500">수업 시간:</span> ${data.plan.duration}</p>
+                                <p><span class="text-gray-500">수강료:</span> ${data.plan.price}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-2">
                         <p class="text-sm text-gray-500">현재 상태</p>
                         <p class="font-medium">
                             <span class="status-display px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(data.status)}">
                                 ${getStatusText(data.status)}
                             </span>
+                            ${data.status === 'cancelled' && data.cancelReason ? `
+                                <span class="ml-2 text-sm text-gray-600">(${data.cancelReason})</span>
+                            ` : ''}
                         </p>
                     </div>
                 </div>
@@ -350,11 +400,72 @@
                 }
             };
 
+            // 메시지 구독 및 전송 로직 추가
+            let currentMessageUnsubscribe = null;
+
+            function subscribeToMessages(teatimeId) {
+                if (currentMessageUnsubscribe) {
+                    currentMessageUnsubscribe();
+                }
+                
+                const messageList = document.getElementById('adminMessageList');
+                messageList.innerHTML = '';
+                
+                currentMessageUnsubscribe = db.collection('messages')
+                    .where('teatimeId', '==', teatimeId)
+                    .orderBy('createdAt', 'asc')
+                    .onSnapshot((snapshot) => {
+                        snapshot.docChanges().forEach((change) => {
+                            if (change.type === 'added') {
+                                const message = change.doc.data();
+                                const messageEl = createMessageElement(message);
+                                messageList.appendChild(messageEl);
+                                messageList.scrollTop = messageList.scrollHeight;
+                                
+                                // 관리자가 읽었음을 표시
+                                if (message.sender === 'user' && !message.readAt) {
+                                    db.collection('messages').doc(change.doc.id).update({
+                                        readAt: firebase.firestore.FieldValue.serverTimestamp()
+                                    });
+                                }
+                            }
+                        });
+                    });
+            }
+
+            document.getElementById('adminMessageForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const input = document.getElementById('adminMessageInput');
+                const content = input.value.trim();
+                
+                if (!content || !docId) return;
+                
+                try {
+                    await db.collection('messages').add({
+                        teatimeId: docId,
+                        userId: 'admin',
+                        content: content,
+                        sender: 'admin',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        readAt: null
+                    });
+                    
+                    input.value = '';
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('메시지 전송 중 오류가 발생했습니다.', 'error');
+                }
+            });
+
             document.getElementById('detailModal').classList.remove('hidden');
         }
 
         // 모달 닫기
         function closeModal() {
+            if (currentMessageUnsubscribe) {
+                currentMessageUnsubscribe();
+            }
             document.getElementById('detailModal').classList.add('hidden');
         }
 
