@@ -180,13 +180,64 @@
         }
 
         .vote-button {
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
+            border: 2px solid transparent;
+            padding: 10px 10px;
+            border-radius: 25px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
+        .vote-button::before {
+            content: "👉";
+            margin-left: 5px;
+            transform: translateY(2px);
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(2px); }
+            50% { transform: translateY(-2px); }
+        }
+        
+        .vote-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .vote-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 투표 안내 텍스트 추가 */
+        .vote-guide {
+            text-align: center;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .vote-guide p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .vote-guide strong {
+            color: #333;
+            font-weight: bold;
+        }
+
         .progress {
             height: 25px;
         }
@@ -382,14 +433,13 @@
 
         .header {
             position: relative;
-            padding: 60px 0;
+            padding: 35px 0;
             background: linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.92)),
                         url('../resources/footer.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             text-align: center;
-            margin-bottom: 20px;
         }
         
         .header::after {
@@ -398,7 +448,6 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 60px;
             background: linear-gradient(
                 to bottom,
                 rgba(255, 255, 255, 0),
@@ -413,9 +462,12 @@
         
         .header h1 {
             color: #333;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+        
+        .highlight-text {
+            background: rgba(255, 255, 255, 0.85);
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
         }
         
         .header h3 {
@@ -431,11 +483,14 @@
 <body>
     <div class="header">
         <div class="container">
-            <h2>🏡 <b>우리동네 <br/>무인 슈퍼마켓의 새로운 변신!</b></h2>
-            <h4>여러분의 의견을 듣고 싶어요 😊</h4>
+            <h1><span class="highlight-text">우리동네<br/>무인 슈퍼마켓의 새로운 변신!</span></h1>
+            <h3>여러분의 소중한 한 표를 기다립니다</h3>
         </div>
     </div>
     <div class="container py-4">        
+        <div class="vote-guide">
+            <p>👇 아래 카드 중 마음에 드는 이름에 🗳️투표해주세요! <small>(💁‍♀️ 카드를 클릭하면, 상세 설명을 볼 수 있어요.)</small></p>
+        </div>
         <div class="row g-3">
             <div class="col-6">
                 <div class="vote-card" id="card-맛나25">
@@ -450,7 +505,7 @@
                                     <div class="progress-bar" id="progress-맛나25" role="progressbar"></div>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="mb-0" id="count-맛나25">0표</h4>
+                                    <h5 class="mb-0" id="count-맛나25">0표</h5>
                                     <button class="vote-button" onclick="vote('맛나25'); event.stopPropagation();">
                                         투표하기
                                     </button>
@@ -480,7 +535,7 @@
                                     <div class="progress-bar" id="progress-잘산데이" role="progressbar"></div>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="mb-0" id="count-잘산데이">0표</h4>
+                                    <h5 class="mb-0" id="count-잘산데이">0표</h5>
                                     <button class="vote-button" onclick="vote('잘산데이'); event.stopPropagation();">
                                         투표하기
                                     </button>
@@ -510,7 +565,7 @@
                                     <div class="progress-bar" id="progress-바른25" role="progressbar"></div>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="mb-0" id="count-바른25">0표</h4>
+                                    <h5 class="mb-0" id="count-바른25">0표</h5>
                                     <button class="vote-button" onclick="vote('바른25'); event.stopPropagation();">
                                         투표하기
                                     </button>
@@ -540,7 +595,7 @@
                                     <div class="progress-bar" id="progress-모아25" role="progressbar"></div>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="mb-0" id="count-모아25">0표</h4>
+                                    <h5 class="mb-0" id="count-모아25">0표</h5>
                                     <button class="vote-button" onclick="vote('모아25'); event.stopPropagation();">
                                         투표하기
                                     </button>
