@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동네 슈퍼 이름 투표</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Firebase 관련 스크립트 추가!!  -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <style>
+        .vote-card {
+            perspective: 1000px;
+            height: 400px;
+            cursor: pointer;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        .vote-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-front {
+            justify-content: space-between;
+        }
+        .card-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .vote-section {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        /* 각 카드별 그라데이션 */
+        #card-맛나25 {
+            --primary: #FF8C42;
+            --secondary: #E63946;
+            --accent: #FDF5E6;
+            --text: #8B5A2B;
+        }
+        
+        #card-잘산데이 {
+            --primary: #FFD700;
+            --secondary: #003366;
+            --accent: #FAF3E0;
+            --text: #FFCC00;
+        }
+        
+        #card-바른25 {
+            --primary: #4CAF50;
+            --secondary: #d9a664;
+            --accent: #FFFDD0;
+            --text: #FFFFFF;
+        }
+        
+        #card-모아25 {
+            --primary: #DAA520;
+            --secondary: #1E3A5F;
+            --accent: #F5DEB3;
+            --text: #FFFFFF;
+        }
+
+        #card-맛나25 .card-front {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--accent);
+        }
+        #card-맛나25 .card-back {
+            background: var(--accent);
+            color: var(--text);
+        }
+        #card-맛나25 .vote-button {
+            background: var(--text);
+            color: var(--accent);
+        }
+        #card-맛나25 .vote-button:hover {
+            background: var(--primary);
+        }
+        #card-맛나25 .progress-bar {
+            background-color: var(--secondary);
+        }
+
+        #card-잘산데이 .card-front {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--accent);
+        }
+        #card-잘산데이 .card-back {
+            background: var(--accent);
+            color: var(--secondary);
+        }
+        #card-잘산데이 .vote-button {
+            background: var(--text);
+            color: var(--accent);
+        }
+        #card-잘산데이 .vote-button:hover {
+            background: var(--primary);
+        }
+        #card-잘산데이 .progress-bar {
+            background-color: var(--text);
+        }
+
+        #card-바른25 .card-front {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text);
+        }
+        #card-바른25 .card-back {
+            background: var(--accent);
+            color: var(--secondary);
+        }
+        #card-바른25 .vote-button {
+            background: var(--secondary);
+            color: var(--text);
+        }
+        #card-바른25 .vote-button:hover {
+            background: var(--primary);
+        }
+        #card-바른25 .progress-bar {
+            background-color: var(--primary);
+        }
+
+        #card-모아25 .card-front {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text);
+        }
+        #card-모아25 .card-back {
+            background: var(--accent);
+            color: var(--secondary);
+        }
+        #card-모아25 .vote-button {
+            background: var(--primary);
+            color: var(--text);
+        }
+        #card-모아25 .vote-button:hover {
+            background: var(--secondary);
+        }
+        #card-모아25 .progress-bar {
+            background-color: var(--primary);
+        }
+
+        .vote-button {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .progress {
+            height: 25px;
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            animation: fall 3s linear forwards;
+            z-index: 1000;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+
+        /* 모바일에서 카드 높이 조정 */
+        @media (max-width: 768px) {
+            .vote-card {
+                height: 260px;
+            }
+            .card-front, .card-back {
+                padding: 15px;
+            }
+            .vote-section {
+                padding-top: 15px;
+            }
+            .card-front h3 {
+                font-size: 1.2rem;
+            }
+            .card-front p, .card-back p {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* 모달 스타일 추가 */
+        .modal-age-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .age-icon {
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .age-icon.selected {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <h1 class="text-center mb-4">동네 슈퍼의 새로운 변신!</h1>
+        <h3 class="text-center mb-4">여러분의 의견을 듣고 싶어요 😊</h3>
+        
+        <div class="row g-3">
+            <div class="col-6">
+                <div class="vote-card" id="card-맛나25">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-content">
+                                <h3>맛나25</h3>
+                                <p>"맛나게 사는 곳"</p>
+                            </div>
+                            <div class="vote-section">
+                                <div class="progress mb-2">
+                                    <div class="progress-bar" id="progress-맛나25" role="progressbar"></div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <p class="mb-0" id="count-맛나25">0표</p>
+                                    <button class="vote-button" onclick="vote('맛나25'); event.stopPropagation();">
+                                        투표하기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <div>
+                                <p class="mb-3">"맛있는 게 가득한 25시 편의점"</p>
+                                <p class="small">따뜻하고 친근한 느낌! 어릴 적 동네 슈퍼처럼 편안하지만, 트렌디한 무인 시스템을 더한 매장입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="vote-card" id="card-잘산데이">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-content">
+                                <h3>잘산데이 / 잘산DAY25</h3>
+                                <p>"오늘도 잘 산다!"</p>
+                            </div>
+                            <div class="vote-section">
+                                <div class="progress mb-2">
+                                    <div class="progress-bar" id="progress-잘산데이" role="progressbar"></div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <p class="mb-0" id="count-잘산데이">0표</p>
+                                    <button class="vote-button" onclick="vote('잘산데이'); event.stopPropagation();">
+                                        투표하기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <div>
+                                <p class="mb-3">"좋은 소비, 좋은 하루"</p>
+                                <p class="small">구매(Buy)와 생활(Living)의 의미를 동시에 담은 이름! 부담 없이 들러서 필요한 걸 편하게 사는 공간이자, 일상을 더 풍요롭게 만드는 슈퍼를 지향합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="vote-card" id="card-바른25">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-content">
+                                <h3>바른25</h3>
+                                <p>"바르고 신선한 제품을 편리하게"</p>
+                            </div>
+                            <div class="vote-section">
+                                <div class="progress mb-2">
+                                    <div class="progress-bar" id="progress-바른25" role="progressbar"></div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <p class="mb-0" id="count-바른25">0표</p>
+                                    <button class="vote-button" onclick="vote('바른25'); event.stopPropagation();">
+                                        투표하기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <div>
+                                <p class="mb-3">건강하고 정직한 느낌!</p>
+                                <p class="small">제품을 꼼꼼히 선별해 좋은 것만 제공하는 신뢰감 있는 무인 슈퍼. 가족들도 안심하고 이용할 수 있는 따뜻한 브랜드입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="vote-card" id="card-모아25">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-content">
+                                <h3>모아25 / 다모아25</h3>
+                                <p>"필요한 것, 다 모였다!"</p>
+                            </div>
+                            <div class="vote-section">
+                                <div class="progress mb-2">
+                                    <div class="progress-bar" id="progress-모아25" role="progressbar"></div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <p class="mb-0" id="count-모아25">0표</p>
+                                    <button class="vote-button" onclick="vote('모아25'); event.stopPropagation();">
+                                        투표하기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <div>
+                                <p class="mb-3">다채로운 상품과 실속 있는 구성을 강조한 이름!</p>
+                                <p class="small">동네 주민들이 필요한 걸 한곳에서 편리하게 구매할 수 있는 실속형 무인 슈퍼를 뜻합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <p class="text-muted">여러분의 소중한 의견이 새로운 동네 슈퍼의 이름이 됩니다!</p>
+            <br/>
+            <small>
+                <a href="/notice/admin_votes.html" style="color: #a5a4a4;" target="_blank">
+                    admin
+                </a>
+            </small>
+        </div>
+    </div>
+
+    <!-- 투표 모달 추가 -->
+    <div class="modal fade" id="voteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">투표하기</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="mb-3">연령대를 선택해주세요</h6>
+                    <div class="modal-age-group">
+                        <div class="age-icon" data-age="10">10대</div>
+                        <div class="age-icon" data-age="20">20대</div>
+                        <div class="age-icon" data-age="30">30대</div>
+                        <div class="age-icon" data-age="40">40대</div>
+                        <div class="age-icon" data-age="50">50대</div>
+                        <div class="age-icon" data-age="60">60대 이상</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">닉네임</label>
+                        <input type="text" class="form-control" id="nickname">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">연락처 (당첨시 연락용)</label>
+                        <input type="tel" class="form-control" id="phone">
+                    </div>
+                    <input type="hidden" id="selectedStore">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="submitVote()">투표하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbu_1gbtSIVUvmmw5RyLYvjaYOG7RdCWw",
+            authDomain: "ppap-ea44a.firebaseapp.com",
+            projectId: "ppap-ea44a",
+            storageBucket: "ppap-ea44a.firebasestorage.app",
+            messagingSenderId: "811949338329",
+            appId: "1:811949338329:web:cda8d43a7aeb825ce258c8",
+            measurementId: "G-6QGZT6Y1TE"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        let selectedAge = null;
+        const voteModal = new bootstrap.Modal(document.getElementById('voteModal'));
+        
+        // 연령대 선택 이벤트
+        document.querySelectorAll('.age-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                document.querySelectorAll('.age-icon').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedAge = this.dataset.age;
+            });
+        });
+
+        // 투표 함수 수정
+        function vote(option) {
+            document.getElementById('selectedStore').value = option;
+            voteModal.show();
+        }
+
+        // 실시간 투표 현황 업데이트
+        function initializeVoteCount() {
+            db.collection('votes')
+                .where('type', '==', 'storeName')
+                .onSnapshot((snapshot) => {
+                    const votes = {
+                        '맛나25': 0,
+                        '잘산데이': 0,
+                        '바른25': 0,
+                        '모아25': 0
+                    };
+                    
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.vote in votes) {
+                            votes[data.vote]++;
+                        }
+                    });
+                    
+                    updateVoteCounts(votes);
+                }, (error) => {
+                    console.error("Error getting vote counts:", error);
+                });
+        }
+
+        // 투표 제출
+        async function submitVote() {
+            const storeName = document.getElementById('selectedStore').value;
+            const nickname = document.getElementById('nickname').value;
+            const phone = document.getElementById('phone').value;
+            
+            try {
+                await db.collection('votes').add({
+                    type: 'storeName',
+                    vote: storeName,
+                    age: selectedAge,
+                    nickname: nickname,
+                    phone: phone,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                createConfetti();
+                voteModal.hide();
+                
+                alert('투표가 완료되었습니다. 참여해주셔서 감사합니다!');
+                
+                // 입력 필드 초기화
+                document.getElementById('nickname').value = '';
+                document.getElementById('phone').value = '';
+                document.querySelectorAll('.age-icon').forEach(i => i.classList.remove('selected'));
+                selectedAge = null;
+                
+            } catch (error) {
+                console.error("Error submitting vote:", error);
+                alert('투표 중 오류가 발생했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        // 투표 현황 업데이트
+        function updateVoteCounts(votes) {
+            const total = Object.values(votes).reduce((a, b) => a + b, 0);
+            
+            Object.entries(votes).forEach(([option, count]) => {
+                const percentage = total ? (count / total * 100).toFixed(1) : 0;
+                const progressBar = document.getElementById(`progress-${option}`);
+                if (progressBar) {
+                    progressBar.style.width = `${percentage}%`;
+                    progressBar.textContent = `${percentage}%`;
+                    document.getElementById(`count-${option}`).textContent = `${count}표`;
+                }
+            });
+        }
+
+        // 꽃가루 효과 (기존 코드 유지)
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                document.body.appendChild(confetti);
+                
+                confetti.addEventListener('animationend', () => {
+                    confetti.remove();
+                });
+            }
+        }
+
+        // 카드 플립 기능
+        document.querySelectorAll('.vote-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.classList.toggle('flipped');
+            });
+        });
+
+        // 투표 버튼 클릭 시 카드 플립 방지
+        document.querySelectorAll('.vote-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+
+        // 실시간 투표 현황 시작
+        initializeVoteCount();
+    </script>
+</body>
+</html>
