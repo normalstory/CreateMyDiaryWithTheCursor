@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>동네 슈퍼 이름 투표</title>
-
+    <title>우리동네 무인 슈퍼마켓 이름 투표</title>
+    
     <!-- Open Graph / Facebook -->
     <link rel="icon" type="image/x-icon" href="../resources/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="../resources/ice-cream.jpg">
@@ -307,15 +307,135 @@
             70% { opacity: 1; }
             100% { opacity: 0; }
         }
+
+        .footer {
+            position: relative;
+            padding: 40px 0;
+            background: linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.12)),
+                        url('../resources/footer.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .footer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(
+                to top,
+                rgba(255, 255, 255, 0),
+                rgba(255, 255, 255, 1)
+            );
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(to right, 
+                rgba(0,0,0,0), 
+                rgba(0,0,0,0.1), 
+                rgba(0,0,0,0));
+        }
+        
+        .footer .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer p {
+            margin-bottom: 1.5em;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .footer a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer a:hover {
+            color: #333;
+        }
+        
+        .footer small {
+            color: #888;
+        }
+
+        /* 카드 영역 배경색 추가 */
+        .container.py-4 {
+            background-color: white;
+            border-radius: 20px;
+            margin-top: -20px;
+            margin-bottom: -20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            position: relative;
+            padding: 60px 0;
+            background: linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.92)),
+                        url('../resources/footer.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0),
+                rgba(255, 255, 255, 1)
+            );
+        }
+        
+        .header .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+        
+        .header h3 {
+            color: #555;
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
     </style>
     <!-- Font Awesome CDN 추가 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container py-5">
-        <h1 class="text-center mb-4">동네 슈퍼의 새로운 변신!</h1>
-        <h3 class="text-center mb-4">여러분의 의견을 듣고 싶어요 😊</h3>
-        
+    <div class="header">
+        <div class="container">
+            <h2>🏡 <b>우리동네 <br/>무인 슈퍼마켓의 새로운 변신!</b></h2>
+            <h4>여러분의 의견을 듣고 싶어요 😊</h4>
+        </div>
+    </div>
+    <div class="container py-4">        
         <div class="row g-3">
             <div class="col-6">
                 <div class="vote-card" id="card-맛나25">
@@ -340,7 +460,7 @@
                         <div class="card-back">
                             <div>
                                 <p class="mb-3">"맛있는 게 가득한 25시 편의점"</p>
-                                <p class="small">따뜻하고 친근한 느낌! 어릴 적 동네 슈퍼처럼 편안하지만, 트렌디한 무인 시스템을 더한 매장입니다.</p>
+                                <p class="small">따뜻하고 친근한 느낌! 어릴 적 우리동네 무인 슈퍼처럼 편안하지만, 트렌디한 무인 시스템을 더한 매장입니다.</p>
                             </div>
                         </div>
                     </div>
@@ -437,26 +557,29 @@
                 </div>
             </div>
         </div>
-
-        <div class="addStyle text-center mt-5">
-            <p class="text-muted">여러분의 소중한 의견이 새로운 동네 슈퍼의 이름이 됩니다! 많은 분들과 공유해주세요~ 🙏</p>
-            <!-- 공유 버튼 -->
-            <button class="share-button" onclick="shareContent()">
-                <span class="share-button-text">공유</span>
-                <i class="fas fa-share-alt"></i>
-            </button>
-            
-        </div>
     </div>
-    <!-- 공유 완료 토스트 메시지 -->
-    <div id="shareToast">링크가 복사되었습니다!</div>
-    <div style="text-align: center;">
-        <br/>
-        <small>
-            <a href="/notice/admin_votes.html" style="color: #a5a4a4;" target="_blank">
-                👉 admin
-            </a>
-        </small>
+
+    <div class="footer">
+        <div class="container">
+            <div class="addStyle text-center mt-5">
+                <p class="text-muted">여러분의 소중한 의견이 새로운 우리동네 무인 슈퍼마켓의 이름이 됩니다! 많은 분들과 공유해주세요~ 🙏</p>
+                <!-- 공유 버튼 -->
+                <button class="share-button" onclick="shareContent()">
+                    <span class="share-button-text">공유</span>
+                    <i class="fas fa-share-alt"></i>
+                </button>
+            </div>
+            <!-- 공유 완료 토스트 메시지 -->
+            <div id="shareToast">링크가 복사되었습니다!</div>
+            <div style="text-align: center;">
+                <br/>
+                <small>
+                    <a href="/notice/admin_votes.html" style="color: #ffffff;" target="_blank">
+                        (( 👉 admin  ))
+                    </a>
+                </small>
+            </div>
+        </div>
     </div>
 
     <!-- 투표 모달 추가 -->
@@ -727,8 +850,8 @@
         // 공유 기능
         async function shareContent() {
             const shareData = {
-                title: '동네 슈퍼의 새로운 변신!',
-                text: '여러분의 의견을 듣고 싶어요! 새로운 동네 슈퍼의 이름을 투표해주세요.',
+                title: '우리동네 무인 슈퍼의 새로운 변신!',
+                text: '여러분의 의견을 듣고 싶어요! 새로운 우리동네 무인 슈퍼의 이름을 투표해주세요.',
                 url: window.location.href
             };
 
