@@ -537,8 +537,33 @@
             });
         });
 
+        // 페이지 로드 시 카드 플립 애니메이션
+        function initialCardFlips() {
+            const cards = document.querySelectorAll('.vote-card');
+            let delay = 500; // 첫 번째 카드 시작 전 대기 시간
+            
+            cards.forEach((card, index) => {
+                // 각 카드 플립
+                setTimeout(() => {
+                    card.classList.add('flipped');
+                    
+                    // 0.8초 후 원래대로 복귀
+                    setTimeout(() => {
+                        card.classList.remove('flipped');
+                    }, 800);
+                }, delay);
+                
+                delay += 1000; // 다음 카드는 1초 후에 시작
+            });
+        }
+
         // 실시간 투표 현황 시작
         initializeVoteCount();
+        
+        // 페이지 로드 완료 후 카드 플립 애니메이션 시작
+        window.addEventListener('load', () => {
+            setTimeout(initialCardFlips, 500);
+        });
     </script>
 </body>
 </html>
