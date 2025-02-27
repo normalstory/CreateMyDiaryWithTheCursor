@@ -55,7 +55,18 @@
             text-align: center;
             padding: 30px;
         }
-        
+
+        /* 커스텀 스타일 */
+        .addStyle {
+            display: flex;
+            gap: 1em;
+        }
+        .share-button-text{
+            width: max-content;
+            margin-right: .5em;
+        }
+
+
         /* 각 카드별 그라데이션 */
         #card-맛나25 {
             --primary: #FF8C42;
@@ -174,15 +185,42 @@
         }
         .confetti {
             position: fixed;
-            width: 10px;
-            height: 10px;
-            background-color: #f00;
-            animation: fall 3s linear forwards;
+            pointer-events: none;
+            opacity: 0;
+            animation: explode 3s ease-out forwards;
             z-index: 1000;
+            transform-origin: center;
+            will-change: transform, opacity;
         }
-        @keyframes fall {
-            to {
-                transform: translateY(100vh);
+        
+        @keyframes explode {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0) scale(0.3) rotate(0deg);
+            }
+            10% {
+                opacity: 1;
+                transform: translate(calc(var(--tx) * 0.3), calc(var(--ty) * 0.3)) scale(0.6) rotate(var(--r));
+            }
+            15% {
+                opacity: 1;
+                transform: translate(calc(var(--tx) * 0.6), calc(var(--ty) * 0.6)) scale(1) rotate(var(--r));
+            }
+            40% {
+                opacity: 1;
+                transform: translate(var(--tx), var(--ty)) scale(1) rotate(calc(var(--r) * 1.5));
+            }
+            70% {
+                opacity: 0.8;
+                transform: translate(calc(var(--tx) * 1.2), calc(var(--ty) * 1.2)) scale(0.9) rotate(calc(var(--r) * 2));
+            }
+            90% {
+                opacity: 0.3;
+                transform: translate(calc(var(--tx) * 1.3), calc(var(--ty) * 1.3)) scale(0.5) rotate(calc(var(--r) * 2.5));
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(var(--tx) * 1.4), calc(var(--ty) * 1.4)) scale(0.2) rotate(calc(var(--r) * 3));
             }
         }
 
@@ -227,7 +265,44 @@
             color: white;
             border-color: #007bff;
         }
+
+        .share-button {
+            padding: 0 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: .8em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+        
+        .share-button:hover {
+            transform: scale(1.1);
+        }
+        
+        #shareToast {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: none;
+            animation: fadeOut 2s forwards;
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
     </style>
+    <!-- Font Awesome CDN 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container py-5">
@@ -356,24 +431,34 @@
             </div>
         </div>
 
-        <div class="text-center mt-5">
-            <p class="text-muted">여러분의 소중한 의견이 새로운 동네 슈퍼의 이름이 됩니다!</p>
-            <br/>
-            <small>
-                <a href="/notice/admin_votes.html" style="color: #a5a4a4;" target="_blank">
-                    admin
-                </a>
-            </small>
+        <div class="addStyle text-center mt-5">
+            <p class="text-muted">여러분의 소중한 의견이 새로운 동네 슈퍼의 이름이 됩니다! 많은 분들과 공유해주세요~ 🙏</p>
+            <!-- 공유 버튼 -->
+            <button class="share-button" onclick="shareContent()">
+                <span class="share-button-text">공유</span>
+                <i class="fas fa-share-alt"></i>
+            </button>
+            
         </div>
+    </div>
+    <!-- 공유 완료 토스트 메시지 -->
+    <div id="shareToast">링크가 복사되었습니다!</div>
+    <div style="text-align: center;">
+        <br/>
+        <small>
+            <a href="/notice/admin_votes.html" style="color: #a5a4a4;" target="_blank">
+                👉 admin
+            </a>
+        </small>
     </div>
 
     <!-- 투표 모달 추가 -->
-    <div class="modal fade" id="voteModal" tabindex="-1">
+    <div class="modal fade" id="voteModal" tabindex="-1" aria-modal="true" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">투표하기</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                 </div>
                 <div class="modal-body">
                     <h6 class="mb-3">연령대를 선택해주세요</h6>
@@ -419,6 +504,14 @@
         
         let selectedAge = null;
         const voteModal = new bootstrap.Modal(document.getElementById('voteModal'));
+        
+        // 이모지 배열을 전역 변수로 이동
+        const FIREWORK_EMOJIS = [
+            '✨', '🎈', '🎉', '🎊',
+            '🎋', '🎀', '🎁', '🎗️',
+            '🍭', '🍬', '🍫', '🧁',
+            '🍰', '🎂'
+        ];
         
         // 연령대 선택 이벤트
         document.querySelectorAll('.age-icon').forEach(icon => {
@@ -479,7 +572,7 @@
                 createConfetti();
                 voteModal.hide();
                 
-                alert('투표가 완료되었습니다. 참여해주셔서 감사합니다!');
+                alert('투표가 완료되었습니다. 🎉 참여해주셔서 감사합니다!');
                 
                 // 입력 필드 초기화
                 document.getElementById('nickname').value = '';
@@ -508,13 +601,72 @@
             });
         }
 
-        // 꽃가루 효과 (기존 코드 유지)
+        // 꽃가루 효과 개선
         function createConfetti() {
-            for (let i = 0; i < 50; i++) {
+            const positions = [
+                { x: 0, y: 0 },                    // 좌상단
+                { x: window.innerWidth, y: 0 },    // 우상단
+                { x: 0, y: window.innerHeight },   // 좌하단
+                { x: window.innerWidth, y: window.innerHeight }, // 우하단
+                { x: window.innerWidth/2, y: window.innerHeight/2 }  // 중앙
+            ];
+            
+            positions.sort(() => Math.random() - 0.5);
+            
+            // 첫 번째 라운드
+            positions.forEach((pos, index) => {
+                setTimeout(() => {
+                    createSingleFirework(pos.x, pos.y);
+                }, index * 600);  // 0.6초 간격으로 증가
+            });
+
+            // 두 번째 라운드
+            setTimeout(() => {
+                positions.sort(() => Math.random() - 0.5);
+                positions.forEach((pos, index) => {
+                    setTimeout(() => {
+                        createSingleFirework(pos.x, pos.y);
+                    }, index * 600);
+                });
+            }, 3000);  // 3초 후 두 번째 라운드
+            
+            // 세 번째 라운드
+            setTimeout(() => {
+                positions.sort(() => Math.random() - 0.5);
+                positions.forEach((pos, index) => {
+                    setTimeout(() => {
+                        createSingleFirework(pos.x, pos.y);
+                    }, index * 600);
+                });
+            }, 6000);  // 6초 후 세 번째 라운드
+        }
+        
+        function createSingleFirework(x, y) {
+            for (let i = 0; i < 20; i++) {  // 파티클 수 약간 감소
                 const confetti = document.createElement('div');
                 confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.textContent = FIREWORK_EMOJIS[Math.floor(Math.random() * FIREWORK_EMOJIS.length)];
+                
+                // 시작 위치 약간 랜덤하게 조정
+                const offsetX = (Math.random() - 0.5) * 20;
+                const offsetY = (Math.random() - 0.5) * 20;
+                confetti.style.left = `${x + offsetX}px`;
+                confetti.style.top = `${y + offsetY}px`;
+                
+                // 크기 랜덤화
+                const size = 20 + Math.random() * 25;
+                confetti.style.fontSize = `${size}px`;
+                
+                // 랜덤한 방향으로 퍼지도록 설정
+                const angle = (Math.random() * 360) * (Math.PI / 180);
+                const velocity = 150 + Math.random() * 200;  // 속도 감소
+                confetti.style.setProperty('--tx', `${Math.cos(angle) * velocity}px`);
+                confetti.style.setProperty('--ty', `${Math.sin(angle) * velocity}px`);
+                confetti.style.setProperty('--r', `${Math.random() * 360}deg`);
+                
+                // 약간의 시차를 두고 터지도록
+                confetti.style.animationDelay = `${Math.random() * 0.4}s`;
+                
                 document.body.appendChild(confetti);
                 
                 confetti.addEventListener('animationend', () => {
@@ -564,6 +716,59 @@
         window.addEventListener('load', () => {
             setTimeout(initialCardFlips, 500);
         });
+
+        // 공유 기능
+        async function shareContent() {
+            const shareData = {
+                title: '동네 슈퍼의 새로운 변신!',
+                text: '여러분의 의견을 듣고 싶어요! 새로운 동네 슈퍼의 이름을 투표해주세요.',
+                url: window.location.href
+            };
+
+            // 모바일 기기 체크
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile && navigator.share) {
+                // 모바일 네이티브 공유 기능 사용
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.error('공유 실패:', err);
+                }
+            } else {
+                // PC에서는 클립보드에 복사
+                try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    showToast();
+                } catch (err) {
+                    console.error('클립보드 복사 실패:', err);
+                    // 폴백: 구형 클립보드 복사 방식
+                    const textarea = document.createElement('textarea');
+                    textarea.value = window.location.href;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    showToast();
+                }
+            }
+        }
+
+        // 토스트 메시지 표시
+        function showToast() {
+            const toast = document.getElementById('shareToast');
+            toast.style.display = 'block';
+            
+            // 애니메이션 재시작을 위해 요소를 리셋
+            toast.style.animation = 'none';
+            toast.offsetHeight; // 리플로우 강제
+            toast.style.animation = 'fadeOut 2s forwards';
+            
+            // 애니메이션 종료 후 숨김
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
     </script>
 </body>
 </html>
