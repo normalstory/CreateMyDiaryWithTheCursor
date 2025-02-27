@@ -72,6 +72,9 @@
             width: max-content;
             margin-right: .5em;
         }
+        .text-muted{
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
 
 
         /* 각 카드별 그라데이션 */
@@ -325,7 +328,8 @@
         }
 
         .share-button {
-            padding: 0 1em;
+            height: fit-content;
+            padding: 1.4em;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -361,7 +365,7 @@
 
         .footer {
             position: relative;
-            padding: 40px 0;
+            padding: 20px 0 0;
             background: linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.12)),
                         url('../resources/footer.jpg');
             background-size: cover;
@@ -408,7 +412,7 @@
         }
         
         .footer a {
-            color: #666;
+            color: #ffffff;
             text-decoration: none;
             transition: color 0.3s;
         }
@@ -475,6 +479,29 @@
             font-size: 1.5rem;
             font-weight: 500;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .footer-message {
+            padding: 10px 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+        }
+        
+        .footer-message .coming-soon {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: #FFD700;
+        }
+        
+        .footer-message .copyright {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .footer-message .highlight {
+            color: #FFD700;
+            font-weight: bold;
         }
     </style>
     <!-- Font Awesome CDN 추가 -->
@@ -624,18 +651,20 @@
                     <i class="fas fa-share-alt"></i>
                 </button>
             </div>
-            <!-- 공유 완료 토스트 메시지 -->
-            <div id="shareToast">링크가 복사되었습니다!</div>
-            <div style="text-align: center;">
-                <br/>
-                <small>
-                    <a href="/notice/admin_votes.html" style="color: #ffffff;" target="_blank">
-                        (( 👉 admin  ))
-                    </a>
-                </small>
+        </div>
+        <a href="/notice/admin_votes.html" target="_blank"> admin </a>
+        <div class="footer-message">
+            <div class="coming-soon">
+                ✨ Coming Soon ✨
+            </div>
+            <div class="copyright">
+                © 2025 함께 만드는 우리 동네의 새로운 이야기 @normalstory 
             </div>
         </div>
     </div>
+
+    <!-- 공유 완료 토스트 메시지 -->
+    <div id="shareToast">링크가 복사되었습니다!</div>
 
     <!-- 투표 모달 추가 -->
     <div class="modal fade" id="voteModal" tabindex="-1" aria-modal="true" role="dialog">
