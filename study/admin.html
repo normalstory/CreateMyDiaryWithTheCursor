@@ -12,6 +12,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <style>
         body { font-family: 'Noto Sans KR', sans-serif; }
+        .section-btn.active {
+            color: #4F46E5;
+            background-color: #EEF2FF;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -35,14 +39,20 @@
     <div id="adminSection" class="hidden">
         <header class="bg-white shadow">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-gray-900">PPA 신청 관리</h1>
+                <div class="flex space-x-4">
+                    <h1 class="text-2xl font-bold text-gray-900">PPA 신청 관리</h1>
+                    <nav class="flex space-x-4">
+                        <button onclick="showSection('applications')" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium section-btn active">신청 목록</button>
+                        <button onclick="showSection('plans')" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium section-btn">강의 유형</button>
+                    </nav>
+                </div>
                 <button id="logoutBtn" class="text-gray-600 hover:text-gray-900">
                     <i class="ri-logout-box-r-line text-xl"></i>
                 </button>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main id="applicationsSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="bg-white rounded-lg shadow">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-6">
@@ -79,6 +89,36 @@
             </div>
         </main>
     </div>
+
+    <!-- 강의 유형 관리 섹션 추가 -->
+    <main id="plansSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden">
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold">강의 유형 관리</h2>
+                    <button onclick="showPlanModal()" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90">
+                        새 강의 유형 추가
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">강의명</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">수업 빈도</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">수업 시간</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">수강료</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="planList" class="bg-white divide-y divide-gray-200">
+                            <!-- 여기에 동적으로 데이터가 추가됩니다 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <!-- 상세 정보 모달 -->
     <div id="detailModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
@@ -178,6 +218,54 @@
             </div>
         </div>
     </div>
+
+    <!-- 강의 유형 모달 -->
+    <div id="planModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold" id="planModalTitle">새 강의 유형 추가</h3>
+                <button onclick="closePlanModal()" class="text-gray-600 hover:text-gray-900">
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
+            </div>
+            <form id="planForm" class="space-y-4">
+                <input type="hidden" id="planId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">강의명</label>
+                    <input type="text" id="planName" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">수업 빈도</label>
+                    <input type="text" id="planFrequency" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="예: 주 2회">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">수업 횟수</label>
+                    <input type="text" id="planSessions" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="예: 월 8회 수업">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">수업 시간</label>
+                    <input type="text" id="planDuration" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="예: 1회 2시간 수업">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">수강료</label>
+                    <input type="text" id="planPrice" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="예: 월 80만원">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">특이사항</label>
+                    <textarea id="planFeatures" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="각 특이사항을 새 줄로 구분해주세요"></textarea>
+                </div>
+                <div class="flex justify-end space-x-4 pt-4">
+                    <button type="button" onclick="closePlanModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+                        취소
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">
+                        저장
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
@@ -507,6 +595,128 @@
 
         // 필터 변경 이벤트
         document.getElementById('statusFilter').addEventListener('change', loadApplications);
+
+        // 섹션 전환 함수
+        function showSection(sectionName) {
+            const sections = ['applications', 'plans'];
+            sections.forEach(section => {
+                document.getElementById(`${section}Section`).classList.add('hidden');
+                document.querySelector(`button[onclick="showSection('${section}')"]`).classList.remove('active');
+            });
+            document.getElementById(`${sectionName}Section`).classList.remove('hidden');
+            document.querySelector(`button[onclick="showSection('${sectionName}')"]`).classList.add('active');
+        }
+
+        // 강의 유형 관련 함수들
+        let currentPlanId = null;
+
+        function showPlanModal(planId = null) {
+            currentPlanId = planId;
+            const modal = document.getElementById('planModal');
+            const form = document.getElementById('planForm');
+            const title = document.getElementById('planModalTitle');
+
+            if (planId) {
+                title.textContent = '강의 유형 수정';
+                // 기존 데이터 불러오기
+                db.collection('plans').doc(planId).get().then(doc => {
+                    const data = doc.data();
+                    document.getElementById('planName').value = data.name;
+                    document.getElementById('planFrequency').value = data.frequency;
+                    document.getElementById('planSessions').value = data.sessions;
+                    document.getElementById('planDuration').value = data.duration;
+                    document.getElementById('planPrice').value = data.price;
+                    document.getElementById('planFeatures').value = data.features.join('\n');
+                });
+            } else {
+                title.textContent = '새 강의 유형 추가';
+                form.reset();
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closePlanModal() {
+            document.getElementById('planModal').classList.add('hidden');
+            currentPlanId = null;
+        }
+
+        // 강의 유형 목록 로드
+        async function loadPlans() {
+            const snapshot = await db.collection('plans').orderBy('name').get();
+            const tbody = document.getElementById('planList');
+            tbody.innerHTML = '';
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const row = `
+                    <tr>
+                        <td class="px-6 py-4">${data.name}</td>
+                        <td class="px-6 py-4">${data.frequency}</td>
+                        <td class="px-6 py-4">${data.duration}</td>
+                        <td class="px-6 py-4">${data.price}</td>
+                        <td class="px-6 py-4">
+                            <button onclick="showPlanModal('${doc.id}')" class="text-primary hover:text-primary/80 mr-2">
+                                수정
+                            </button>
+                            <button onclick="deletePlan('${doc.id}')" class="text-red-600 hover:text-red-800">
+                                삭제
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // 강의 유형 저장
+        document.getElementById('planForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const planData = {
+                name: document.getElementById('planName').value,
+                frequency: document.getElementById('planFrequency').value,
+                sessions: document.getElementById('planSessions').value,
+                duration: document.getElementById('planDuration').value,
+                price: document.getElementById('planPrice').value,
+                features: document.getElementById('planFeatures').value.split('\n').filter(f => f.trim()),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                if (currentPlanId) {
+                    await db.collection('plans').doc(currentPlanId).update(planData);
+                } else {
+                    await db.collection('plans').add(planData);
+                }
+                
+                showToast('강의 유형이 저장되었습니다.', 'success');
+                closePlanModal();
+                loadPlans();
+            } catch (error) {
+                showToast('저장 중 오류가 발생했습니다.', 'error');
+                console.error('Error:', error);
+            }
+        });
+
+        // 강의 유형 삭제
+        async function deletePlan(planId) {
+            if (!confirm('이 강의 유형을 삭제하시겠습니까?')) return;
+            
+            try {
+                await db.collection('plans').doc(planId).delete();
+                showToast('강의 유형이 삭제되었습니다.', 'success');
+                loadPlans();
+            } catch (error) {
+                showToast('삭제 중 오류가 발생했습니다.', 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        // 페이지 로드 시 강의 유형 목록 로드
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPlans();
+        });
     </script>
 </body>
 </html> 

@@ -279,14 +279,14 @@
                 <h2 class="text-3xl font-bold text-center mb-16">과외 선생님 소개</h2>
                 <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-center">
                     <div
-                        class="bg-[url('https://public.readdy.ai/ai/img_res/dba5b2fec50fa46b0926ec0f949e5089.jpg')] bg-cover bg-center h-[600px] rounded-lg shadow-lg">
+                        class="bg-[url('../resources/chanwoo.gif')] bg-cover bg-center h-[320px] rounded-lg shadow-lg">
                     </div>
                     <div class="space-y-8">
                         <div>
-                            <h3 class="text-2xl font-bold mb-4">이진우 선생님</h3>
+                            <h3 class="text-2xl font-bold mb-4">변찬우 선생님</h3>
                             <p class="text-gray-600 leading-relaxed">
-                                10년차 현직 프로그래머이자 교육자로서, 복잡한 기술을 쉽게 설명하는 것을 전문으로 합니다.
-                                실무에서의 풍부한 경험을 바탕으로 실용적인 프로그래밍 교육을 제공합니다.
+                                지난 13년간 IT 업계에서 기획PO 및 개발PM 업무 담당. 클라이언트 및 사용자에게 복잡한 기술을 쉽게 설명하는 것을 전문으로 합니다.
+                                실무에서의 풍부한 경험을 바탕으로 일반인(중학생 ~ 중장년)들을 대상으로 실용적인 프로그래밍 교육을 제공하고자 합니다.
                             </p>
                         </div>
                         <div class="space-y-4">
@@ -307,7 +307,7 @@
                                 </div>
                                 <div class="ml-4">
                                     <h4 class="text-lg font-bold mb-2">경력</h4>
-                                    <p class="text-gray-600">네이버, 카카오 등 IT 기업 근무 경력</p>
+                                    <p class="text-gray-600">SI, Agency, Startup 등 다양한 형태의 IT 조직에서 PM, PO, 개발PM 등 13년차 근무 경력</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
@@ -546,47 +546,8 @@
                     <form class="space-y-6">
                         <div class="space-y-4">
                             <p class="font-medium text-gray-700">강의 유형 선택</p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <label class="relative cursor-pointer">
-                                    <input type="radio" name="plan" value="standard" class="peer sr-only" checked>
-                                    <div
-                                        class="p-4 border rounded-lg peer-checked:border-primary peer-checked:bg-primary/5 transition-colors">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <h4 class="text-lg font-bold">Standard Plan</h4>
-                                            <span class="text-sm bg-primary/10 text-primary px-2 py-1 rounded-full">주
-                                                2회</span>
-                                        </div>
-                                        <p class="text-2xl font-bold mb-2">월 80만원</p>
-                                        <ul class="text-sm text-gray-600 space-y-1">
-                                            <li class="flex items-center"><i
-                                                    class="ri-check-line text-primary mr-2"></i>월 8회 수업</li>
-                                            <li class="flex items-center"><i
-                                                    class="ri-check-line text-primary mr-2"></i>1회 2시간 수업</li>
-                                            <li class="flex items-center"><i
-                                                    class="ri-check-line text-primary mr-2"></i>시간대/요일 자유 선택</li>
-                                        </ul>
-                                    </div>
-                                </label>
-                                <label class="relative cursor-pointer">
-                                    <input type="radio" name="plan" value="intensive" class="peer sr-only">
-                                    <div
-                                        class="p-4 border rounded-lg peer-checked:border-primary peer-checked:bg-primary/5 transition-colors">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <h4 class="text-lg font-bold">Intensive Plan</h4>
-                                            <span class="text-sm bg-primary/10 text-primary px-2 py-1 rounded-full">주
-                                                3회</span>
-                                        </div>
-                                        <p class="text-2xl font-bold mb-2">월 110만원</p>
-                                        <ul class="text-sm text-gray-600 space-y-1">
-                                            <li class="flex items-center"><i
-                                                    class="ri-check-line text-primary mr-2"></i>월 12회 수업</li>
-                                            <li class="flex items-center"><i
-                                                    class="ri-check-line text-primary mr-2"></i>1회 2시간 수업</li>
-                                            <li class="flex items-center"><i
-                                                    class="ri-check-line text-primary mr-2"></i>프로젝트 리뷰 제공</li>
-                                        </ul>
-                                    </div>
-                                </label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="planSelection">
+                                <!-- 여기에 동적으로 강의 유형이 추가됩니다 -->
                             </div>
                         </div>
                         <div>
@@ -945,16 +906,16 @@
                 const planDetails = {
                     'standard': {
                         name: 'Standard Plan',
-                        frequency: '주 2회',
-                        price: '월 80만원',
-                        sessions: '월 8회 수업',
-                        duration: '1회 2시간 수업'
+                        frequency: '주 3회',
+                        price: '월 40만원',
+                        sessions: '월 12시간 수업',
+                        duration: '1회 1시간 수업'
                     },
                     'intensive': {
                         name: 'Intensive Plan',
                         frequency: '주 3회',
-                        price: '월 110만원',
-                        sessions: '월 12회 수업',
+                        price: '월 60만원',
+                        sessions: '월 24시간 수업',
                         duration: '1회 2시간 수업'
                     }
                 };
@@ -1196,6 +1157,48 @@
             const submitButton = document.getElementById('submitButton');
             submitButton.disabled = !e.target.checked;
         });
+
+        // 강의 유형 로드 및 표시
+        async function loadAndDisplayPlans() {
+            try {
+                const snapshot = await db.collection('plans').orderBy('name').get();
+                const planSelection = document.getElementById('planSelection');
+                planSelection.innerHTML = '';
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const planHtml = `
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="plan" value="${doc.id}" class="peer sr-only">
+                            <div class="p-4 border rounded-lg peer-checked:border-primary peer-checked:bg-primary/5 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="text-lg font-bold">${data.name}</h4>
+                                    <span class="text-sm bg-primary/10 text-primary px-2 py-1 rounded-full">${data.frequency}</span>
+                                </div>
+                                <p class="text-2xl font-bold mb-2">${data.price}</p>
+                                <ul class="text-sm text-gray-600 space-y-1">
+                                    <li class="flex items-center"><i class="ri-check-line text-primary mr-2"></i>${data.sessions}</li>
+                                    <li class="flex items-center"><i class="ri-check-line text-primary mr-2"></i>${data.duration}</li>
+                                    ${data.features.map(feature => `
+                                        <li class="flex items-center"><i class="ri-check-line text-primary mr-2"></i>${feature}</li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </label>
+                    `;
+                    planSelection.innerHTML += planHtml;
+                });
+
+                // 첫 번째 플랜 자동 선택
+                const firstPlan = planSelection.querySelector('input[type="radio"]');
+                if (firstPlan) firstPlan.checked = true;
+            } catch (error) {
+                console.error('Error loading plans:', error);
+            }
+        }
+
+        // 페이지 로드 시 강의 유형 목록 로드
+        document.addEventListener('DOMContentLoaded', loadAndDisplayPlans);
     </script>
 </body>
 
