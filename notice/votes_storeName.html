@@ -85,13 +85,6 @@
             --text: #8B5A2B;
         }
         
-        #card-잘산데이 {
-            --primary: #FFD700;
-            --secondary: #003366;
-            --accent: #FAF3E0;
-            --text: #FFCC00;
-        }
-        
         #card-바른25 {
             --primary: #4CAF50;
             --secondary: #d9a664;
@@ -123,25 +116,6 @@
         }
         #card-맛나25 .progress-bar {
             background-color: var(--secondary);
-        }
-
-        #card-잘산데이 .card-front {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: var(--accent);
-        }
-        #card-잘산데이 .card-back {
-            background: var(--accent);
-            color: var(--secondary);
-        }
-        #card-잘산데이 .vote-button {
-            background: var(--text);
-            color: var(--accent);
-        }
-        #card-잘산데이 .vote-button:hover {
-            background: var(--primary);
-        }
-        #card-잘산데이 .progress-bar {
-            background-color: var(--text);
         }
 
         #card-바른25 .card-front {
@@ -661,6 +635,26 @@
         #card-피터마켓 .progress-bar {
             background-color: var(--primary);
         }
+
+        @font-face {
+            font-family: 'Dokrip';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.1/Dokrip.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .card-content h2 {
+            font-family: 'Dokrip', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 모바일 환경에서의 폰트 크기 조정 */
+        @media (max-width: 768px) {
+            .card-content h2 {
+                font-size: 2rem;
+            }
+        }
     </style>
     <!-- Font Awesome CDN 추가 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1027,11 +1021,9 @@
                 .onSnapshot((snapshot) => {
                     const votes = {
                         '맛나25': 0,
-                        '잘산데이': 0,
                         '바른25': 0,
                         '모아25': 0,
                         '무인마켓': 0,
-                        '무인82': 0,
                         '매일25': 0,
                         '찰쓰상회': 0,
                         '바른상회': 0,
