@@ -115,16 +115,20 @@
         // 투표 데이터 가져오기
         async function loadVoteData() {
             try {
-                // 먼저 모든 storeName 투표를 가져옵니다
+                // 현재 운영 중인 매장 목록으로 업데이트
                 const snapshot = await db.collection('votes')
                     .where('type', '==', 'storeName')
                     .get();
 
                 const voteData = {
                     '맛나25': 0,
-                    '잘산데이': 0,
                     '바른25': 0,
-                    '모아25': 0
+                    '모아25': 0,
+                    '무인마켓': 0,
+                    '매일25': 0,
+                    '찰쓰상회': 0,
+                    '바른상회': 0,
+                    '피터마켓': 0
                 };
                 
                 const ageData = {
@@ -135,13 +139,16 @@
                 const votes = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    voteData[data.vote]++;
-                    if (data.age) ageData[data.age]++;
-                    votes.push({
-                        id: doc.id,
-                        ...data,
-                        timestamp: data.timestamp ? data.timestamp.toDate() : null
-                    });
+                    // 현재 운영 중인 매장의 투표만 집계
+                    if (data.vote in voteData) {
+                        voteData[data.vote]++;
+                        if (data.age) ageData[data.age]++;
+                        votes.push({
+                            id: doc.id,
+                            ...data,
+                            timestamp: data.timestamp ? data.timestamp.toDate() : null
+                        });
+                    }
                 });
 
                 // 시간순 정렬은 클라이언트에서 수행
@@ -183,6 +190,19 @@
             if (voteChart) voteChart.destroy();
             if (ageChart) ageChart.destroy();
 
+            // 매장별 투표 현황 차트 색상 설정
+            const storeColors = {
+                '맛나25': '#FF6A88',
+                '잘산데이': '#3EECAC',
+                '바른25': '#FD6585',
+                '모아25': '#3F2B96',
+                '무인마켓': '#D67D3E',
+                '매일25': '#00AEEF',
+                '찰쓰상회': '#00BFFF',
+                '바른상회': '#003366',
+                '피터마켓': '#4682B4'
+            };
+
             voteChart = new Chart(document.getElementById('voteChart'), {
                 type: 'bar',
                 data: {
@@ -190,12 +210,7 @@
                     datasets: [{
                         label: '투표 수',
                         data: Object.values(voteData),
-                        backgroundColor: [
-                            '#FF6A88',
-                            '#3EECAC',
-                            '#FD6585',
-                            '#3F2B96'
-                        ]
+                        backgroundColor: Object.keys(voteData).map(store => storeColors[store] || '#999999')
                     }]
                 },
                 options: {
@@ -203,11 +218,36 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: '매장별 투표 현황'
+                            text: '매장별 투표 현황',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
                         }
                     }
                 }
             });
+
+            // 연령대별 투표 현황 차트
+            const ageColors = {
+                '10': '#FF6384',
+                '20': '#36A2EB',
+                '30': '#FFCE56',
+                '40': '#4BC0C0',
+                '50': '#9966FF',
+                '60': '#FF9F40'
+            };
 
             ageChart = new Chart(document.getElementById('ageChart'), {
                 type: 'pie',
@@ -215,14 +255,8 @@
                     labels: Object.keys(ageData).map(age => age + '대'),
                     datasets: [{
                         data: Object.values(ageData),
-                        backgroundColor: [
-                            '#FF6384',
-                            '#36A2EB',
-                            '#FFCE56',
-                            '#4BC0C0',
-                            '#9966FF',
-                            '#FF9F40'
-                        ]
+                        backgroundColor: Object.keys(ageData).map(age => ageColors[age]),
+                        borderWidth: 1
                     }]
                 },
                 options: {
@@ -230,7 +264,28 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: '연령대별 투표 현황'
+                            text: '연령대별 투표 현황',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value}명 (${percentage}%)`;
+                                }
+                            }
                         }
                     }
                 }
