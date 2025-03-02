@@ -1207,11 +1207,27 @@
             });
         }
 
+        // 카드 섞기 함수 추가
+        function shuffleCards() {
+            const container = document.querySelector('.row.g-3');
+            const cards = Array.from(container.children);
+            
+            // Fisher-Yates 셔플 알고리즘
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                container.appendChild(cards[j]);
+            }
+        }
+
         // 실시간 투표 현황 시작
         initializeVoteCount();
         
-        // 페이지 로드 완료 후 카드 플립 애니메이션 시작
+        // 페이지 로드 완료 후 카드 플립 애니메이션과 섞기 시작
         window.addEventListener('load', () => {
+            // 카드 섞기 실행
+            shuffleCards();
+            
+            // 기존의 카드 플립 애니메이션 실행
             setTimeout(initialCardFlips, 500);
         });
 
