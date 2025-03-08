@@ -6,6 +6,10 @@
     <title>바른상회 관리자</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- CKEditor 추가 -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
+    <!-- 이미지 최적화를 위한 browser-image-compression 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -131,9 +135,10 @@
                     <div class="flex space-x-2">
                         <select id="statusFilter" class="border rounded-md px-3 py-1">
                             <option value="all">전체</option>
-                            <option value="pending">신규접수</option>
+                            <option value="pending">접수완료</option>
+                            <option value="checking">확인중</option>
                             <option value="consulting">상담중</option>
-                            <option value="completed">계약완료</option>
+                            <option value="completed">상담완료</option>
                             <option value="canceled">취소</option>
                         </select>
                         <button onclick="inquiryManager.loadInquiries()" class="px-3 py-1 bg-gray-100 rounded-md hover:bg-gray-200">
@@ -151,6 +156,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">희망지역</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">파트너 유형</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
                             </tr>
                         </thead>
                         <tbody id="inquiryList" class="bg-white divide-y divide-gray-200">
@@ -168,14 +174,39 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">시간</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리자</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">신청자</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작업</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상세정보</th>
                             </tr>
                         </thead>
                         <tbody id="activityList" class="bg-white divide-y divide-gray-200">
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메시지 전송 모달 수정 -->
+    <div id="messageModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg w-[800px] max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 class="text-lg font-medium">메시지 작성</h3>
+                <button onclick="messageManager.closeMessageModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="ri-close-line text-xl"></i>
+                </button>
+            </div>
+            <div class="p-4 flex-1 overflow-y-auto">
+                <div id="messageEditor"></div>
+            </div>
+            <div class="p-4 border-t flex justify-end gap-2">
+                <button onclick="messageManager.closeMessageModal()" 
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                    취소
+                </button>
+                <button onclick="messageManager.sendMessage()" 
+                        class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90">
+                    전송
+                </button>
             </div>
         </div>
     </div>
@@ -195,6 +226,7 @@
         // Firebase 초기화
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const storage = firebase.storage();
 
         // Firebase 컬렉션 초기화 함수
         const initializeCollections = async () => {
@@ -293,22 +325,37 @@
                     const tbody = document.getElementById('activityList');
                     tbody.innerHTML = '';
 
-                    snapshot.forEach(doc => {
+                    for (const doc of snapshot.docs) {
                         const data = doc.data();
+                        let applicantName = '-';
+
+                        // 문의 ID가 있는 경우 신청자 정보 조회
+                        if (data.data && data.data.inquiryId) {
+                            try {
+                                const inquiryDoc = await db.collection('franchise_inquiries')
+                                    .doc(data.data.inquiryId)
+                                    .get();
+                                
+                                if (inquiryDoc.exists) {
+                                    applicantName = inquiryDoc.data().name || '-';
+                                }
+                            } catch (error) {
+                                console.error('신청자 정보 조회 실패:', error);
+                            }
+                        }
+
                         const row = `
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     ${new Date(data.timestamp.toDate()).toLocaleString()}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">${data.adminId}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${applicantName}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">${this.getActionText(data.action)}</td>
-                                <td class="px-6 py-4">
-                                    <pre class="text-sm whitespace-pre-wrap">${JSON.stringify(data.data, null, 2)}</pre>
-                                </td>
                             </tr>
                         `;
                         tbody.innerHTML += row;
-                    });
+                    }
                 } catch (error) {
                     console.error('활동 로그 로드 실패:', error);
                 }
@@ -326,14 +373,225 @@
             }
         };
 
+        // 이미지 관리자 수정
+        const imageManager = {
+            // GitHub 설정
+            githubConfig: {
+                owner: 'thinknormal',
+                repo: 'barun_reply_img',
+                path: 'images',  // 경로 수정
+                token: ''
+            },
+
+            // 이미지 최적화
+            async optimizeImage(file) {
+                try {
+                    const options = {
+                        maxSizeMB: 0.5,           // 최대 크기를 500KB로 제한
+                        maxWidthOrHeight: 1200,    // 최대 해상도 조정
+                        useWebWorker: true,
+                        fileType: 'image/jpeg',    // JPEG 형식으로 통일
+                        initialQuality: 0.7        // 초기 품질 설정
+                    };
+                    
+                    const compressedFile = await imageCompression(file, options);
+                    console.log('압축 전 크기:', file.size / 1024 / 1024, 'MB');
+                    console.log('압축 후 크기:', compressedFile.size / 1024 / 1024, 'MB');
+                    return compressedFile;
+                } catch (error) {
+                    console.error('이미지 최적화 실패:', error);
+                    throw new Error('이미지 최적화에 실패했습니다.');
+                }
+            },
+
+            // 파일명 정리
+            sanitizeFileName(fileName) {
+                // 한글 및 특수문자 제거, 공백을 언더스코어로 변경
+                return fileName
+                    .replace(/[^a-zA-Z0-9.]/g, '_')
+                    .replace(/_+/g, '_')
+                    .toLowerCase();
+            },
+
+            // GitHub에 이미지 업로드
+            async uploadToGithub(file) {
+                try {
+                    const optimizedFile = await this.optimizeImage(file);
+                    const reader = new FileReader();
+                    
+                    return new Promise((resolve, reject) => {
+                        reader.onload = async () => {
+                            try {
+                                const base64Data = reader.result.split(',')[1];
+                                const sanitizedName = this.sanitizeFileName(file.name);
+                                const fileName = `${Date.now()}_${sanitizedName}`;
+                                const path = `${this.githubConfig.path}/${fileName}`;
+                                
+                                const response = await fetch(`https://api.github.com/repos/${this.githubConfig.owner}/${this.githubConfig.repo}/contents/${path}`, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Authorization': `Bearer ${this.githubConfig.token.trim()}`,
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/vnd.github.v3+json'
+                                    },
+                                    body: JSON.stringify({
+                                        message: `Upload image: ${fileName}`,
+                                        content: base64Data,
+                                        branch: 'main'  // 브랜치 명시
+                                    })
+                                });
+
+                                if (!response.ok) {
+                                    const errorData = await response.json();
+                                    console.error('GitHub API 응답:', errorData);
+                                    throw new Error(`GitHub 업로드 실패 (${response.status}): ${errorData.message}`);
+                                }
+
+                                const data = await response.json();
+                                resolve(data.content.download_url);
+                            } catch (error) {
+                                console.error('GitHub 업로드 상세 에러:', error);
+                                reject(new Error('이미지 업로드에 실패했습니다. 네트워크 연결을 확인해주세요.'));
+                            }
+                        };
+                        reader.onerror = () => reject(new Error('파일 읽기에 실패했습니다.'));
+                        reader.readAsDataURL(optimizedFile);
+                    });
+                } catch (error) {
+                    console.error('이미지 업로드 프로세스 실패:', error);
+                    throw error;
+                }
+            }
+        };
+
+        // 메시지 관리자 수정
+        const messageManager = {
+            currentInquiryId: null,
+            editor: null,
+
+            initEditor() {
+                if (!this.editor) {
+                    ClassicEditor
+                        .create(document.querySelector('#messageEditor'), {
+                            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'uploadImage', '|', 'undo', 'redo'],
+                            placeholder: '메시지를 입력하세요...',
+                            image: {
+                                upload: {
+                                    types: ['jpeg', 'png', 'gif', 'bmp', 'webp', 'tiff']
+                                }
+                            }
+                        })
+                        .then(editor => {
+                            this.editor = editor;
+
+                            // 이미지 업로드 핸들러 수정
+                            editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                                return {
+                                    upload: async () => {
+                                        try {
+                                            const file = await loader.file;
+                                            
+                                            // 파일 크기 검사
+                                            if (file.size > 5 * 1024 * 1024) { // 5MB 제한
+                                                throw new Error('파일 크기가 너무 큽니다. 5MB 이하의 이미지를 선택해주세요.');
+                                            }
+
+                                            // 파일 형식 검사
+                                            if (!file.type.startsWith('image/')) {
+                                                throw new Error('이미지 파일만 업로드 가능합니다.');
+                                            }
+
+                                            // 로딩 표시
+                                            const loadingElement = document.createElement('div');
+                                            loadingElement.className = 'text-center p-4 text-gray-600';
+                                            loadingElement.innerHTML = `
+                                                <div class="flex items-center justify-center">
+                                                    <svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    이미지 업로드 중...
+                                                </div>
+                                            `;
+                                            document.querySelector('#messageEditor').appendChild(loadingElement);
+
+                                            // GitHub에 업로드
+                                            const url = await imageManager.uploadToGithub(file);
+                                            
+                                            // 로딩 제거
+                                            loadingElement.remove();
+                                            
+                                            return { default: url };
+                                        } catch (error) {
+                                            console.error('이미지 업로드 실패:', error);
+                                            alert(error.message);
+                                            throw error;
+                                        }
+                                    }
+                                };
+                            };
+                        })
+                        .catch(error => {
+                            console.error('에디터 초기화 실패:', error);
+                            alert('에디터 초기화에 실패했습니다. 페이지를 새로고침해주세요.');
+                        });
+                }
+            },
+
+            showMessageModal(inquiryId) {
+                this.currentInquiryId = inquiryId;
+                document.getElementById('messageModal').classList.remove('hidden');
+                this.initEditor();
+            },
+
+            closeMessageModal() {
+                document.getElementById('messageModal').classList.add('hidden');
+                this.currentInquiryId = null;
+                if (this.editor) {
+                    this.editor.setData('');
+                }
+            },
+
+            async sendMessage() {
+                if (!this.currentInquiryId || !this.editor) return;
+
+                try {
+                    const content = this.editor.getData();
+                    if (!content.trim()) {
+                        alert('메시지 내용을 입력해주세요.');
+                        return;
+                    }
+
+                    await db.collection('inquiry_messages').add({
+                        inquiryId: this.currentInquiryId,
+                        content: content,
+                        adminId: localStorage.getItem('adminId'),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // 활동 로그 기록
+                    await activityLogger.logActivity('send_message', {
+                        inquiryId: this.currentInquiryId,
+                        adminId: localStorage.getItem('adminId')
+                    });
+
+                    alert('메시지가 전송되었습니다.');
+                    this.closeMessageModal();
+                } catch (error) {
+                    console.error('메시지 전송 실패:', error);
+                    alert('메시지 전송에 실패했습니다.');
+                }
+            }
+        };
+
         // 문의 관리자
         const inquiryManager = {
             async loadInquiries() {
                 try {
-                    const statusFilter = document.getElementById('statusFilter').value;
                     let query = db.collection('franchise_inquiries')
                         .orderBy('createdAt', 'desc');
                     
+                    const statusFilter = document.getElementById('statusFilter').value;
                     if (statusFilter !== 'all') {
                         query = query.where('status', '==', statusFilter);
                     }
@@ -344,6 +602,13 @@
 
                     snapshot.forEach(doc => {
                         const data = doc.data();
+                        const statusTexts = {
+                            'pending': '접수완료',
+                            'checking': '확인중',
+                            'consulting': '상담중',
+                            'completed': '상담완료',
+                            'canceled': '취소'
+                        };
                         const row = `
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -353,21 +618,30 @@
                                 <td class="px-6 py-4 whitespace-nowrap">${data.phone}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">${data.location}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">${data.partnerType}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${statusTexts[data.status]}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <select onchange="inquiryManager.updateStatus('${doc.id}', this.value)" 
-                                            class="text-sm border rounded p-1">
-                                        <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>신규접수</option>
-                                        <option value="consulting" ${data.status === 'consulting' ? 'selected' : ''}>상담중</option>
-                                        <option value="completed" ${data.status === 'completed' ? 'selected' : ''}>계약완료</option>
-                                        <option value="canceled" ${data.status === 'canceled' ? 'selected' : ''}>취소</option>
-                                    </select>
+                                    <div class="flex space-x-2">
+                                        <button onclick="inquiryManager.showDetail('${doc.id}')" 
+                                                class="text-blue-600 hover:text-blue-800">
+                                            상세
+                                        </button>
+                                        ${data.status === 'consulting' ? `
+                                        <button onclick="messageManager.showMessageModal('${doc.id}')"
+                                                class="text-green-600 hover:text-green-800">
+                                            회신
+                                        </button>
+                                        ` : ''}
+                                        <button onclick="inquiryManager.deleteInquiry('${doc.id}')"
+                                                class="text-red-600 hover:text-red-800">
+                                            삭제
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         `;
                         tbody.innerHTML += row;
                     });
 
-                    // 통계 업데이트
                     await statsManager.updateStatistics();
                 } catch (error) {
                     console.error('문의 목록 로드 실패:', error);
@@ -393,6 +667,28 @@
                 } catch (error) {
                     console.error('상태 업데이트 실패:', error);
                     alert('상태 업데이트에 실패했습니다.');
+                }
+            },
+
+            async deleteInquiry(docId) {
+                if (!confirm('정말 삭제하시겠습니까?')) {
+                    return;
+                }
+
+                try {
+                    await db.collection('franchise_inquiries').doc(docId).delete();
+                    
+                    // 활동 로그 기록
+                    await activityLogger.logActivity('delete_inquiry', {
+                        inquiryId: docId,
+                        adminId: localStorage.getItem('adminId')
+                    });
+
+                    alert('삭제되었습니다.');
+                    await this.loadInquiries();
+                } catch (error) {
+                    console.error('문의 삭제 실패:', error);
+                    alert('문의 삭제에 실패했습니다.');
                 }
             }
         };
