@@ -379,8 +379,11 @@
             githubConfig: {
                 owner: 'thinknormal',
                 repo: 'barun_reply_img',
-                path: 'images',  // 경로 수정
-                token: ''
+                path: 'images',
+                // 환경 변수에서 토큰 가져오기
+                get token() {
+                    return process.env.GITHUB_TOKEN || '';
+                }
             },
 
             // 이미지 최적화
