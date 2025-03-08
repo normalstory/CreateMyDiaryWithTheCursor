@@ -380,10 +380,8 @@
                 owner: 'thinknormal',
                 repo: 'barun_reply_img',
                 path: 'images',
-                // 환경 변수에서 토큰 가져오기
                 get token() {
-                    // window.__GITHUB_TOKEN__는 HTML에서 설정됩니다
-                    return window.__GITHUB_TOKEN__ || '';
+                    return window.__GITHUB_TOKEN__;
                 }
             },
 
@@ -434,14 +432,14 @@
                                 const response = await fetch(`https://api.github.com/repos/${this.githubConfig.owner}/${this.githubConfig.repo}/contents/${path}`, {
                                     method: 'PUT',
                                     headers: {
-                                        'Authorization': `Bearer ${this.githubConfig.token.trim()}`,
+                                        'Authorization': `Bearer ${this.githubConfig.token}`,
                                         'Content-Type': 'application/json',
                                         'Accept': 'application/vnd.github.v3+json'
                                     },
                                     body: JSON.stringify({
                                         message: `Upload image: ${fileName}`,
                                         content: base64Data,
-                                        branch: 'main'  // 브랜치 명시
+                                        branch: 'main'
                                     })
                                 });
 
@@ -455,7 +453,7 @@
                                 resolve(data.content.download_url);
                             } catch (error) {
                                 console.error('GitHub 업로드 상세 에러:', error);
-                                reject(new Error('이미지 업로드에 실패했습니다. 네트워크 연결을 확인해주세요.'));
+                                reject(new Error('GitHub 업로드에 실패했습니다. 토큰을 확인해주세요.'));
                             }
                         };
                         reader.onerror = () => reject(new Error('파일 읽기에 실패했습니다.'));
