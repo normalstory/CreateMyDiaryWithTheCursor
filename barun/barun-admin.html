@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>바른상회 관리자</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4CAF50',
+                        secondary: '#2C3E50',
+                        beige: '#F5F0E1',
+                        brown: '#D7A86E',
+                        yellow: '#F1C40F'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100">
+    <!-- 로그인 모달 -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg w-96">
+            <h2 class="text-2xl font-bold mb-6">관리자 로그인</h2>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">아이디</label>
+                    <input type="text" id="adminId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">비밀번호</label>
+                    <input type="password" id="adminPw" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90">
+                    로그인
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 메인 대시보드 -->
+    <div id="dashboard" class="hidden">
+        <nav class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <span class="text-xl font-bold text-secondary">바른상회 관리자</span>
+                    </div>
+                    <div class="flex items-center">
+                        <button id="logoutBtn" class="text-gray-600 hover:text-gray-900">
+                            로그아웃
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- 통계 대시보드 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">금일 문의</h3>
+                    <p id="todayInquiries" class="text-3xl font-bold text-primary">0</p>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">이번 달 문의</h3>
+                    <p id="monthInquiries" class="text-3xl font-bold text-primary">0</p>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">계약 완료</h3>
+                    <p id="completedContracts" class="text-3xl font-bold text-primary">0</p>
+                </div>
+            </div>
+
+            <!-- 메인 슬라이더 관리 -->
+            <div class="bg-white rounded-lg shadow p-6 mb-8">
+                <h2 class="text-xl font-bold mb-4">메인 슬라이더 관리</h2>
+                <div class="space-y-4">
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-medium mb-2">슬라이드 1</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">이미지</label>
+                                <input type="file" class="mt-1 block w-full" accept="image/*">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">제목</label>
+                                <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" value="어른들에게는 향수를, 아이들에게는 추억을">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 추가 슬라이드 관리 UI -->
+                </div>
+            </div>
+
+            <!-- 파트너 혜택 관리 -->
+            <div class="bg-white rounded-lg shadow p-6 mb-8">
+                <h2 class="text-xl font-bold mb-4">파트너 혜택 관리</h2>
+                <div class="space-y-4">
+                    <div class="border rounded-lg p-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">혜택 제목</label>
+                                <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" value="초기 투자 부담 최소화">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">설명</label>
+                                <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" value="합리적인 창업비용과 안정적인 수익구조">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 파트너 문의 관리 -->
+            <div class="bg-white rounded-lg shadow p-6 mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">파트너 문의 관리</h2>
+                    <div class="flex space-x-2">
+                        <select id="statusFilter" class="border rounded-md px-3 py-1">
+                            <option value="all">전체</option>
+                            <option value="pending">신규접수</option>
+                            <option value="consulting">상담중</option>
+                            <option value="completed">계약완료</option>
+                            <option value="canceled">취소</option>
+                        </select>
+                        <button onclick="inquiryManager.loadInquiries()" class="px-3 py-1 bg-gray-100 rounded-md hover:bg-gray-200">
+                            <i class="ri-refresh-line"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">날짜</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">연락처</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">희망지역</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">파트너 유형</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inquiryList" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 활동 로그 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-bold mb-4">활동 로그</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">시간</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리자</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작업</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상세정보</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityList" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbu_1gbtSIVUvmmw5RyLYvjaYOG7RdCWw",
+            authDomain: "ppap-ea44a.firebaseapp.com",
+            projectId: "ppap-ea44a",
+            storageBucket: "ppap-ea44a.firebasestorage.app",
+            messagingSenderId: "811949338329",
+            appId: "1:811949338329:web:cda8d43a7aeb825ce258c8",
+            measurementId: "G-6QGZT6Y1TE"
+        };
+
+        // Firebase 초기화
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Firebase 컬렉션 초기화 함수
+        const initializeCollections = async () => {
+            try {
+                // franchise_inquiries 컬렉션이 없으면 생성
+                const inquiriesSnapshot = await db.collection('franchise_inquiries').get();
+                if (inquiriesSnapshot.empty) {
+                    // 샘플 데이터 추가
+                    await db.collection('franchise_inquiries').add({
+                        name: '홍길동',
+                        phone: '010-1234-5678',
+                        location: '서울 강남구',
+                        partnerType: '전속 파트너',
+                        status: 'pending',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                // activity_logs 컬렉션이 없으면 생성
+                const logsSnapshot = await db.collection('activity_logs').get();
+                if (logsSnapshot.empty) {
+                    // 샘플 로그 추가
+                    await db.collection('activity_logs').add({
+                        action: 'system_init',
+                        data: { message: '시스템 초기화' },
+                        adminId: 'system',
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                console.log('Firebase 컬렉션 초기화 완료');
+            } catch (error) {
+                console.error('Firebase 컬렉션 초기화 실패:', error);
+            }
+        };
+
+        // 통계 관리자
+        const statsManager = {
+            async updateStatistics() {
+                try {
+                    // 오늘 날짜 설정 (시작 시간)
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    // 이번 달 시작일 설정
+                    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+                    // 금일 문의 수 조회
+                    const todayInquiries = await db.collection('franchise_inquiries')
+                        .where('createdAt', '>=', today)
+                        .get();
+
+                    // 이번 달 문의 수 조회
+                    const monthInquiries = await db.collection('franchise_inquiries')
+                        .where('createdAt', '>=', monthStart)
+                        .get();
+
+                    // 계약 완료 수 조회
+                    const completedInquiries = await db.collection('franchise_inquiries')
+                        .where('status', '==', 'completed')
+                        .get();
+
+                    // 통계 업데이트
+                    document.getElementById('todayInquiries').textContent = todayInquiries.size;
+                    document.getElementById('monthInquiries').textContent = monthInquiries.size;
+                    document.getElementById('completedContracts').textContent = completedInquiries.size;
+                } catch (error) {
+                    console.error('통계 업데이트 실패:', error);
+                }
+            }
+        };
+
+        // 활동 로그 관리자
+        const activityLogger = {
+            async logActivity(action, data) {
+                try {
+                    await db.collection('activity_logs').add({
+                        action,
+                        data,
+                        adminId: localStorage.getItem('adminId'),
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch (error) {
+                    console.error('활동 로그 기록 실패:', error);
+                }
+            },
+
+            async loadActivityLogs() {
+                try {
+                    const snapshot = await db.collection('activity_logs')
+                        .orderBy('timestamp', 'desc')
+                        .limit(50)
+                        .get();
+
+                    const tbody = document.getElementById('activityList');
+                    tbody.innerHTML = '';
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const row = `
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    ${new Date(data.timestamp.toDate()).toLocaleString()}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">${data.adminId}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${this.getActionText(data.action)}</td>
+                                <td class="px-6 py-4">
+                                    <pre class="text-sm whitespace-pre-wrap">${JSON.stringify(data.data, null, 2)}</pre>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                } catch (error) {
+                    console.error('활동 로그 로드 실패:', error);
+                }
+            },
+
+            getActionText(action) {
+                const actionTexts = {
+                    'login': '로그인',
+                    'logout': '로그아웃',
+                    'update_inquiry_status': '문의 상태 변경',
+                    'update_inquiry_memo': '상담 메모 작성',
+                    'view_inquiry_detail': '문의 상세 조회'
+                };
+                return actionTexts[action] || action;
+            }
+        };
+
+        // 문의 관리자
+        const inquiryManager = {
+            async loadInquiries() {
+                try {
+                    const statusFilter = document.getElementById('statusFilter').value;
+                    let query = db.collection('franchise_inquiries')
+                        .orderBy('createdAt', 'desc');
+                    
+                    if (statusFilter !== 'all') {
+                        query = query.where('status', '==', statusFilter);
+                    }
+
+                    const snapshot = await query.get();
+                    const tbody = document.getElementById('inquiryList');
+                    tbody.innerHTML = '';
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const row = `
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    ${new Date(data.createdAt.toDate()).toLocaleString()}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">${data.name}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${data.phone}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${data.location}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${data.partnerType}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <select onchange="inquiryManager.updateStatus('${doc.id}', this.value)" 
+                                            class="text-sm border rounded p-1">
+                                        <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>신규접수</option>
+                                        <option value="consulting" ${data.status === 'consulting' ? 'selected' : ''}>상담중</option>
+                                        <option value="completed" ${data.status === 'completed' ? 'selected' : ''}>계약완료</option>
+                                        <option value="canceled" ${data.status === 'canceled' ? 'selected' : ''}>취소</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+
+                    // 통계 업데이트
+                    await statsManager.updateStatistics();
+                } catch (error) {
+                    console.error('문의 목록 로드 실패:', error);
+                    alert('문의 목록을 불러오는데 실패했습니다.');
+                }
+            },
+
+            async updateStatus(docId, newStatus) {
+                try {
+                    await db.collection('franchise_inquiries').doc(docId).update({
+                        status: newStatus,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // 활동 로그 기록
+                    await activityLogger.logActivity('update_inquiry_status', {
+                        inquiryId: docId,
+                        newStatus: newStatus
+                    });
+
+                    // 목록 새로고침
+                    await this.loadInquiries();
+                } catch (error) {
+                    console.error('상태 업데이트 실패:', error);
+                    alert('상태 업데이트에 실패했습니다.');
+                }
+            }
+        };
+
+        // 로그인 처리
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('adminId').value;
+            const pw = document.getElementById('adminPw').value;
+            
+            try {
+                // 임시 로그인 처리 (실제 구현 시 서버 인증 필요)
+                if (id === 'admin' && pw === 'admin123') {
+                    localStorage.setItem('adminId', id);
+                    document.getElementById('loginModal').classList.add('hidden');
+                    document.getElementById('dashboard').classList.remove('hidden');
+                    
+                    // 로그인 활동 기록
+                    await activityLogger.logActivity('login', { adminId: id });
+                    
+                    // 데이터 로드
+                    await Promise.all([
+                        inquiryManager.loadInquiries(),
+                        activityLogger.loadActivityLogs()
+                    ]);
+                } else {
+                    throw new Error('아이디 또는 비밀번호가 올바르지 않습니다.');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        // 로그아웃 처리
+        document.getElementById('logoutBtn').addEventListener('click', async function() {
+            try {
+                const adminId = localStorage.getItem('adminId');
+                await activityLogger.logActivity('logout', { adminId });
+                
+                localStorage.removeItem('adminId');
+                document.getElementById('loginModal').classList.remove('hidden');
+                document.getElementById('dashboard').classList.add('hidden');
+            } catch (error) {
+                console.error('로그아웃 실패:', error);
+            }
+        });
+
+        // 상태 필터 변경 이벤트
+        document.getElementById('statusFilter').addEventListener('change', () => {
+            inquiryManager.loadInquiries();
+        });
+
+        // 페이지 로드 시 인증 상태 확인
+        window.addEventListener('load', async () => {
+            try {
+                // Firebase 컬렉션 초기화
+                await initializeCollections();
+                
+                const adminId = localStorage.getItem('adminId');
+                if (adminId) {
+                    document.getElementById('loginModal').classList.add('hidden');
+                    document.getElementById('dashboard').classList.remove('hidden');
+                    
+                    await Promise.all([
+                        inquiryManager.loadInquiries(),
+                        activityLogger.loadActivityLogs()
+                    ]);
+                }
+            } catch (error) {
+                console.error('초기화 실패:', error);
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375px, initial-scale=1.0">
+<title>바른상회</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+<style>:where([class^="ri-"])::before { content: "\f3c2"; }</style>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: '#4CAF50',
+secondary: '#2C3E50',
+beige: '#F5F0E1',
+brown: '#D7A86E',
+yellow: '#F1C40F'
+},
+borderRadius: {
+'none': '0px',
+'sm': '4px',
+DEFAULT: '8px',
+'md': '12px',
+'lg': '16px',
+'xl': '20px',
+'2xl': '24px',
+'3xl': '32px',
+'full': '9999px',
+'button': '8px'
+}
+}
+}
+}
+</script>
+</head>
+<body class="w-[375px] min-h-[762px] mx-auto bg-white">
+<nav class="fixed top-0 w-[375px] z-50 bg-white/95 backdrop-blur-sm border-b">
+<div class="flex items-center justify-between px-4 py-3">
+<div class="font-bold text-xl text-secondary">바른상회</div>
+<button class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 !rounded-button">
+파트너 문의
+</button>
+</div>
+</nav>
+<main class="pt-[60px] pb-[80px]">
+<section class="relative h-[480px] overflow-hidden">
+<div class="swiper-container h-full" id="mainSwiper">
+<div class="swiper-wrapper">
+<div class="swiper-slide">
+<img src="https://public.readdy.ai/ai/img_res/a4c3402a92879bcc88599e1e71996b43.jpg" class="w-full h-full object-cover" alt="Store Image">
+<div class="absolute inset-0 bg-black/30 flex flex-col justify-center px-6">
+<p class="text-white/80 mb-2 text-sm font-medium">바른상회 소개</p>
+<h1 class="text-3xl font-bold text-white mb-4">어른들에게는 향수를,<br>아이들에게는 추억을</h1>
+<p class="text-white/90 mb-2">익숙한 따뜻함과<br>새로운 즐거움이 함께하는 공간</p>
+<p class="text-white/80 text-sm mb-8">할인이 필요 없는 바른 가격으로<br>정직하게 운영하는 로컬 마켓</p>
+</div>
+</div>
+<div class="swiper-slide">
+<img src="https://public.readdy.ai/ai/img_res/7fc2af2d95112a2957f7666fa875f953.jpg" class="w-full h-full object-cover" alt="Communication Image">
+<div class="absolute inset-0 bg-black/30 flex flex-col justify-center px-6">
+<p class="text-white/80 mb-2 text-sm font-medium">바른 소통</p>
+<h1 class="text-3xl font-bold text-white mb-4">지역사회와 함께<br>성장하는 파트너</h1>
+<p class="text-white/90 mb-2">이웃과 함께 만드는<br>따뜻한 커뮤니티</p>
+<p class="text-white/80 text-sm mb-8">지역 주민들의 일상 속<br>소통의 공간이 되겠습니다</p>
+</div>
+</div>
+<div class="swiper-slide">
+<img src="https://public.readdy.ai/ai/img_res/88761fb771b809bf72b8fce2d58499ae.jpg" class="w-full h-full object-cover" alt="Partnership Image">
+<div class="absolute inset-0 bg-black/30 flex flex-col justify-center px-6">
+<p class="text-white/80 mb-2 text-sm font-medium">바른 파트너십</p>
+<h1 class="text-3xl font-bold text-white mb-4">성공적인 창업,<br>든든한 동반자</h1>
+<p class="text-white/90 mb-2">체계적인 운영 시스템과<br>안정적인 수익 창출</p>
+<p class="text-white/80 text-sm mb-8">본사의 전폭적인 지원으로<br>함께 성장하는 파트너십</p>
+</div>
+</div>
+</div>
+<div class="swiper-pagination absolute bottom-20"></div>
+</div>
+<button class="w-[calc(100%-48px)] absolute bottom-8 left-1/2 -translate-x-1/2 py-4 bg-primary text-white font-medium !rounded-button">
+파트너 상담 신청하기
+</button>
+</section>
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+// Firebase 설정
+const firebaseConfig = {
+    apiKey: "AIzaSyCbu_1gbtSIVUvmmw5RyLYvjaYOG7RdCWw",
+    authDomain: "ppap-ea44a.firebaseapp.com",
+    projectId: "ppap-ea44a",
+    storageBucket: "ppap-ea44a.firebasestorage.app",
+    messagingSenderId: "811949338329",
+    appId: "1:811949338329:web:cda8d43a7aeb825ce258c8",
+    measurementId: "G-6QGZT6Y1TE"
+};
+
+// Firebase 초기화
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+// 유틸리티 함수
+const utils = {
+    // 이미지 최적화 및 업로드
+    async optimizeAndUploadImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = async () => {
+                    const canvas = document.createElement('canvas');
+                    const [MAX_WIDTH, MAX_HEIGHT] = [1200, 1200];
+                    let [width, height] = [img.width, img.height];
+
+                    if (width > height && width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    } else if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+
+                    Object.assign(canvas, { width, height });
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob(async (blob) => {
+                        try {
+                            const fileRef = storage.ref().child(`franchise_inquiries/${Date.now()}_${file.name}`);
+                            await fileRef.put(blob);
+                            const url = await fileRef.getDownloadURL();
+                            resolve(url);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    }, 'image/jpeg', 0.8);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    },
+
+    // 활동 로그 기록
+    async logActivity(action, data) {
+        try {
+            await db.collection('activity_logs').add({
+                action,
+                data,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                userAgent: navigator.userAgent,
+                path: window.location.pathname
+            });
+        } catch (error) {
+            console.error('로그 기록 실패:', error);
+        }
+    }
+};
+
+// 파트너 문의 관련 기능
+const partnerInquiry = {
+    // 문의 제출
+    async submit(formData) {
+        try {
+            const docRef = await db.collection('franchise_inquiries').add({
+                ...formData,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            await utils.logActivity('partner_inquiry_submit', {
+                inquiryId: docRef.id,
+                partnerType: formData.partnerType
+            });
+
+            return docRef.id;
+        } catch (error) {
+            console.error('문의 제출 실패:', error);
+            throw error;
+        }
+    },
+
+    // 문의 다이얼로그 HTML
+    getDialogHTML() {
+        return `
+            <div class="bg-white w-[320px] rounded-lg p-6">
+                <h3 class="text-lg font-medium mb-4">파트너 상담 신청</h3>
+                <form id="partnerInquiryForm" class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">파트너 유형</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center p-3 border rounded cursor-pointer hover:border-primary">
+                                <input type="radio" name="partner-type" value="전속" class="mr-2" required>
+                                <div>
+                                    <div class="font-medium">전속 파트너</div>
+                                    <div class="text-xs text-gray-500">신규 개설 A to Z 지원</div>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-3 border rounded cursor-pointer hover:border-primary">
+                                <input type="radio" name="partner-type" value="운영지원" class="mr-2">
+                                <div>
+                                    <div class="font-medium">운영 지원</div>
+                                    <div class="text-xs text-gray-500">상품 납품 및 매장 관리</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <input type="text" placeholder="이름" required class="w-full px-4 py-2 border rounded">
+                    <input type="tel" placeholder="연락처" required class="w-full px-4 py-2 border rounded">
+                    <input type="text" placeholder="희망지역" required class="w-full px-4 py-2 border rounded">
+                    <button type="submit" class="w-full py-3 bg-primary hover:bg-primary/90 text-white !rounded-button">신청하기</button>
+                </form>
+                <button class="w-full py-2 mt-2 text-gray-500" onclick="this.closest('.fixed').remove()">닫기</button>
+            </div>
+        `;
+    },
+
+    // 다이얼로그 표시
+    showDialog() {
+        const dialog = document.createElement('div');
+        dialog.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+        dialog.innerHTML = this.getDialogHTML();
+        document.body.appendChild(dialog);
+
+        // 폼 제출 이벤트 리스너
+        const form = dialog.querySelector('#partnerInquiryForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+
+            try {
+                const formData = {
+                    name: form.querySelector('input[placeholder="이름"]').value,
+                    phone: form.querySelector('input[placeholder="연락처"]').value,
+                    location: form.querySelector('input[placeholder="희망지역"]').value,
+                    partnerType: form.querySelector('input[name="partner-type"]:checked').value
+                };
+
+                await this.submit(formData);
+                alert('문의가 성공적으로 접수되었습니다.');
+                dialog.remove();
+            } catch (error) {
+                alert('문의 접수 중 오류가 발생했습니다. 다시 시도해주세요.');
+                submitButton.disabled = false;
+            }
+        });
+    }
+};
+
+// 전역에서 접근 가능하도록 함수 설정
+window.showContactDialog = () => partnerInquiry.showDialog();
+
+// 이벤트 리스너 설정
+document.addEventListener('DOMContentLoaded', () => {
+    // 스무스 스크롤
+    document.querySelectorAll('.smooth-scroll').forEach(anchor => {
+        anchor.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = anchor.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // 문의 버튼 이벤트 (footer 버튼 제외)
+    document.querySelectorAll('button:not([onclick])').forEach(button => {
+        const text = button.textContent.trim().toLowerCase();
+        if (text.includes('파트너') || text.includes('상담')) {
+            button.addEventListener('click', () => partnerInquiry.showDialog());
+        }
+    });
+});
+
+// Swiper 초기화
+new Swiper('#mainSwiper', {
+    loop: true,
+    pagination: {
+        el: '.swiper-pagination',
+        clickable: true
+    },
+    autoplay: {
+        delay: 5000,
+        disableOnInteraction: false
+    }
+});
+</script>
+<section class="px-4 py-8 bg-white">
+<h2 class="text-xl font-bold mb-2">바른상회의 약속</h2>
+<p class="text-sm text-gray-600 mb-6">올바른 유통, 바른 가격, 정직한 운영</p>
+<div class="grid grid-cols-3 gap-4">
+<div class="text-center">
+<div class="w-16 h-16 mx-auto mb-2 rounded-full bg-beige flex items-center justify-center">
+<i class="ri-store-3-line text-xl text-brown"></i>
+</div>
+<p class="text-sm font-medium">익숙한 공간</p>
+<p class="text-xs text-gray-500 mt-1">정겨운 동네가게</p>
+</div>
+<div class="text-center">
+<div class="w-16 h-16 mx-auto mb-2 rounded-full bg-beige flex items-center justify-center">
+<i class="ri-hand-heart-line text-xl text-brown"></i>
+</div>
+<p class="text-sm font-medium">로컬 상생</p>
+<p class="text-xs text-gray-500 mt-1">지역과 함께 성장</p>
+</div>
+<div class="text-center">
+<div class="w-16 h-16 mx-auto mb-2 rounded-full bg-beige flex items-center justify-center">
+<i class="ri-group-line text-xl text-brown"></i>
+</div>
+<p class="text-sm font-medium">커뮤니티</p>
+<p class="text-xs text-gray-500 mt-1">이웃과의 소통</p>
+</div>
+</div>
+</section>
+<section id="benefits" class="px-4 py-8 bg-gray-50">
+<h2 class="text-xl font-bold mb-2">파트너 혜택</h2>
+<p class="text-sm text-gray-600 mb-6">쉽고 안정적인 운영을 위한 본사의 든든한 지원</p>
+<div class="space-y-4">
+<div class="p-4 bg-white rounded-lg shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 flex items-center justify-center bg-beige rounded-full">
+<i class="ri-money-dollar-circle-line text-lg text-yellow"></i>
+</div>
+<div>
+<h3 class="font-medium">초기 투자 부담 최소화</h3>
+<p class="text-sm text-gray-600">합리적인 창업비용과 안정적인 수익구조</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-white rounded-lg shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 flex items-center justify-center bg-beige rounded-full">
+<i class="ri-customer-service-2-line text-lg text-yellow"></i>
+</div>
+<div>
+<h3 class="font-medium">스마트한 운영 시스템</h3>
+<p class="text-sm text-gray-600">무인 운영으로 효율적인 매장 관리</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-white rounded-lg shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 flex items-center justify-center bg-beige rounded-full">
+<i class="ri-store-2-line text-lg text-yellow"></i>
+</div>
+<div>
+<h3 class="font-medium">로컬 브랜드 파워</h3>
+<p class="text-sm text-gray-600">지역 밀착형 마케팅 및 상품 구성 지원</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-white rounded-lg shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 flex items-center justify-center bg-beige rounded-full">
+<i class="ri-ice-cream-line text-lg text-yellow"></i>
+</div>
+<div>
+<h3 class="font-medium">기존 매장 관리 서비스</h3>
+<p class="text-sm text-gray-600">운영 중인 아이스크림 매장 납품 및 위탁 관리</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="guide" class="px-4 py-8 bg-white">
+<h2 class="text-xl font-bold mb-6">바른 파트너 운영 가이드</h2>
+<p class="text-sm text-gray-600 mb-8">더 쉽고 효율적인 운영을 위한 바른상회의 체계적인 지원 시스템을 소개합니다.</p>
+<div class="grid grid-cols-2 gap-4 mb-8">
+<div class="relative overflow-hidden rounded-lg">
+<img src="https://public.readdy.ai/ai/img_res/4083c283aec6a027663145cdf7316670.jpg" class="w-full h-40 object-cover" alt="Store Layout">
+<div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+<div class="text-center">
+<div class="text-3xl mb-2">🏪</div>
+<h3 class="text-white font-medium">매장 컨설팅</h3>
+</div>
+</div>
+</div>
+<div class="relative overflow-hidden rounded-lg">
+<img src="https://public.readdy.ai/ai/img_res/a51e3453c0c8178e98fd1a46e098fde5.jpg" class="w-full h-40 object-cover" alt="Smart System">
+<div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+<div class="text-center">
+<div class="text-3xl mb-2">📊</div>
+<h3 class="text-white font-medium">스마트 운영</h3>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="bg-gray-50 p-4 rounded-lg flex items-start gap-4">
+<div class="text-2xl">💡</div>
+<div>
+<h4 class="font-medium mb-2">전문 컨설팅</h4>
+<p class="text-sm text-gray-600">입지 분석부터 인테리어, 상품 구성까지 전문가의 맞춤 컨설팅을 제공합니다.</p>
+</div>
+</div>
+<div class="bg-gray-50 p-4 rounded-lg flex items-start gap-4">
+<div class="text-2xl">🤖</div>
+<div>
+<h4 class="font-medium mb-2">AI 운영 시스템</h4>
+<p class="text-sm text-gray-600">실시간 데이터 분석으로 재고와 매출을 최적화하는 스마트 솔루션을 제공합니다.</p>
+</div>
+</div>
+<div class="bg-gray-50 p-4 rounded-lg flex items-start gap-4">
+<div class="text-2xl">🤝</div>
+<div>
+<h4 class="font-medium mb-2">든든한 파트너십</h4>
+<p class="text-sm text-gray-600">정기적인 방문 관리와 긴급 지원으로 안정적인 운영을 도와드립니다.</p>
+</div>
+</div>
+</div>
+<div class="mt-8">
+<button class="w-full py-4 bg-primary text-white font-medium !rounded-button">
+파트너 신청하기
+</button>
+</div>
+</section>
+</main>
+<footer class="fixed bottom-0 w-[375px] bg-white border-t">
+<div class="grid grid-cols-4 gap-0">
+<a href="#mainSwiper" class="flex flex-col items-center justify-center py-2 smooth-scroll">
+<i class="ri-home-5-line text-lg"></i>
+<span class="text-xs mt-1">메인</span>
+</a>
+<a href="#benefits" class="flex flex-col items-center justify-center py-2 smooth-scroll">
+<i class="ri-gift-line text-lg"></i>
+<span class="text-xs mt-1">혜택안내</span>
+</a>
+<a href="#guide" class="flex flex-col items-center justify-center py-2 smooth-scroll">
+<i class="ri-book-open-line text-lg"></i>
+<span class="text-xs mt-1">운영가이드</span>
+</a>
+<button class="flex flex-col items-center justify-center py-2 w-full" id="contactButton">
+<i class="ri-customer-service-2-line text-lg"></i>
+<span class="text-xs mt-1">상담신청</span>
+</button>
+</div>
+</footer>
+
+
+<div class="px-4 py-6 bg-gray-50 text-center text-sm text-gray-500">
+    <p class="font-medium mb-2">바른상회 생활연구소</p>
+    <p class="mb-1">사업자등록번호: 123-45-67890</p>
+    <p class="mb-1">대표: 김바른</p>
+    <p class="mb-1">주소: 서울특별시 강남구 테헤란로 123</p>
+    <p class="mb-1">대표전화: 1544-1234</p>
+    <p class="mb-4">이메일: contact@barun.co.kr</p>
+    <p class="text-xs">© 2025 바른상회 생활연구소. All rights reserved.</p>
+    </div>
+</body>
+</html>
