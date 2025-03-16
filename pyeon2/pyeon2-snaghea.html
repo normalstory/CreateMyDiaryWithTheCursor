@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=375px, initial-scale=1.0">
+    <title>편편상회 便便商會</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :where([class^="ri-"])::before {
+            content: "\f3c2";
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4CAF50',
+                        secondary: '#2C3E50',
+                        beige: '#F5F0E1',
+                        brown: '#D7A86E',
+                        yellow: '#F1C40F'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="w-[375px] min-h-[762px] mx-auto bg-white">
+    <nav class="fixed top-0 w-[375px] z-50 bg-white/95 backdrop-blur-sm border-b">
+        <div class="flex items-center justify-between px-4 py-3">
+            <div class="font-bold text-xl text-secondary">편편상회 便便商會</div>
+            <button class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 !rounded-button">
+                파트너 문의
+            </button>
+        </div>
+    </nav>
+    <main class="pt-[60px] pb-[80px]">
+        <div id="main-content">
+            <section class="relative h-[480px] overflow-hidden">
+                <div class="swiper-container h-full" id="mainSwiper">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <img src="https://public.readdy.ai/ai/img_res/a4e2c2dcb0c11b788e21a4afbe6526a3.jpg"
+                                class="w-full h-full object-cover" alt="Store Image" />
+                            <div class="absolute inset-0 bg-black/30 flex flex-col justify-center px-6">
+                                <p class="text-white/80 mb-2 text-sm font-medium">
+                                    편편상회, 하루의 쉼표
+                                </p>
+                                <h1 class="text-3xl font-bold text-white mb-4">
+                                    The Present is<br />a Present
+                                </h1>
+                                <p class="text-white/90 mb-2">
+                                    좋은 것보다<br />좋아하는 것을 고르는 공간
+                                </p>
+                                <p class="text-white/80 text-sm mb-8">
+                                    하루를 위로하는<br />작은 쉼표 같은 곳
+                                </p>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="https://public.readdy.ai/ai/img_res/090ca493480043136506a77337fb80e8.jpg"
+                                class="w-full h-full object-cover" alt="Products Image" />
+                            <div class="absolute inset-0 bg-black/30 flex flex-col justify-center px-6">
+                                <p class="text-white/80 mb-2 text-sm font-medium">
+                                    소소한 행복
+                                </p>
+                                <h1 class="text-3xl font-bold text-white mb-4">
+                                    내일도 힘내야 하니까<br />오늘은 나를 위한 선물
+                                </h1>
+                                <p class="text-white/90 mb-2">
+                                    좋아하는 걸 고르는 순간<br />오늘이 조금 더 괜찮아져요
+                                </p>
+                                <p class="text-white/80 text-sm mb-8">
+                                    불량식품은 없어요<br />불량한 습관이 있을 뿐
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="swiper-slide">
+                            <img src="https://public.readdy.ai/ai/img_res/7fc2af2d95112a2957f7666fa875f953.jpg"
+                                class="w-full h-full object-cover" alt="Communication Image">
+                            <div class="absolute inset-0 bg-black/30 flex flex-col justify-center px-6">
+                                <p class="text-white/80 mb-2 text-sm font-medium">함께 나누는 소통</p>
+                                <h1 class="text-3xl font-bold text-white mb-4">지역사회와 함께<br>성장하는 파트너</h1>
+                                <p class="text-white/90 mb-2">이웃과 함께 만드는<br>따뜻한 커뮤니티</p>
+                                <p class="text-white/80 text-sm mb-8">지역 주민들의 일상 속<br>소통의 공간이 되겠습니다</p>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="https://public.readdy.ai/ai/img_res/88761fb771b809bf72b8fce2d58499ae.jpg"
+                                class="w-full h-full object-cover" alt="Partnership Image">
+                            <div class="absolute inset-0 bg-black/30 flex flex-col justify-center px-6">
+                                <p class="text-white/80 mb-2 text-sm font-medium">바른 파트너십</p>
+                                <h1 class="text-3xl font-bold text-white mb-4">성공적인 창업,<br>든든한 동반자</h1>
+                                <p class="text-white/90 mb-2">체계적인 운영 시스템과<br>안정적인 수익 창출</p>
+                                <p class="text-white/80 text-sm mb-8">본사의 전폭적인 지원으로<br>함께 성장하는 파트너십</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-pagination absolute bottom-8"></div>
+                </div>
+                <button
+                    class="w-[calc(100%-48px)] absolute bottom-8 left-1/2 -translate-x-1/2 py-4 bg-primary text-white font-medium !rounded-button">
+                    파트너 상담 신청하기
+                </button>
+            </section>
+            <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+            <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+            <section class="px-4 py-5 bg-white">
+                <div class="text-center mb-2">
+                  <h2 class="text-3xl font-bold mb-3 relative inline-block">
+                    <span class="absolute -top-1 -left-6 text-2xl animate-bounce"
+                      >✨</span
+                    >
+                    The Present is<br />
+                    <span class="relative inline-block">
+                      a Present
+                      <span class="absolute -top-1 -right-6 text-2xl animate-bounce"
+                        >✨</span
+                      >
+                    </span>
+                  </h2>
+                  <p class="text-pink-600">지금 이 순간이 선물이 되는 공간</p>
+                </div>
+                <div class="mt-8">
+                    <p class="text-black-600 text-sm mb-2 flex items-center gap-3">
+                      <span class="text-xl">🏡</span>
+                      동네 속 작은 쉼표
+                      <br />언제든 가볍게 들러 필요한 걸 채울 수 있는 곳
+                    </p>
+                </div>
+                <div class="mt-8">
+                    <p class="text-black-600 text-sm mb-2 flex items-center gap-3">
+                      <span class="text-xl">🤝</span>
+                      로컬과 함께하는 가게
+                      <br />친숙한 브랜드, 익숙한 제품, 그리고 새로운 발견
+                    </p>
+                </div>
+              </section>
+            <section id="benefits" class="px-4 py-8 bg-gray-50">
+                <h2 class="text-xl font-bold mb-2">편편상회에서 만나는 작은 위로</h2>
+                <p class="text-sm text-sky-600 mb-6">
+                  ✨ 당신의 하루를 조금 더 특별하게
+                </p>
+                <div class="space-y-4">
+                  <div class="p-4 bg-white rounded-lg shadow-sm">
+                    <div class="flex items-center gap-3">
+                      <div class="text-2xl">🍦</div>
+                      <div>
+                        <h3 class="font-medium">시원한 아이스크림</h3>
+                        <p class="text-sm text-gray-600">
+                          한입 베어 물면 사르르 녹아내리는 달콤한 순간
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-4 bg-white rounded-lg shadow-sm">
+                    <div class="flex items-center gap-3">
+                      <div class="text-2xl">🍞</div>
+                      <div>
+                        <h3 class="font-medium">갓 구운 빵처럼 포근한 간식</h3>
+                        <p class="text-sm text-gray-600">
+                          바쁜 하루에도 손쉽게 즐기는 부드러운 한 조각
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-4 bg-white rounded-lg shadow-sm">
+                    <div class="flex items-center gap-3">
+                      <div class="text-2xl">🍫</div>
+                      <div>
+                        <h3 class="font-medium">달콤한 과자 한 봉지</h3>
+                        <p class="text-sm text-gray-600">
+                          오늘 하루, 수고한 나에게 작은 보상
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-4 bg-white rounded-lg shadow-sm">
+                    <div class="flex items-center gap-3">
+                      <div class="text-2xl">🥤</div>
+                      <div>
+                        <h3 class="font-medium">언제든 시원한 음료</h3>
+                        <p class="text-sm text-gray-600">
+                          냉장고 속 다양한 선택지, 내 취향대로 골라 마시는 즐거움
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            <section class="px-4 py-8 bg-white">
+                <h2 class="text-xl font-bold mb-2">편편상회의 약속</h2>
+                <p class="text-sm text-sky-600 mb-6">올바른 유통, 바른 가격, 정직한 운영</p>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <div class="w-16 h-16 mx-auto mb-2 rounded-full bg-beige flex items-center justify-center">
+                            <i class="ri-store-3-line text-xl text-brown"></i>
+                        </div>
+                        <p class="text-sm font-medium">익숙한 공간</p>
+                        <p class="text-xs text-gray-500 mt-1">정겨운 동네가게</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 mx-auto mb-2 rounded-full bg-beige flex items-center justify-center">
+                            <i class="ri-hand-heart-line text-xl text-brown"></i>
+                        </div>
+                        <p class="text-sm font-medium">로컬 상생</p>
+                        <p class="text-xs text-gray-500 mt-1">지역과 함께 성장</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 mx-auto mb-2 rounded-full bg-beige flex items-center justify-center">
+                            <i class="ri-group-line text-xl text-brown"></i>
+                        </div>
+                        <p class="text-sm font-medium">커뮤니티</p>
+                        <p class="text-xs text-gray-500 mt-1">이웃과의 소통</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="partnership-content" class="hidden">
+            <section id="benefits" class="px-4 py-8 bg-gray-50">
+                <h2 class="text-xl font-bold mb-2">편편한 파트너십</h2>
+                <p class="text-sm text-gray-600 mb-6">쉽고 안정적인 운영을 위한 본사의 든든한 지원</p>
+                <div class="space-y-4">
+                    <div class="p-4 bg-white rounded-lg shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 flex items-center justify-center bg-beige rounded-full">
+                                <i class="ri-money-dollar-circle-line text-lg text-yellow"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">초기 투자 부담 최소화</h3>
+                                <p class="text-sm text-gray-600">합리적인 창업비용과 안정적인 수익구조</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 flex items-center justify-center bg-beige rounded-full">
+                                <i class="ri-customer-service-2-line text-lg text-yellow"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">스마트한 운영 시스템</h3>
+                                <p class="text-sm text-gray-600">무인 운영으로 효율적인 매장 관리</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 flex items-center justify-center bg-beige rounded-full">
+                                <i class="ri-store-2-line text-lg text-yellow"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">로컬 브랜드 파워</h3>
+                                <p class="text-sm text-gray-600">지역 밀착형 마케팅 및 상품 구성 지원</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 flex items-center justify-center bg-beige rounded-full">
+                                <i class="ri-ice-cream-line text-lg text-yellow"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">기존 매장 관리 서비스</h3>
+                                <p class="text-sm text-gray-600">운영 중인 아이스크림 매장 납품 및 위탁 관리</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="guide" class="px-4 py-8 bg-white">
+                <h2 class="text-xl font-bold mb-6">파트너 운영 가이드</h2>
+                <p class="text-sm text-gray-600 mb-8">더 쉽고 효율적인 운영을 위한 편편상회의 체계적인 지원 시스템을 소개합니다.</p>
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="relative overflow-hidden rounded-lg">
+                        <img src="https://public.readdy.ai/ai/img_res/4083c283aec6a027663145cdf7316670.jpg"
+                            class="w-full h-40 object-cover" alt="Store Layout">
+                        <div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-3xl mb-2">🏪</div>
+                                <h3 class="text-white font-medium">매장 컨설팅</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative overflow-hidden rounded-lg">
+                        <img src="https://public.readdy.ai/ai/img_res/a51e3453c0c8178e98fd1a46e098fde5.jpg"
+                            class="w-full h-40 object-cover" alt="Smart System">
+                        <div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-3xl mb-2">📊</div>
+                                <h3 class="text-white font-medium">스마트 운영</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-gray-50 p-4 rounded-lg flex items-start gap-4">
+                        <div class="text-2xl">💡</div>
+                        <div>
+                            <h4 class="font-medium mb-2">전문 컨설팅</h4>
+                            <p class="text-sm text-gray-600">입지 분석부터 인테리어, 상품 구성까지 전문가의 맞춤 컨설팅을 제공합니다.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg flex items-start gap-4">
+                        <div class="text-2xl">🤖</div>
+                        <div>
+                            <h4 class="font-medium mb-2">AI 운영 시스템</h4>
+                            <p class="text-sm text-gray-600">실시간 데이터 분석으로 재고와 매출을 최적화하는 스마트 솔루션을 제공합니다.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg flex items-start gap-4">
+                        <div class="text-2xl">🤝</div>
+                        <div>
+                            <h4 class="font-medium mb-2">든든한 파트너십</h4>
+                            <p class="text-sm text-gray-600">정기적인 방문 관리와 긴급 지원으로 안정적인 운영을 도와드립니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <button class="w-full py-4 bg-primary text-white font-medium !rounded-button">
+                        파트너 신청하기
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <div class="px-4 py-6 bg-gray-50 text-center text-sm text-gray-500">
+            <p class="font-medium mb-2">편편한생활연구소</p>
+            <p class="mb-1">사업자등록번호: 327-43-01269</p>
+            <p class="mb-1">대전광역시 동구 대전천동로 528,부라다오피스텔 1110호</p>
+            <p class="mb-4">이메일: dev.chanwoo@gmail.com</p>
+            <p class="text-xs">© 2025 편편한생활연구소. All rights reserved.</p>
+            <a href="/pyeon2/pyeon2-admin.html" target="_blank" style="color: antiquewhite;">관리자 페이지</a>
+        </div>
+    </main>
+    <footer class="fixed bottom-0 w-[375px] bg-white border-t">
+        <div class="grid grid-cols-4 gap-0">
+            <button id="home-btn" class="flex flex-col items-center justify-center py-2">
+                <i class="ri-home-5-line text-lg"></i>
+                <span class="text-xs mt-1">편편상회</span>
+            </button>
+            <button id="partnership-btn" class="flex flex-col items-center justify-center py-2">
+                <i class="ri-book-open-line text-lg"></i>
+                <span class="text-xs mt-1">파트너십</span>
+            </button>
+            <button class="flex flex-col items-center justify-center py-2 w-full" onclick="showContactDialog()">
+                <i class="ri-customer-service-2-line text-lg"></i>
+                <span class="text-xs mt-1">상담신청</span>
+            </button>
+            <button class="flex flex-col items-center justify-center py-2 w-full" onclick="showProgressDialog()">
+                <i class="ri-search-line text-lg"></i>
+                <span class="text-xs mt-1">진행확인</span>
+            </button>
+        </div>
+    </footer>
+
+    <!-- 진행 상황 확인 모달 -->
+    <div id="progressModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white w-[320px] rounded-lg p-6">
+            <h3 class="text-lg font-medium mb-4">진행 상황 확인</h3>
+            <form id="progressCheckForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">핸드폰 번호</label>
+                    <input type="text" id="phoneNumber" placeholder="숫자만 입력 (01012345678)"
+                        class="mt-1 w-full px-4 py-2 border rounded" required maxlength="11"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, ''); validatePhoneNumber(this);">
+                    <p class="text-xs text-gray-500 mt-1">'-' 없이 숫자만 입력해주세요</p>
+                    <p id="phoneError" class="text-xs text-red-500 mt-1 hidden">핸드폰 번호 11자리를 입력해주세요</p>
+                </div>
+                <button type="submit" class="w-full py-3 bg-primary hover:bg-primary/90 text-white !rounded-button">
+                    확인하기
+                </button>
+            </form>
+            <button class="w-full py-2 mt-2 text-gray-500" onclick="closeProgressModal()">
+                닫기
+            </button>
+        </div>
+    </div>
+
+    <!-- 진행 상황 상세 모달 -->
+    <div id="progressDetailModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white w-[90%] max-w-[480px] rounded-lg max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 class="text-lg font-medium">신청 진행 상황</h3>
+                <button onclick="closeProgressDetailModal()" class="text-gray-500">
+                    <i class="ri-close-line text-xl"></i>
+                </button>
+            </div>
+            <div class="overflow-y-auto flex-1 p-6">
+                <div id="progressDetail" class="space-y-4">
+                    <!-- 진행 상황 내용이 여기에 동적으로 추가됨 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbu_1gbtSIVUvmmw5RyLYvjaYOG7RdCWw",
+            authDomain: "ppap-ea44a.firebaseapp.com",
+            projectId: "ppap-ea44a",
+            storageBucket: "ppap-ea44a.firebasestorage.app",
+            messagingSenderId: "811949338329",
+            appId: "1:811949338329:web:cda8d43a7aeb825ce258c8",
+            measurementId: "G-6QGZT6Y1TE"
+        };
+
+        // Firebase 초기화
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // 유틸리티 함수
+        const utils = {
+            // 이미지 최적화 및 업로드
+            async optimizeAndUploadImage(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = async () => {
+                            const canvas = document.createElement('canvas');
+                            const [MAX_WIDTH, MAX_HEIGHT] = [1200, 1200];
+                            let [width, height] = [img.width, img.height];
+
+                            if (width > height && width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            } else if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+
+                            Object.assign(canvas, { width, height });
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            canvas.toBlob(async (blob) => {
+                                try {
+                                    const fileRef = storage.ref().child(`franchise_inquiries/${Date.now()}_${file.name}`);
+                                    await fileRef.put(blob);
+                                    const url = await fileRef.getDownloadURL();
+                                    resolve(url);
+                                } catch (error) {
+                                    reject(error);
+                                }
+                            }, 'image/jpeg', 0.8);
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            },
+
+            // 활동 로그 기록
+            async logActivity(action, data) {
+                try {
+                    await db.collection('activity_logs').add({
+                        action,
+                        data,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        userAgent: navigator.userAgent,
+                        path: window.location.pathname
+                    });
+                } catch (error) {
+                    console.error('로그 기록 실패:', error);
+                }
+            }
+        };
+
+        // 파트너 문의 관련 기능
+        const partnerInquiry = {
+            // 문의 제출
+            async submit(formData) {
+                try {
+                    const docRef = await db.collection('franchise_inquiries').add({
+                        ...formData,
+                        status: 'pending',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    await utils.logActivity('partner_inquiry_submit', {
+                        inquiryId: docRef.id,
+                        partnerType: formData.partnerType
+                    });
+
+                    return docRef.id;
+                } catch (error) {
+                    console.error('문의 제출 실패:', error);
+                    throw error;
+                }
+            },
+
+            // 문의 다이얼로그 HTML
+            getDialogHTML() {
+                return `
+            <div class="bg-white w-[320px] rounded-lg p-6">
+                <h3 class="text-lg font-medium mb-4">파트너 상담 신청</h3>
+                <form id="partnerInquiryForm" class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">파트너 유형</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center p-3 border rounded cursor-pointer hover:border-primary">
+                                <input type="radio" name="partner-type" value="전속" class="mr-2" required>
+                                <div>
+                                    <div class="font-medium">전속 파트너</div>
+                                    <div class="text-xs text-gray-500">신규 개설 A to Z 지원</div>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-3 border rounded cursor-pointer hover:border-primary">
+                                <input type="radio" name="partner-type" value="운영지원" class="mr-2">
+                                <div>
+                                    <div class="font-medium">운영 지원</div>
+                                    <div class="text-xs text-gray-500">상품 납품 및 매장 관리</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <input type="text" placeholder="이름" required class="w-full px-4 py-2 border rounded">
+                    <input type="tel" placeholder="연락처" required class="w-full px-4 py-2 border rounded">
+                    <input type="text" placeholder="희망지역" required class="w-full px-4 py-2 border rounded">
+                    <button type="submit" class="w-full py-3 bg-primary hover:bg-primary/90 text-white !rounded-button">신청하기</button>
+                </form>
+                <button class="w-full py-2 mt-2 text-gray-500" onclick="this.closest('.fixed').remove()">닫기</button>
+            </div>
+        `;
+            },
+
+            // 다이얼로그 표시
+            showDialog() {
+                const dialog = document.createElement('div');
+                dialog.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+                dialog.innerHTML = this.getDialogHTML();
+                document.body.appendChild(dialog);
+
+                // 폼 제출 이벤트 리스너
+                const form = dialog.querySelector('#partnerInquiryForm');
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    submitButton.disabled = true;
+
+                    try {
+                        const formData = {
+                            name: form.querySelector('input[placeholder="이름"]').value,
+                            phone: form.querySelector('input[placeholder="연락처"]').value,
+                            location: form.querySelector('input[placeholder="희망지역"]').value,
+                            partnerType: form.querySelector('input[name="partner-type"]:checked').value
+                        };
+
+                        await this.submit(formData);
+                        alert('문의가 성공적으로 접수되었습니다.');
+                        dialog.remove();
+                    } catch (error) {
+                        alert('문의 접수 중 오류가 발생했습니다. 다시 시도해주세요.');
+                        submitButton.disabled = false;
+                    }
+                });
+            }
+        };
+
+        // 전역에서 접근 가능하도록 함수 설정
+        window.showContactDialog = () => partnerInquiry.showDialog();
+
+        // 이벤트 리스너 설정
+        document.addEventListener('DOMContentLoaded', () => {
+            // 스무스 스크롤
+            document.querySelectorAll('.smooth-scroll').forEach(anchor => {
+                anchor.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = anchor.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // 문의 버튼 이벤트 수정 부분
+            document.querySelectorAll('button:not([onclick]):not(#partnership-btn)').forEach(button => {
+                const text = button.textContent.trim().toLowerCase();
+                if (text.includes('파트너') || text.includes('상담')) {
+                    button.addEventListener('click', () => partnerInquiry.showDialog());
+                }
+            });
+
+            // Swiper 초기화
+            new Swiper('#mainSwiper', {
+                loop: true,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true
+                },
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false
+                }
+            });
+
+            // 화면 전환 기능 추가
+            const homeBtn = document.getElementById('home-btn');
+            const partnershipBtn = document.getElementById('partnership-btn');
+            const mainContent = document.getElementById('main-content');
+            const partnershipContent = document.getElementById('partnership-content');
+
+            // 홈 버튼 클릭 이벤트
+            homeBtn.addEventListener('click', () => {
+                mainContent.classList.remove('hidden');
+                partnershipContent.classList.add('hidden');
+                // 활성화된 버튼 스타일 변경
+                homeBtn.classList.add('text-primary');
+                partnershipBtn.classList.remove('text-primary');
+            });
+
+            // 파트너십 버튼 클릭 이벤트
+            partnershipBtn.addEventListener('click', () => {
+                mainContent.classList.add('hidden');
+                partnershipContent.classList.remove('hidden');
+                // 활성화된 버튼 스타일 변경
+                homeBtn.classList.remove('text-primary');
+                partnershipBtn.classList.add('text-primary');
+            });
+
+            // 초기 상태 설정
+            homeBtn.classList.add('text-primary');
+        });
+
+        // 진행 상황 확인 모달 관련 함수
+        function showProgressDialog() {
+            document.getElementById('progressModal').classList.remove('hidden');
+        }
+
+        function closeProgressModal() {
+            document.getElementById('progressModal').classList.add('hidden');
+        }
+
+        function closeProgressDetailModal() {
+            document.getElementById('progressDetailModal').classList.add('hidden');
+        }
+
+        // 진행 상황 확인 처리
+        document.getElementById('progressCheckForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const phone = document.getElementById('phoneNumber').value;
+
+            try {
+                // 문의 조회
+                const snapshot = await db.collection('franchise_inquiries')
+                    .where('phone', '==', phone)
+                    .get();
+
+                if (snapshot.empty) {
+                    alert('해당 번호로 신청된 내역이 없습니다.');
+                    return;
+                }
+
+                // 클라이언트 측에서 정렬
+                const docs = snapshot.docs.sort((a, b) =>
+                    b.data().createdAt.toDate() - a.data().createdAt.toDate()
+                );
+                const data = docs[0].data();
+
+                // 메시지 내역 조회 - 수정된 부분
+                let messagesHtml = '';
+                try {
+                    const messagesSnapshot = await db.collection('inquiry_messages')
+                        .where('inquiryId', '==', docs[0].id)
+                        .orderBy('createdAt', 'desc')
+                        .get()
+                        .catch(async (error) => {
+                            if (error.code === 'failed-precondition') {
+                                // 인덱스가 없는 경우 메시지만 조회
+                                const simpleMessagesSnapshot = await db.collection('inquiry_messages')
+                                    .where('inquiryId', '==', docs[0].id)
+                                    .get();
+                                return simpleMessagesSnapshot;
+                            }
+                            throw error;
+                        });
+
+                    if (!messagesSnapshot.empty) {
+                        const messages = messagesSnapshot.docs.sort((a, b) =>
+                            b.data().createdAt.toDate() - a.data().createdAt.toDate()
+                        );
+
+                        messages.forEach(messageDoc => {
+                            const messageData = messageDoc.data();
+                            messagesHtml += `
+                    <div class="bg-gray-50 rounded-lg p-4 mb-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-sm font-medium">담당자: ${messageData.adminId}</span>
+                            <span class="text-xs text-gray-500">
+                                ${new Date(messageData.createdAt.toDate()).toLocaleString()}
+                            </span>
+                        </div>
+                        <div class="prose prose-sm max-w-none">
+                            ${messageData.content}
+                        </div>
+                    </div>
+                `;
+                        });
+                    } else {
+                        messagesHtml = '<p class="text-sm text-gray-500 text-center">아직 상담 내역이 없습니다.</p>';
+                    }
+                } catch (error) {
+                    console.error('메시지 조회 실패:', error);
+                    messagesHtml = '<p class="text-sm text-red-500 text-center">메시지 조회 중 오류가 발생했습니다.</p>';
+                }
+
+                // 나머지 코드는 그대로 유지
+                const statusTexts = {
+                    'pending': '접수완료',
+                    'checking': '확인중',
+                    'consulting': '상담중',
+                    'completed': '상담완료',
+                    'canceled': '취소'
+                };
+
+                const progressDetail = document.getElementById('progressDetail');
+                progressDetail.innerHTML = `
+        <div class="space-y-6">
+            <!-- 진행 단계 표시 -->
+            <div class="flex justify-between items-center relative mb-2">
+                <div class="absolute left-0 right-0 top-1/2 h-1 bg-gray-200 -z-10"></div>
+                <div class="flex flex-col items-center">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center ${data.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-500'}">
+                        📝
+                    </div>
+                    <span class="text-xs mt-1">접수완료</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center ${data.status === 'checking' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'}">
+                        🔍
+                    </div>
+                    <span class="text-xs mt-1">확인중</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center ${data.status === 'consulting' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'}">
+                        💬
+                    </div>
+                    <span class="text-xs mt-1">상담중</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center ${data.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}">
+                        ✨
+                    </div>
+                    <span class="text-xs mt-1">상담완료</span>
+                </div>
+            </div>
+
+            <!-- 현재 상태 표시 -->
+            <div class="bg-gray-50 p-3 rounded-lg text-center">
+                <p class="text-sm text-gray-600">현재 진행 상태</p>
+                <div class="mt-2">
+                    <span class="px-3 py-1.5 text-sm font-medium rounded-full inline-flex items-center gap-1.5 ${getStatusColor(data.status)}">
+                        ${data.status === 'pending' ? '📝' :
+                        data.status === 'checking' ? '🔍' :
+                            data.status === 'consulting' ? '💬' :
+                                data.status === 'completed' ? '✨' : '❌'}
+                        ${statusTexts[data.status] || data.status}
+                    </span>
+                </div>
+            </div>
+
+            <!-- 신청 정보 -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">신청자명</label>
+                    <p class="mt-1 flex items-center gap-2">
+                        <span class="text-lg">👤</span>
+                        ${data.name}
+                    </p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">연락처</label>
+                    <p class="mt-1 flex items-center gap-2">
+                        <span class="text-lg">📱</span>
+                        ${data.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}
+                    </p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">희망지역</label>
+                    <p class="mt-1 flex items-center gap-2">
+                        <span class="text-lg">📍</span>
+                        ${data.location}
+                    </p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">파트너 유형</label>
+                    <p class="mt-1 flex items-center gap-2">
+                        <span class="text-lg">🤝</span>
+                        ${data.partnerType}
+                    </p>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">신청일시</label>
+                    <p class="mt-1 flex items-center gap-2">
+                        <span class="text-lg">📅</span>
+                        ${new Date(data.createdAt.toDate()).toLocaleString()}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 상담 메시지 표시 -->
+            <div class="mt-6">
+                <h4 class="text-sm font-medium text-gray-700 mb-3">상담 내역</h4>
+                <div id="messageHistory" class="space-y-4">
+                    ${messagesHtml}
+                </div>
+            </div>
+
+            <!-- 안내 메시지 -->
+            <div class="mt-4 text-center space-y-4">
+                <p class="text-sm text-gray-600">
+                    추가 문의사항은 고객센터(dev.chanwoo@gmail.com)로 연락주세요
+                </p>
+                ${data.status !== 'canceled' ? `
+                <div class="border-t pt-4">
+                    <div class="flex gap-2 justify-center">
+                        <button onclick="cancelInquiry('${docs[0].id}')" 
+                                class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm">
+                            상담 취소
+                        </button>
+                        <button onclick="closeProgressDetailModal()" 
+                                class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm">
+                            닫기
+                        </button>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+
+                // 진행 상황 모달 전환
+                document.getElementById('progressModal').classList.add('hidden');
+                document.getElementById('progressDetailModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('진행 상황 조회 실패:', error);
+                alert('진행 상황을 조회하는데 실패했습니다. 잠시 후 다시 시도해주세요.');
+            }
+        });
+
+        // 신청 취소 처리 함수 추가
+        async function cancelInquiry(docId) {
+            if (!confirm('상담 신청을 취소하시겠습니까?\n취소 후에는 되돌릴 수 없습니다.')) {
+                return;
+            }
+
+            try {
+                await db.collection('franchise_inquiries').doc(docId).update({
+                    status: 'canceled',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // 활동 로그 기록
+                await utils.logActivity('cancel_inquiry', {
+                    inquiryId: docId,
+                    action: 'user_canceled'
+                });
+
+                alert('상담 신청이 취소되었습니다.');
+                closeProgressDetailModal();
+            } catch (error) {
+                console.error('신청 취소 실패:', error);
+                alert('신청 취소 처리에 실패했습니다. 고객센터로 문의해주세요.');
+            }
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'checking': 'bg-blue-100 text-blue-800',
+                'consulting': 'bg-blue-100 text-blue-800',
+                'completed': 'bg-green-100 text-green-800',
+                'canceled': 'bg-red-100 text-red-800'
+            };
+            return colors[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        function validatePhoneNumber(input) {
+            const errorElement = document.getElementById('phoneError');
+            if (input.value.length !== 11) {
+                errorElement.classList.remove('hidden');
+                input.setCustomValidity('핸드폰 번호 11자리를 입력해주세요');
+            } else {
+                errorElement.classList.add('hidden');
+                input.setCustomValidity('');
+            }
+        }
+    </script>
+</body>
+
+</html>
