@@ -14,6 +14,29 @@
         :where([class^="ri-"])::before {
             content: "\f3c2";
         }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(0.95);
+            }
+        }
+
+        .animate-pulse-delay-0 {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .animate-pulse-delay-1 {
+            animation: pulse 2s ease-in-out 0.5s infinite;
+        }
+
+        .animate-pulse-delay-2 {
+            animation: pulse 2s ease-in-out 1s infinite;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -348,22 +371,62 @@
         </div>
 
         <section id="security-content" class="hidden">
-            <!-- 추천 대상 -->
+            <!-- 트리플 안심 솔루션 -->
+            <section class="px-4 py-8 bg-white">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold mb-3">편편상회의 트리플 안심 솔루션</h2>
+                    <p class="text-gray-500">도난 · 화재 · 정전, 미리 예방하고 피해도 보상해주는<br><b>편편상회</b>의 3중 안전망</p>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <!-- 도난 방지 카드 -->
+                    <div class="bg-white rounded-lg shadow p-3 border border-blue-100">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center animate-pulse-delay-0 mb-2">
+                                <i class="ri-shield-check-line text-xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-blue-600 mb-1">도난 안심</h3>
+                            <p class="text-xs text-gray-600 mb-1">도난 피해 보상</p>
+                            <p class="text-xs font-bold text-red-500">1,000만원</p>
+                        </div>
+                    </div>
+
+                    <!-- 화재 감지 카드 -->
+                    <div class="bg-white rounded-lg shadow p-3 border border-red-100">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center animate-pulse-delay-1 mb-2">
+                                <i class="ri-fire-line text-xl text-red-600"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-red-600 mb-1">화재 안심</h3>
+                            <p class="text-xs text-gray-600 mb-1">화재 피해 보상</p>
+                            <p class="text-xs font-bold text-red-500">나와 이웃 1억씩</p>
+                        </div>
+                    </div>
+
+                    <!-- 정전 대비 카드 //-->
+                    <div class="bg-white rounded-lg shadow p-3 border border-yellow-100">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="w-14 h-14 rounded-full bg-yellow-50 flex items-center justify-center animate-pulse-delay-2 mb-2">
+                                <i class="ri-flashlight-line text-xl text-yellow-600"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-yellow-600 mb-1">정전 안심</h3>
+                            <p class="text-xs text-gray-600 mb-1">정전 피해 보상</p>
+                            <p class="text-xs font-bold text-red-500">1,000만원</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 추천 대상 ///-->
             <section class="px-4 py-8 bg-white">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold mb-2">🙋 이런 분들에게 추천합니다</h2>
-                    <p class="text-gray-600">안전한 무인매장 운영을 위한<br>최적의 선택, SK쉴더스</p>
+                    <p class="text-gray-500">안전한 무인매장 운영에 최적화된, SK쉴더스</p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-blue-50 p-4 rounded-lg">
                         <div class="text-2xl mb-2">💰</div>
                         <p class="text-sm font-medium mb-1">초기 비용 부담</p>
                         <p class="text-xs text-gray-600">월정액으로 부담 없는 시작</p>
-                    </div>
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <div class="text-2xl mb-2">🔧</div>
-                        <p class="text-sm font-medium mb-1">장비 선택 고민</p>
-                        <p class="text-xs text-gray-600">전문가의 맞춤 구성 제안</p>
                     </div>
                     <div class="bg-blue-50 p-4 rounded-lg">
                         <div class="text-2xl mb-2">🚨</div>
@@ -374,6 +437,11 @@
                         <div class="text-2xl mb-2">⚡</div>
                         <p class="text-sm font-medium mb-1">빠른 대응 필요</p>
                         <p class="text-xs text-gray-600">전국 설치/AS 네트워크</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <div class="text-2xl mb-2">🛡️</div>
+                        <p class="text-sm font-medium mb-1">실질적인 실손 보상</p>
+                        <p class="text-xs text-gray-600">도난/화재/정전 피해 보상</p>
                     </div>
                 </div>
             </section>
@@ -418,7 +486,7 @@
             <!-- 패키지 선택 -->
             <section class="px-4 py-8 bg-white ">
                 <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold mb-2">🎯 패키지 선택</h2>
+                    <h2 class="text-2xl font-bold mb-2">🎯 보안 패키지 선택</h2>
                     <p class="text-gray-600">목적에 맞는 최적의 패키지를 선택하세요</p>
                 </div>
                 
@@ -595,7 +663,7 @@
             </button>
             <button id="security-btn" class="flex flex-col items-center justify-center py-2">
                 <i class="ri-shield-check-line text-lg"></i>
-                <span class="text-xs mt-1">보안솔루션</span>
+                <span class="text-xs mt-1">안심솔루션</span>
             </button>
             <button class="flex flex-col items-center justify-center py-2 w-full" onclick="showContactDialog()">
                 <i class="ri-customer-service-2-line text-lg"></i>
@@ -603,7 +671,7 @@
             </button>
             <button class="flex flex-col items-center justify-center py-2 w-full" onclick="showProgressDialog()">
                 <i class="ri-search-line text-lg"></i>
-                <span class="text-xs mt-1">진행확인</span>
+                <span class="text-xs mt-1">상담현황</span>
             </button>
         </div>
     </footer>
