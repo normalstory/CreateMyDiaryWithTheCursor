@@ -1,0 +1,9 @@
+{
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/pyeon2/pyeon2-snaghea.html"
+      }
+    ]
+  }
+  
