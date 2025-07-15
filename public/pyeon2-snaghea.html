@@ -911,9 +911,12 @@
             // 문의 다이얼로그 HTML
             getDialogHTML() {
                 return `
-            <div class="bg-white w-[320px] rounded-lg p-6">
-                <h3 class="text-lg font-medium mb-4">파트너 상담 신청</h3>
-                <form id="partnerInquiryForm" class="space-y-1">
+            <div class="bg-white w-[320px] rounded-lg max-h-[90vh] flex flex-col">
+                <div class="p-6 border-b">
+                    <h3 class="text-lg font-medium">파트너 상담 신청</h3>
+                </div>
+                <div class="flex-1 overflow-y-auto p-6">
+                    <form id="partnerInquiryForm" class="space-y-1">
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">파트너 유형</label>
                         <div class="grid grid-cols-2 gap-2">
@@ -1005,12 +1008,14 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="flex gap-2 mt-10 pt-3">
-                        <button type="button" class="px-6 py-3 text-gray-500 border border-gray-300 rounded-button hover:bg-gray-50" onclick="this.closest('.fixed').remove()">닫기</button>
-                        <button type="submit" class="flex-1 py-3 bg-primary hover:bg-primary/90 text-white !rounded-button">신청하기</button>
-                    </div>
                 </form>
+                </div>
+                <div class="p-6 border-t bg-gray-50">
+                    <div class="flex gap-2">
+                        <button type="button" class="px-6 py-3 text-gray-500 border border-gray-300 rounded-button hover:bg-gray-50" onclick="this.closest('.fixed').remove()">닫기</button>
+                        <button type="submit" form="partnerInquiryForm" class="flex-1 py-3 bg-primary hover:bg-primary/90 text-white !rounded-button">신청하기</button>
+                    </div>
+                </div>
             </div>
         `;
             },
@@ -1040,6 +1045,14 @@
                     if (isHidden) {
                         additionalSection.classList.remove('hidden');
                         toggleIcon.style.transform = 'rotate(180deg)';
+                        
+                        // 펼친 후 스크롤을 해당 섹션으로 부드럽게 이동
+                        setTimeout(() => {
+                            additionalSection.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'start' 
+                            });
+                        }, 100);
                     } else {
                         additionalSection.classList.add('hidden');
                         toggleIcon.style.transform = 'rotate(0deg)';
