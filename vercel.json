@@ -2,7 +2,7 @@
     "rewrites": [
       {
         "source": "/",
-        "destination": "/pyeon2/pyeon2-snaghea.html"
+        "destination": "/pyeon2-snaghea.html"
       }
     ]
   }
