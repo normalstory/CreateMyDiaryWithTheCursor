@@ -61,10 +61,29 @@
         .animate-pulse-delay-2 {
             animation: pulse 2s ease-in-out 1s infinite;
         }
+
+        /* 카카오맵 기본 닫기 버튼 숨기기 */
+        .kakao-map-info-window .close {
+            display: none !important;
+        }
+        
+        /* 인포윈도우 내부의 기본 닫기 버튼 숨기기 */
+        .kakao-map-info-window .info-window-close {
+            display: none !important;
+        }
+        
+        /* 카카오맵 인포윈도우의 모든 기본 닫기 버튼 숨기기 */
+        .kakao-map-info-window button[type="button"],
+        .kakao-map-info-window .close,
+        .kakao-map-info-window .info-window-close,
+        .kakao-map-info-window .info-window-close-btn {
+            display: none !important;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2cafc04e8b8ef1ab57c1dfe658dff951&libraries=services"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -283,6 +302,30 @@
                         <p class="text-sm font-medium">커뮤니티</p>
                         <p class="text-xs text-gray-500 mt-1">이웃과의 소통</p>
                     </div>
+                </div>
+            </section>
+
+            <!-- 매장 위치 섹션 -->
+            <section class="px-4 py-8 bg-gray-50">
+                <h2 class="text-xl font-bold mb-2">편편상회 매장 위치</h2>
+                
+                <!-- 간소화된 매장 목록 -->
+                <div class="mb-6">
+                    <div class="flex gap-3">
+                        <button onclick="selectStore('복수점')" 
+                                class="px-6 py-3 bg-white border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-all duration-200 font-medium">
+                            복수점
+                        </button>
+                        <button onclick="selectStore('중촌연구소')" 
+                                class="px-6 py-3 bg-white border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-all duration-200 font-medium">
+                            중촌연구소
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 지도 영역 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div id="map" class="w-full h-80"></div>
                 </div>
             </section>
         </div>
@@ -672,7 +715,6 @@
             <p class="mb-1">대전 중구 중촌로 15 중촌SK뷰아파트 상가동 105호</p>
             <p class="mb-4">이메일: ppsanghoe@gmail.com</p>
             <p class="text-xs">© 2025 편편생활연구소. All rights reserved.</p>
-            <a href="/ppadmin.html" target="_blank" style="color: antiquewhite;">관리자 페이지</a>
         </div>
     </main>
     <footer class="fixed bottom-0 w-[375px] bg-white border-t">
@@ -937,8 +979,357 @@
         // 전역에서 접근 가능하도록 함수 설정
         window.showContactDialog = () => partnerInquiry.showDialog();
 
+        // 지도 관련 기능
+        let map, markers = [], infowindows = [];
+        
+        // 매장 정보 데이터
+        const storeData = {
+            '중촌연구소': {
+                name: '편편상회 중촌연구소',
+                address: '대전 중구 중촌로 15 중촌SK뷰아파트 상가동 105호',
+                description: '중촌동 주민을 위한 무인 상점',
+                hours: '24시간 무인운영',
+                services: ['무인아이스크림', '세계과자', '뷰티용품', '간편식', '음료'],
+                lat: 36.338753,
+                lng: 127.409683,
+                keywords: ['중촌연구소', '중구', '편편상회', '편편생활연구소', '본사', '무인편의점', '아이스크림', '과자', '뷰티', '간편식', '연구소']
+            },
+            '복수점': {
+                name: '편편상회 복수점',
+                address: '대전 서구 복수동',
+                description: '복수동 주민을 위한 무인 상점',
+                hours: '24시간 무인운영<br/>(Break Time 04:00 ~ 06:00)',
+                services: ['무인아이스크림', '세계과자', '뷰티용품', '간편식', '음료'],
+                lat: 36.300632,
+                lng: 127.379670,
+                keywords: ['복수점', '복수동', '서구', '편편상회', '무인편의점', '아이스크림', '과자', '뷰티', '간편식', '음료']
+            }
+        };
+
+        // 매장 선택 기능 개선
+        function selectStore(storeKey) {
+            const store = storeData[storeKey];
+            if (!store) {
+                console.warn('매장 정보를 찾을 수 없습니다:', storeKey);
+                return;
+            }
+
+            // 지도가 초기화되지 않은 경우 처리
+            if (!map || typeof map.panTo !== 'function') {
+                console.warn('지도가 아직 초기화되지 않았습니다.');
+                return;
+            }
+
+            // 좌표 유효성 검사
+            if (!store.lat || !store.lng || isNaN(store.lat) || isNaN(store.lng)) {
+                console.error('유효하지 않은 좌표:', store.lat, store.lng);
+                return;
+            }
+
+            // 모든 버튼의 선택 상태 제거
+            document.querySelectorAll('button[onclick*="selectStore"]').forEach(btn => {
+                btn.className = 'px-6 py-3 bg-white border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-all duration-200 font-medium';
+            });
+
+            // 선택된 버튼 강조 (간단한 스타일)
+            const selectedButton = event.currentTarget;
+            selectedButton.className = 'px-6 py-3 bg-primary/10 border-2 border-primary rounded-lg transition-all duration-200 font-medium text-primary';
+
+            // 지도에서 해당 매장 위치로 정확히 이동 (더블 클릭 효과)
+            try {
+                const position = new kakao.maps.LatLng(store.lat, store.lng);
+                
+                // 첫 번째 이동: 빠른 이동
+                map.panTo(position);
+                
+                // 두 번째 이동: 정확한 위치 설정 (더블 클릭 효과)
+                setTimeout(() => {
+                    map.setCenter(position);
+                    map.setLevel(3); // 줌 레벨 조정
+                    
+                    // 세 번째 이동: 최종 위치 확인 (더블 클릭 효과 강화)
+                    setTimeout(() => {
+                        map.setCenter(position);
+                    }, 100);
+                }, 300);
+                
+            } catch (error) {
+                console.error('지도 이동 중 오류:', error);
+                return;
+            }
+
+            // 모든 마커를 기본 스타일로
+            if (markers && markers.length > 0) {
+                markers.forEach(marker => {
+                    if (marker && typeof marker.setZIndex === 'function') {
+                        marker.setZIndex(1);
+                    }
+                });
+
+                // 선택된 매장의 마커만 강조 (인포윈도우는 열지 않음)
+                const storeIndex = Object.keys(storeData).indexOf(storeKey);
+                if (storeIndex >= 0 && markers[storeIndex]) {
+                    markers[storeIndex].setZIndex(1000);
+                    
+                    // 기존에 열린 인포윈도우는 닫기
+                    if (infowindows && infowindows.length > 0) {
+                        infowindows.forEach(iw => {
+                            if (iw && typeof iw.close === 'function') {
+                                iw.close();
+                            }
+                        });
+                    }
+                }
+            }
+
+            console.log(`매장 선택: ${storeKey}, 위치: ${store.lat}, ${store.lng}`);
+        }
+
+        // 지도 초기화 개선
+        function initMap() {
+            const mapContainer = document.getElementById('map');
+            if (!mapContainer) {
+                console.warn('지도 컨테이너를 찾을 수 없습니다.');
+                return;
+            }
+
+            // 카카오맵 API가 로드되었는지 확인
+            if (typeof kakao === 'undefined' || !kakao.maps) {
+                console.warn('카카오맵 API가 로드되지 않았습니다.');
+                setTimeout(initMap, 1000); // 1초 후 재시도
+                return;
+            }
+
+            try {
+                const mapOption = {
+                    center: new kakao.maps.LatLng(36.3375, 127.4023), // 대전 중심
+                    level: 9
+                };
+
+                map = new kakao.maps.Map(mapContainer, mapOption);
+
+                // 매장 마커 추가
+                Object.keys(storeData).forEach(storeKey => {
+                    const store = storeData[storeKey];
+                    addMarker(store, storeKey);
+                });
+
+                console.log('지도가 성공적으로 초기화되었습니다.');
+            } catch (error) {
+                console.error('지도 초기화 중 오류 발생:', error);
+            }
+        }
+
+        // 마커 추가
+        function addMarker(store, storeKey) {
+            const position = new kakao.maps.LatLng(store.lat, store.lng);
+            
+            // 마커 이미지 설정 - 이모지 제거하고 간단한 원형으로 변경
+            const markerImage = new kakao.maps.MarkerImage(
+                'data:image/svg+xml;base64,' + btoa(`
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20" cy="20" r="18" fill="#4CAF50" stroke="white" stroke-width="2"/>
+                        <circle cx="20" cy="20" r="8" fill="white"/>
+                    </svg>
+                `),
+                new kakao.maps.Size(40, 40)
+            );
+
+            const marker = new kakao.maps.Marker({
+                position: position,
+                map: map,
+                title: store.name,
+                image: markerImage
+            });
+
+            // 인포윈도우 생성
+            const infowindow = new kakao.maps.InfoWindow({
+                content: createInfoWindowContent(store),
+                removable: false
+            });
+
+            // 마커 클릭 이벤트 - 자동 이동 방지
+            kakao.maps.event.addListener(marker, 'click', function() {
+                // 다른 인포윈도우 닫기
+                infowindows.forEach(iw => {
+                    if (iw && typeof iw.close === 'function') {
+                        iw.close();
+                    }
+                });
+                infowindows = [];
+                
+                // 현재 인포윈도우만 열기 (지도 이동 없음)
+                if (infowindow && typeof infowindow.open === 'function') {
+                    infowindow.open(map, marker);
+                    infowindows.push(infowindow);
+                    
+                    // 인포윈도우가 열린 후 기본 닫기 버튼 숨기기
+                    setTimeout(() => {
+                        const infoWindowElements = document.querySelectorAll('.kakao-map-info-window');
+                        infoWindowElements.forEach(element => {
+                            const closeButtons = element.querySelectorAll('button[type="button"], .close, .info-window-close, .info-window-close-btn');
+                            closeButtons.forEach(btn => {
+                                btn.style.display = 'none';
+                            });
+                        });
+                    }, 100);
+                }
+            });
+
+            markers.push(marker);
+            infowindows.push(infowindow);
+        }
+
+        // 인포윈도우 내용 개선
+        function createInfoWindowContent(store) {
+            const servicesHtml = store.services.map(service => 
+                `<span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded mr-1 mb-1">${service}</span>`
+            ).join('');
+
+            return `
+                <div class="p-4 max-w-xs relative">
+                    <!-- 커스텀 닫기 버튼 -->
+                    <button onclick="closeCurrentInfoWindow()" 
+                            class="absolute top-2 right-2 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors z-10">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    
+                    <div class="flex items-start gap-3">
+                        <div class="text-2xl">🏪</div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-lg text-gray-800 mb-1">${store.name}</h3>
+                            <p class="text-sm text-gray-600 mb-2">${store.address}</p>
+                            <p class="text-xs text-gray-500 mb-2">${store.description}</p>
+                            <div class="space-y-1 text-sm">
+                                <p><span class="font-medium">📞</span> ${store.phone}</p>
+                                <p><span class="font-medium">🕒</span> ${store.hours}</p>
+                            </div>
+                            <div class="mt-3">
+                                <p class="text-xs font-medium text-gray-700 mb-1">주요 상품</p>
+                                <div class="flex flex-wrap">
+                                    ${servicesHtml}
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button onclick="navigateToStore('${Object.keys(storeData).find(key => storeData[key] === store)}')" 
+                                        class="w-full py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary/90 transition-colors">
+                                    길찾기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 매장 정보 모달 표시
+        function showStoreInfo(storeKey) {
+            const store = storeData[storeKey];
+            if (!store) return;
+
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white w-[320px] rounded-lg p-6">
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="text-3xl">🏪</div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-gray-800">${store.name}</h3>
+                            <p class="text-sm text-gray-600">${store.address}</p>
+                        </div>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-500">
+                            <i class="ri-close-line text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-500">📞</span>
+                            <span>${store.phone}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-500">🕒</span>
+                            <span>${store.hours}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-500">📍</span>
+                            <span>${store.description}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h4 class="font-medium text-gray-700 mb-2">주요 상품</h4>
+                        <div class="flex flex-wrap gap-1">
+                            ${store.services.map(service => 
+                                `<span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">${service}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex gap-2">
+                        <button onclick="navigateToStore('${storeKey}')" 
+                                class="flex-1 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">
+                            길찾기
+                        </button>
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="flex-1 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                            닫기
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // 길찾기 기능
+        function navigateToStore(storeKey) {
+            const store = storeData[storeKey];
+            if (!store) return;
+
+            // 카카오맵 길찾기 URL 생성
+            const url = `https://map.kakao.com/link/to/${store.name},${store.lat},${store.lng}`;
+            window.open(url, '_blank');
+        }
+
+        // 현재 열린 인포윈도우 닫기
+        function closeCurrentInfoWindow() {
+            if (infowindows && infowindows.length > 0) {
+                infowindows.forEach(iw => {
+                    if (iw && typeof iw.close === 'function') {
+                        iw.close();
+                    }
+                });
+                infowindows = [];
+            }
+        }
+
+        // 엔터키로 검색
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('storeSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        // 검색 기능 제거됨
+                    }
+                });
+            }
+        });
+
+        // 전역 함수로 등록
+        window.showStoreInfo = showStoreInfo;
+        window.navigateToStore = navigateToStore;
+        window.selectStore = selectStore;
+        window.closeCurrentInfoWindow = closeCurrentInfoWindow;
+
         // 이벤트 리스너 설정
         document.addEventListener('DOMContentLoaded', () => {
+            // 지도 초기화
+            initMap();
+
             // 스무스 스크롤
             document.querySelectorAll('.smooth-scroll').forEach(anchor => {
                 anchor.addEventListener('click', (e) => {
