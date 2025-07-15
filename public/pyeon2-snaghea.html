@@ -862,15 +862,37 @@
             // 문의 제출
             async submit(formData) {
                 try {
+                    // 이미지 업로드 처리
+                    let imageUrls = [];
+                    if (formData.attachedImages && formData.attachedImages.length > 0) {
+                        const uploadPromises = formData.attachedImages.map(async (imageData) => {
+                            try {
+                                const url = await utils.optimizeAndUploadImage(imageData.file);
+                                return url;
+                            } catch (error) {
+                                console.error('이미지 업로드 실패:', error);
+                                return null;
+                            }
+                        });
+                        
+                        imageUrls = (await Promise.all(uploadPromises)).filter(url => url !== null);
+                    }
+
+                    // Firestore에 저장할 데이터에서 파일 객체 제거
+                    const { attachedImages, ...dataToSave } = formData;
+                    
                     const docRef = await db.collection('franchise_inquiries').add({
-                        ...formData,
+                        ...dataToSave,
+                        imageUrls: imageUrls,
                         status: 'pending',
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
 
                     await utils.logActivity('partner_inquiry_submit', {
                         inquiryId: docRef.id,
-                        partnerType: formData.partnerType
+                        partnerType: formData.partnerType,
+                        hasImages: imageUrls.length > 0,
+                        imageCount: imageUrls.length
                     });
 
                     return docRef.id;
@@ -885,7 +907,7 @@
                 return `
             <div class="bg-white w-[320px] rounded-lg p-6">
                 <h3 class="text-lg font-medium mb-4">파트너 상담 신청</h3>
-                <form id="partnerInquiryForm" class="space-y-4">
+                <form id="partnerInquiryForm" class="space-y-1">
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">파트너 유형</label>
                         <div class="grid grid-cols-2 gap-2">
@@ -900,7 +922,7 @@
                                 <input type="radio" name="partner-type" value="운영지원" class="mr-2">
                                 <div>
                                     <div class="font-medium">운영 지원</div>
-                                    <div class="text-xs text-gray-500">상품 납품 및 매장 관리</div>
+                                    <div class="text-xs text-gray-500">상품 납품 및 매장 관리 위탁 서비스</div>
                                 </div>
                             </label>
                         </div>
@@ -924,12 +946,51 @@
                         </div>
                     </div>
 
+                    <label class="block text-sm font-medium text-gray-700">희망 파트너 정보</label>
                     <input type="text" placeholder="이름" required class="w-full px-4 py-2 border rounded">
                     <input type="tel" placeholder="연락처" required class="w-full px-4 py-2 border rounded">
                     <input type="text" placeholder="희망지역" required class="w-full px-4 py-2 border rounded">
-                    <button type="submit" class="w-full py-3 bg-primary hover:bg-primary/90 text-white !rounded-button">신청하기</button>
+                    
+                    <!-- 추가 문의 사항 접기/펼치기 -->
+                    <div class="border-t pt-4">
+                        <button type="button" id="toggleAdditionalInfo" class="flex items-center justify-between w-full text-left text-sm font-medium text-gray-700 hover:text-primary transition-colors">
+                            <span>📝 추가 문의 사항</span>
+                            <i class="ri-arrow-down-s-line transition-transform" id="toggleIcon"></i>
+                        </button>
+                        <div id="additionalInfoSection" class="hidden mt-3 space-y-3">
+                            <textarea id="additionalMessage" placeholder="추가로 궁금한 점이나 특별한 요청사항이 있으시면 자유롭게 작성해주세요." 
+                                      class="w-full px-3 py-2 border rounded-lg resize-none" rows="3"></textarea>
+                            
+                            <!-- 사진 첨부 영역 -->
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">📷 사진 첨부</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="button" id="cameraBtn" class="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-primary/5 transition-colors">
+                                        <i class="ri-camera-line text-lg"></i>
+                                        <span class="text-sm">카메라</span>
+                                    </button>
+                                    <button type="button" id="galleryBtn" class="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-primary/5 transition-colors">
+                                        <i class="ri-image-line text-lg"></i>
+                                        <span class="text-sm">갤러리</span>
+                                    </button>
+                                </div>
+                                
+                                <!-- 첨부된 이미지 미리보기 -->
+                                <div id="imagePreviewContainer" class="hidden">
+                                    <div class="text-sm font-medium text-gray-700 mb-2">첨부된 이미지</div>
+                                    <div id="imagePreviewList" class="grid grid-cols-3 gap-2">
+                                        <!-- 이미지 미리보기가 여기에 추가됨 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2 mt-10 pt-3">
+                        <button type="button" class="px-6 py-3 text-gray-500 border border-gray-300 rounded-button hover:bg-gray-50" onclick="this.closest('.fixed').remove()">닫기</button>
+                        <button type="submit" class="flex-1 py-3 bg-primary hover:bg-primary/90 text-white !rounded-button">신청하기</button>
+                    </div>
                 </form>
-                <button class="w-full py-2 mt-2 text-gray-500" onclick="this.closest('.fixed').remove()">닫기</button>
             </div>
         `;
             },
@@ -949,6 +1010,58 @@
                     }
                 }
 
+                // 접기/펼치기 기능
+                const toggleBtn = dialog.querySelector('#toggleAdditionalInfo');
+                const additionalSection = dialog.querySelector('#additionalInfoSection');
+                const toggleIcon = dialog.querySelector('#toggleIcon');
+                
+                toggleBtn.addEventListener('click', () => {
+                    const isHidden = additionalSection.classList.contains('hidden');
+                    if (isHidden) {
+                        additionalSection.classList.remove('hidden');
+                        toggleIcon.style.transform = 'rotate(180deg)';
+                    } else {
+                        additionalSection.classList.add('hidden');
+                        toggleIcon.style.transform = 'rotate(0deg)';
+                    }
+                });
+
+                // 이미지 첨부 관련 변수
+                let attachedImages = [];
+                dialog.attachedImages = attachedImages; // dialog 객체에 참조 저장
+
+                // 카메라 버튼 이벤트
+                const cameraBtn = dialog.querySelector('#cameraBtn');
+                cameraBtn.addEventListener('click', () => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.capture = 'environment'; // 후면 카메라 우선
+                    input.addEventListener('change', (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                            handleImageUpload(e.target.files[0], dialog, attachedImages);
+                        }
+                    });
+                    input.click();
+                });
+
+                // 갤러리 버튼 이벤트
+                const galleryBtn = dialog.querySelector('#galleryBtn');
+                galleryBtn.addEventListener('click', () => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.multiple = true;
+                    input.addEventListener('change', (e) => {
+                        if (e.target.files) {
+                            Array.from(e.target.files).forEach(file => {
+                                handleImageUpload(file, dialog, attachedImages);
+                            });
+                        }
+                    });
+                    input.click();
+                });
+
                 // 폼 제출 이벤트 리스너
                 const form = dialog.querySelector('#partnerInquiryForm');
                 form.addEventListener('submit', async (e) => {
@@ -962,7 +1075,9 @@
                             phone: form.querySelector('input[placeholder="연락처"]').value,
                             location: form.querySelector('input[placeholder="희망지역"]').value,
                             partnerType: form.querySelector('input[name="partner-type"]:checked')?.value || '',
-                            securityPackage: form.querySelector('input[name="security-package"]:checked')?.value || ''
+                            securityPackage: form.querySelector('input[name="security-package"]:checked')?.value || '',
+                            additionalMessage: form.querySelector('#additionalMessage')?.value || '',
+                            attachedImages: attachedImages
                         };
 
                         await this.submit(formData);
@@ -976,11 +1091,91 @@
             }
         };
 
+        // 이미지 업로드 처리 함수
+        function handleImageUpload(file, dialog, attachedImages) {
+            // 파일 크기 제한 (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('파일 크기는 5MB 이하여야 합니다.');
+                return;
+            }
+
+            // 이미지 파일인지 확인
+            if (!file.type.startsWith('image/')) {
+                alert('이미지 파일만 첨부 가능합니다.');
+                return;
+            }
+
+            // 최대 5개까지만 첨부 가능
+            if (attachedImages.length >= 5) {
+                alert('최대 5개까지만 첨부 가능합니다.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageData = {
+                    file: file,
+                    preview: e.target.result,
+                    id: Date.now() + Math.random()
+                };
+                
+                attachedImages.push(imageData);
+                updateImagePreview(dialog, attachedImages);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 이미지 미리보기 업데이트
+        function updateImagePreview(dialog, attachedImages) {
+            const container = dialog.querySelector('#imagePreviewContainer');
+            const list = dialog.querySelector('#imagePreviewList');
+            
+            if (attachedImages.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            list.innerHTML = '';
+
+            attachedImages.forEach((imageData, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'relative group';
+                previewItem.innerHTML = `
+                    <img src="${imageData.preview}" alt="첨부 이미지" 
+                         class="w-full h-20 object-cover rounded-lg border">
+                    <button type="button" onclick="removeImage(${imageData.id}, this)" 
+                            class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors">
+                        <i class="ri-close-line"></i>
+                    </button>
+                `;
+                list.appendChild(previewItem);
+            });
+        }
+
+        // 이미지 제거 함수
+        function removeImage(imageId, button) {
+            const dialog = button.closest('.fixed');
+            const attachedImages = dialog.attachedImages || [];
+            const index = attachedImages.findIndex(img => img.id === imageId);
+            
+            if (index > -1) {
+                attachedImages.splice(index, 1);
+                updateImagePreview(dialog, attachedImages);
+            }
+        }
+
         // 전역에서 접근 가능하도록 함수 설정
         window.showContactDialog = () => partnerInquiry.showDialog();
+        window.removeImage = removeImage;
 
         // 지도 관련 기능
         let map, markers = [], infowindows = [];
+        
+        // 카카오맵 API 로드 상태 확인
+        function isKakaoMapLoaded() {
+            return typeof kakao !== 'undefined' && kakao.maps && typeof kakao.maps.Map === 'function';
+        }
         
         // 매장 정보 데이터
         const storeData = {
@@ -1037,6 +1232,11 @@
 
             // 지도에서 해당 매장 위치로 정확히 이동 (더블 클릭 효과)
             try {
+                if (!isKakaoMapLoaded()) {
+                    console.warn('카카오맵 API가 로드되지 않았습니다.');
+                    return;
+                }
+                
                 const position = new kakao.maps.LatLng(store.lat, store.lng);
                 
                 // 첫 번째 이동: 빠른 이동
@@ -1094,15 +1294,15 @@
             }
 
             // 카카오맵 API가 로드되었는지 확인
-            if (typeof kakao === 'undefined' || !kakao.maps) {
-                console.warn('카카오맵 API가 로드되지 않았습니다.');
-                setTimeout(initMap, 1000); // 1초 후 재시도
+            if (!isKakaoMapLoaded()) {
+                console.warn('카카오맵 API가 로드되지 않았습니다. 재시도 중...');
+                setTimeout(initMap, 500); // 0.5초 후 재시도
                 return;
             }
 
             try {
                 const mapOption = {
-                    center: new kakao.maps.LatLng(36.3375, 127.4023), // 대전 중심
+                    center: new kakao.maps.LatLng(36.338753, 127.409683), // 중촌연구소 위치로 초기 중심 설정
                     level: 9
                 };
 
@@ -1117,6 +1317,8 @@
                 console.log('지도가 성공적으로 초기화되었습니다.');
             } catch (error) {
                 console.error('지도 초기화 중 오류 발생:', error);
+                // 오류 발생 시 1초 후 재시도
+                setTimeout(initMap, 1000);
             }
         }
 
@@ -1327,8 +1529,18 @@
 
         // 이벤트 리스너 설정
         document.addEventListener('DOMContentLoaded', () => {
-            // 지도 초기화
-            initMap();
+            // 지도 초기화 - 카카오맵 API 로드 완료 후 실행
+            const initMapWithRetry = () => {
+                if (typeof kakao !== 'undefined' && kakao.maps) {
+                    initMap();
+                } else {
+                    console.log('카카오맵 API 로드 대기 중...');
+                    setTimeout(initMapWithRetry, 100);
+                }
+            };
+            
+            // 지도 초기화 시작
+            initMapWithRetry();
 
             // 스무스 스크롤
             document.querySelectorAll('.smooth-scroll').forEach(anchor => {
