@@ -814,11 +814,38 @@
                                             </div>
                                         </div>
                                     </div>
-                                    ${data.message ? `
+                                    ${data.additionalMessage ? `
                                     <div class="mt-6">
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">추가 메시지</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">추가 문의 사항</label>
                                         <div class="bg-gray-50 p-4 rounded-md">
-                                            <p class="text-sm">${data.message}</p>
+                                            <p class="text-sm whitespace-pre-wrap">${data.additionalMessage}</p>
+                                        </div>
+                                    </div>
+                                    ` : ''}
+                                    
+                                    ${data.imageUrls && data.imageUrls.length > 0 ? `
+                                    <div class="mt-6">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            첨부된 이미지 (${data.imageUrls.length}/3개)
+                                            <span class="text-xs text-gray-500 ml-2">📸 최적화됨 (높이 300px 기준)</span>
+                                        </label>
+                                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                            ${data.imageUrls.map((url, index) => `
+                                                <div class="relative group">
+                                                    <img src="${url}" alt="첨부 이미지 ${index + 1}" 
+                                                         class="w-full h-24 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition-opacity"
+                                                         onclick="openImageModal('${url}', '${data.name}님의 첨부 이미지 ${index + 1}')">
+                                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center">
+                                                        <i class="ri-zoom-in-line text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                                    </div>
+                                                    <div class="absolute top-1 left-1 bg-blue-500 text-white text-xs px-1 py-0.5 rounded">
+                                                        ${index + 1}
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                        <div class="mt-2 text-xs text-gray-500">
+                                            💡 가이드라인: 매장 전경 • 상품 구성 • 참고사항
                                         </div>
                                     </div>
                                     ` : ''}
@@ -865,6 +892,16 @@
             async updateStatusFromDetail(docId) {
                 try {
                     const newStatus = document.getElementById('statusSelect').value;
+                    
+                    // 상담완료로 변경하는 경우 확인 얼럿 표시
+                    if (newStatus === 'completed') {
+                        const confirmMessage = `상담완료로 상태를 변경하시겠습니까?\n\n⚠️ 주의사항:\n• 첨부된 이미지 파일들이 자동으로 삭제됩니다\n• 삭제된 이미지는 복구할 수 없습니다\n• 상담 완료 후에는 이미지를 다시 확인할 수 없습니다\n\n계속하시겠습니까?`;
+                        
+                        if (!confirm(confirmMessage)) {
+                            return; // 사용자가 취소한 경우
+                        }
+                    }
+                    
                     await this.updateStatus(docId, newStatus);
                     this.closeDetailModal();
                 } catch (error) {
@@ -875,6 +912,67 @@
 
             async updateStatus(docId, newStatus) {
                 try {
+                    // 상담 완료 시 이미지 삭제 처리
+                    if (newStatus === 'completed') {
+                        try {
+                            // 문의 데이터 조회
+                            const inquiryDoc = await db.collection('franchise_inquiries').doc(docId).get();
+                            if (inquiryDoc.exists) {
+                                const inquiryData = inquiryDoc.data();
+                                
+                                // 이미지 URL이 있는 경우 삭제
+                                if (inquiryData.imageUrls && inquiryData.imageUrls.length > 0) {
+                                    console.log(`상담 완료: ${inquiryData.imageUrls.length}개 이미지 삭제 시작`);
+                                    
+                                    // Firebase Storage에서 이미지 삭제
+                                    const deletePromises = inquiryData.imageUrls.map(async (imageUrl) => {
+                                        try {
+                                            // URL에서 파일 경로 추출
+                                            const urlParts = imageUrl.split('/');
+                                            const fileName = urlParts[urlParts.length - 1].split('?')[0];
+                                            
+                                            // 날짜별 폴더 구조에서 파일 찾기
+                                            const dateStr = inquiryData.createdAt.toDate().toISOString().split('T')[0];
+                                            const filePath = `franchise_inquiries/${dateStr}/${fileName}`;
+                                            
+                                            const fileRef = storage.ref().child(filePath);
+                                            await fileRef.delete();
+                                            
+                                            console.log(`이미지 삭제 완료: ${filePath}`);
+                                            return { success: true, path: filePath };
+                                        } catch (deleteError) {
+                                            console.error(`이미지 삭제 실패: ${imageUrl}`, deleteError);
+                                            return { success: false, path: imageUrl, error: deleteError };
+                                        }
+                                    });
+                                    
+                                    const deleteResults = await Promise.all(deletePromises);
+                                    const successCount = deleteResults.filter(result => result.success).length;
+                                    const failCount = deleteResults.filter(result => !result.success).length;
+                                    
+                                    console.log(`이미지 삭제 결과: 성공 ${successCount}개, 실패 ${failCount}개`);
+                                    
+                                    // 삭제 결과를 활동 로그에 기록
+                                    await activityLogger.logActivity('delete_images_on_completion', {
+                                        inquiryId: docId,
+                                        totalImages: inquiryData.imageUrls.length,
+                                        deletedCount: successCount,
+                                        failedCount: failCount,
+                                        failedUrls: deleteResults.filter(result => !result.success).map(result => result.path)
+                                    });
+                                    
+                                    if (failCount > 0) {
+                                        console.warn(`${failCount}개 이미지 삭제에 실패했습니다.`);
+                                    }
+                                }
+                            }
+                        } catch (imageDeleteError) {
+                            console.error('이미지 삭제 중 오류 발생:', imageDeleteError);
+                            // 이미지 삭제 실패해도 상태 업데이트는 계속 진행
+                        }
+                    }
+
+                    // 상태 업데이트
                     await db.collection('franchise_inquiries').doc(docId).update({
                         status: newStatus,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -888,6 +986,11 @@
 
                     // 목록 새로고침
                     await this.loadInquiries();
+                    
+                    // 상담 완료 시 사용자에게 알림
+                    if (newStatus === 'completed') {
+                        alert('상담이 완료되었습니다.\n첨부된 이미지 파일들이 자동으로 삭제되었습니다.');
+                    }
                 } catch (error) {
                     console.error('상태 업데이트 실패:', error);
                     alert('상태 업데이트에 실패했습니다.');
@@ -895,17 +998,60 @@
             },
 
             async deleteInquiry(docId) {
-                if (!confirm('정말 삭제하시겠습니까?')) {
+                if (!confirm('정말 삭제하시겠습니까?\n첨부된 이미지 파일들도 함께 삭제됩니다.')) {
                     return;
                 }
 
                 try {
+                    // 문의 데이터 조회 (이미지 삭제를 위해)
+                    const inquiryDoc = await db.collection('franchise_inquiries').doc(docId).get();
+                    let imageDeleteResults = [];
+                    
+                    if (inquiryDoc.exists) {
+                        const inquiryData = inquiryDoc.data();
+                        
+                        // 이미지 URL이 있는 경우 삭제
+                        if (inquiryData.imageUrls && inquiryData.imageUrls.length > 0) {
+                            console.log(`문의 삭제: ${inquiryData.imageUrls.length}개 이미지 삭제 시작`);
+                            
+                            // Firebase Storage에서 이미지 삭제
+                            const deletePromises = inquiryData.imageUrls.map(async (imageUrl) => {
+                                try {
+                                    // URL에서 파일 경로 추출
+                                    const urlParts = imageUrl.split('/');
+                                    const fileName = urlParts[urlParts.length - 1].split('?')[0];
+                                    
+                                    // 날짜별 폴더 구조에서 파일 찾기
+                                    const dateStr = inquiryData.createdAt.toDate().toISOString().split('T')[0];
+                                    const filePath = `franchise_inquiries/${dateStr}/${fileName}`;
+                                    
+                                    const fileRef = storage.ref().child(filePath);
+                                    await fileRef.delete();
+                                    
+                                    console.log(`이미지 삭제 완료: ${filePath}`);
+                                    return { success: true, path: filePath };
+                                } catch (deleteError) {
+                                    console.error(`이미지 삭제 실패: ${imageUrl}`, deleteError);
+                                    return { success: false, path: imageUrl, error: deleteError };
+                                }
+                            });
+                            
+                            imageDeleteResults = await Promise.all(deletePromises);
+                            const successCount = imageDeleteResults.filter(result => result.success).length;
+                            const failCount = imageDeleteResults.filter(result => !result.success).length;
+                            
+                            console.log(`이미지 삭제 결과: 성공 ${successCount}개, 실패 ${failCount}개`);
+                        }
+                    }
+
+                    // Firestore에서 문의 삭제
                     await db.collection('franchise_inquiries').doc(docId).delete();
                     
                     // 활동 로그 기록
                     await activityLogger.logActivity('delete_inquiry', {
                         inquiryId: docId,
-                        adminId: localStorage.getItem('adminId')
+                        adminId: localStorage.getItem('adminId'),
+                        imageDeleteResults: imageDeleteResults
                     });
 
                     alert('삭제되었습니다.');
@@ -945,6 +1091,51 @@
                 alert(error.message);
             }
         });
+
+        // 이미지 모달 기능
+        function openImageModal(imageUrl, title) {
+            const modalHTML = `
+                <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg max-w-4xl max-h-[90vh] flex flex-col">
+                        <div class="p-4 border-b flex justify-between items-center">
+                            <h3 class="text-lg font-medium">${title}</h3>
+                            <button onclick="closeImageModal()" class="text-gray-500 hover:text-gray-700">
+                                <i class="ri-close-line text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="p-4 flex-1 overflow-auto">
+                            <img src="${imageUrl}" alt="${title}" class="w-full h-auto max-h-[70vh] object-contain">
+                        </div>
+                        <div class="p-4 border-t flex justify-between items-center">
+                            <a href="${imageUrl}" target="_blank" class="text-blue-600 hover:text-blue-800">
+                                <i class="ri-external-link-line mr-1"></i>새 탭에서 보기
+                            </a>
+                            <button onclick="closeImageModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                                닫기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 기존 모달 제거 후 새 모달 추가
+            const existingModal = document.getElementById('imageModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // 전역 함수로 등록
+        window.openImageModal = openImageModal;
+        window.closeImageModal = closeImageModal;
 
         // 로그아웃 처리
         document.getElementById('logoutBtn').addEventListener('click', async function() {

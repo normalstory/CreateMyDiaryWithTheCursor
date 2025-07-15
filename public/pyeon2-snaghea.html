@@ -826,14 +826,20 @@
 
                             canvas.toBlob(async (blob) => {
                                 try {
-                                    const fileRef = storage.ref().child(`franchise_inquiries/${Date.now()}_${file.name}`);
+                                    // 저장 경로 개선: 날짜별 폴더 구조
+                                    const now = new Date();
+                                    const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+                                    const timeStr = now.getTime();
+                                    const fileName = `${timeStr}_${file.name || 'image.jpg'}`;
+                                    const fileRef = storage.ref().child(`franchise_inquiries/${dateStr}/${fileName}`);
+                                    
                                     await fileRef.put(blob);
                                     const url = await fileRef.getDownloadURL();
                                     resolve(url);
                                 } catch (error) {
                                     reject(error);
                                 }
-                            }, 'image/jpeg', 0.8);
+                            }, 'image/jpeg', 0.85);
                         };
                         img.src = e.target.result;
                     };
@@ -962,8 +968,19 @@
                                       class="w-full px-3 py-2 border rounded-lg resize-none" rows="3"></textarea>
                             
                             <!-- 사진 첨부 영역 -->
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">📷 사진 첨부</label>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">📷 사진 첨부 (최대 3장)</label>
+                                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                                        <div class="text-xs text-blue-800 font-medium mb-2">📸 촬영 가이드라인</div>
+                                        <div class="text-xs text-blue-700 space-y-1">
+                                            <div>• 매장 외부/내부 전경 1장</div>
+                                            <div>• 희망하는 상품 구성 1장</div>
+                                            <div>• 기타 참고사항 1장</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <div class="grid grid-cols-2 gap-2">
                                     <button type="button" id="cameraBtn" class="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-primary/5 transition-colors">
                                         <i class="ri-camera-line text-lg"></i>
@@ -977,7 +994,10 @@
                                 
                                 <!-- 첨부된 이미지 미리보기 -->
                                 <div id="imagePreviewContainer" class="hidden">
-                                    <div class="text-sm font-medium text-gray-700 mb-2">첨부된 이미지</div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <div class="text-sm font-medium text-gray-700">첨부된 이미지</div>
+                                        <div class="text-xs text-gray-500" id="imageCount">0/3</div>
+                                    </div>
                                     <div id="imagePreviewList" class="grid grid-cols-3 gap-2">
                                         <!-- 이미지 미리보기가 여기에 추가됨 -->
                                     </div>
@@ -1033,16 +1053,37 @@
                 // 카메라 버튼 이벤트
                 const cameraBtn = dialog.querySelector('#cameraBtn');
                 cameraBtn.addEventListener('click', () => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.capture = 'environment'; // 후면 카메라 우선
-                    input.addEventListener('change', (e) => {
-                        if (e.target.files && e.target.files[0]) {
-                            handleImageUpload(e.target.files[0], dialog, attachedImages);
-                        }
-                    });
-                    input.click();
+                    // 모바일 환경에서 카메라 접근 권한 확인
+                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        navigator.mediaDevices.getUserMedia({ video: true })
+                            .then(() => {
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = 'image/*';
+                                input.capture = 'environment'; // 후면 카메라 우선
+                                input.addEventListener('change', (e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        handleImageUpload(e.target.files[0], dialog, attachedImages);
+                                    }
+                                });
+                                input.click();
+                            })
+                            .catch(() => {
+                                alert('카메라 접근 권한이 필요합니다. 브라우저 설정에서 카메라 권한을 허용해주세요.');
+                            });
+                    } else {
+                        // 권한 확인이 불가능한 경우 기본 방식 사용
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.capture = 'environment';
+                        input.addEventListener('change', (e) => {
+                            if (e.target.files && e.target.files[0]) {
+                                handleImageUpload(e.target.files[0], dialog, attachedImages);
+                            }
+                        });
+                        input.click();
+                    }
                 });
 
                 // 갤러리 버튼 이벤트
@@ -1105,22 +1146,59 @@
                 return;
             }
 
-            // 최대 5개까지만 첨부 가능
-            if (attachedImages.length >= 5) {
-                alert('최대 5개까지만 첨부 가능합니다.');
+            // 최대 3개까지만 첨부 가능 (가이드라인 개선)
+            if (attachedImages.length >= 3) {
+                alert('최대 3개까지만 첨부 가능합니다.\n\n📸 가이드라인:\n• 매장 외부/내부 전경 1장\n• 희망하는 상품 구성 1장\n• 기타 참고사항 1장');
                 return;
             }
 
+            // 이미지 최적화 (높이 300px 기준)
             const reader = new FileReader();
             reader.onload = (e) => {
-                const imageData = {
-                    file: file,
-                    preview: e.target.result,
-                    id: Date.now() + Math.random()
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // 높이 300px 기준으로 비율 유지하며 리사이즈
+                    const targetHeight = 300;
+                    const aspectRatio = img.width / img.height;
+                    const targetWidth = Math.round(targetHeight * aspectRatio);
+                    
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    
+                    // 이미지 품질 향상을 위한 스무딩 설정
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    
+                    // 이미지 그리기
+                    ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+                    
+                    // 최적화된 이미지를 JPEG로 변환 (품질 0.85)
+                    canvas.toBlob((blob) => {
+                        const imageData = {
+                            file: blob,
+                            preview: canvas.toDataURL('image/jpeg', 0.85),
+                            id: Date.now() + Math.random(),
+                            originalName: file.name,
+                            optimizedSize: blob.size
+                        };
+                        
+                        attachedImages.push(imageData);
+                        updateImagePreview(dialog, attachedImages);
+                        
+                        // 최적화 결과 알림
+                        const originalSize = file.size;
+                        const optimizedSize = blob.size;
+                        const reduction = Math.round((1 - optimizedSize / originalSize) * 100);
+                        
+                        if (reduction > 20) {
+                            console.log(`이미지 최적화 완료: ${originalSize}KB → ${optimizedSize}KB (${reduction}% 감소)`);
+                        }
+                    }, 'image/jpeg', 0.85);
                 };
-                
-                attachedImages.push(imageData);
-                updateImagePreview(dialog, attachedImages);
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -1129,6 +1207,7 @@
         function updateImagePreview(dialog, attachedImages) {
             const container = dialog.querySelector('#imagePreviewContainer');
             const list = dialog.querySelector('#imagePreviewList');
+            const countElement = dialog.querySelector('#imageCount');
             
             if (attachedImages.length === 0) {
                 container.classList.add('hidden');
@@ -1137,6 +1216,11 @@
 
             container.classList.remove('hidden');
             list.innerHTML = '';
+            
+            // 이미지 카운터 업데이트
+            if (countElement) {
+                countElement.textContent = `${attachedImages.length}/3`;
+            }
 
             attachedImages.forEach((imageData, index) => {
                 const previewItem = document.createElement('div');
@@ -1145,9 +1229,12 @@
                     <img src="${imageData.preview}" alt="첨부 이미지" 
                          class="w-full h-20 object-cover rounded-lg border">
                     <button type="button" onclick="removeImage(${imageData.id}, this)" 
-                            class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors">
+                            class="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center text-sm hover:bg-red-600 transition-colors touch-manipulation">
                         <i class="ri-close-line"></i>
                     </button>
+                    <div class="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded">
+                        ${Math.round(imageData.optimizedSize / 1024)}KB
+                    </div>
                 `;
                 list.appendChild(previewItem);
             });
