@@ -829,20 +829,8 @@
                                             첨부된 이미지 (${data.imageUrls.length}/3개)
                                             <span class="text-xs text-gray-500 ml-2">📸 최적화됨 (높이 300px 기준)</span>
                                         </label>
-                                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                                            ${data.imageUrls.map((url, index) => `
-                                                <div class="relative group">
-                                                    <img src="${url}" alt="첨부 이미지 ${index + 1}" 
-                                                         class="w-full h-24 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition-opacity"
-                                                         onclick="openImageModal('${url}', '${data.name}님의 첨부 이미지 ${index + 1}')">
-                                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center">
-                                                        <i class="ri-zoom-in-line text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                                                    </div>
-                                                    <div class="absolute top-1 left-1 bg-blue-500 text-white text-xs px-1 py-0.5 rounded">
-                                                        ${index + 1}
-                                                    </div>
-                                                </div>
-                                            `).join('')}
+                                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3" id="admin-image-thumbnails">
+                                            <!-- 썸네일은 JS에서 동적으로 생성 -->
                                         </div>
                                         <div class="mt-2 text-xs text-gray-500">
                                             💡 가이드라인: 매장 전경 • 상품 구성 • 참고사항
@@ -870,6 +858,25 @@
                         existingModal.remove();
                     }
                     document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+                    // 모달을 DOM에 추가한 직후 썸네일 동적 생성 코드 추가
+                    const container = document.getElementById('admin-image-thumbnails');
+                    if (container && Array.isArray(data.imageUrls)) {
+                        container.innerHTML = '';
+                        data.imageUrls.forEach((url, index) => {
+                            const div = document.createElement('div');
+                            div.className = 'relative group';
+                            const img = document.createElement('img');
+                            img.src = url;
+                            img.alt = `첨부 이미지 ${index + 1}`;
+                            img.className = 'w-full h-24 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition-opacity';
+                            img.addEventListener('click', function() {
+                                window.openImageModal(url, `${data.name}님의 첨부 이미지 ${index + 1}`);
+                            });
+                            div.appendChild(img);
+                            container.appendChild(div);
+                        });
+                    }
 
                     // 활동 로그 기록
                     await activityLogger.logActivity('view_inquiry_detail', {
