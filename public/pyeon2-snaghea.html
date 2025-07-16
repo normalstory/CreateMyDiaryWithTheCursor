@@ -1671,18 +1671,42 @@
             const store = storeData[storeKey];
             if (!store) return;
 
-            // 카카오맵 길찾기 URL 생성
-            const url = `https://map.kakao.com/link/to/${store.name},${store.lat},${store.lng}`;
-
             // 모바일/PC 구분
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
+            
             if (isMobile) {
-                // 모바일은 현재 창에서 바로 이동
-                location.href = url;
+                // 모바일: 카카오맵 앱 우선 실행 시도
+                const appUrl = `kakaomap://look?p=${store.lat},${store.lng}`;
+                const webUrl = `https://map.kakao.com/link/to/${encodeURIComponent(store.name)},${store.lat},${store.lng}`;
+                
+                // 앱 실행 시도
+                const link = document.createElement('a');
+                link.href = appUrl;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                
+                // 앱 실행 시도 후 일정 시간 후 웹으로 대체
+                const timeout = setTimeout(() => {
+                    // 앱이 없으면 웹으로 이동
+                    window.location.href = webUrl;
+                }, 2000);
+                
+                // 앱 실행 시도
+                link.click();
+                document.body.removeChild(link);
+                
+                // 페이지 포커스 이벤트로 앱 실행 확인
+                const handleFocus = () => {
+                    clearTimeout(timeout);
+                    window.removeEventListener('focus', handleFocus);
+                };
+                
+                window.addEventListener('focus', handleFocus);
+                
             } else {
-                // PC는 새 탭에서 열기
-                window.open(url, '_blank');
+                // PC: 새 탭에서 웹으로 열기
+                const webUrl = `https://map.kakao.com/link/to/${encodeURIComponent(store.name)},${store.lat},${store.lng}`;
+                window.open(webUrl, '_blank');
             }
         }
 
