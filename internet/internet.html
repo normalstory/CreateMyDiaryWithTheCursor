@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>빌라 인터넷 설치 공지</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="../resources/favicon-32x32.png">
+    <meta name="theme-color" content="#007bff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="인터넷설치">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .notice-card {
+            margin: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .notice-header {
+            background: #f8f9fa;
+            padding: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .notice-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 8px;
+        }
+        
+        .notice-content {
+            padding: 20px;
+        }
+        
+        .upgrade-info {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .upgrade-info h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .upgrade-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .schedule-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .schedule-date {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+        
+        .form-section {
+            margin: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .radio-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .radio-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .radio-item.selected {
+            border-color: #007bff;
+            background: #e7f3ff;
+        }
+        
+        .radio-item input[type="radio"] {
+            margin-right: 12px;
+            width: auto;
+        }
+        
+        .radio-item-content {
+            flex: 1;
+        }
+        
+        .radio-item-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .radio-item-desc {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 12px;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-admin {
+            background: #dc3545;
+            color: white;
+            font-size: 14px;
+            padding: 12px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .admin-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .admin-stats {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: .3em .3em;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 80px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-card.total-stat {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+            font-weight: bold;
+        }
+        
+        .stat-card.total-stat .stat-number {
+            color: white;
+        }
+        
+        .stat-card.total-stat .stat-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .stat-divider {
+            width: 2px;
+            height: 40px;
+            background: #dee2e6;
+            margin: 0 10px;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .application-list {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .application-item {
+            padding: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .application-item:last-child {
+            border-bottom: none;
+        }
+        
+        .application-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .application-unit {
+            font-weight: 600;
+            color: #007bff;
+        }
+        
+        .application-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-install {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-reschedule {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-password {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-cancelled {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+        
+        .floor-filter-btn {
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .floor-filter-btn:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+        
+        .floor-filter-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .floor-filter-btn.active:hover {
+            background: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .install-form {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .install-form.active {
+            border-color: #007bff;
+            background: #e7f3ff;
+        }
+        
+        .deadline-warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .deadline-expired {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .phone-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .phone-input-group span {
+            font-size: 16px;
+            color: #495057;
+            white-space: nowrap;
+        }
+        
+        .phone-input-group .phone-prefix {
+            font-weight: 600;
+            color: #007bff;
+        }
+        
+        .phone-input-group .phone-separator {
+            color: #6c757d;
+        }
+        
+        .phone-input-group input[type="tel"] {
+            width: 70px;
+            text-align: center;
+            padding: 12px 8px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: border-color 0.3s;
+        }
+        
+        .phone-input-group input[type="tel"]:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        @media (max-width: 480px) {
+            .phone-input-group {
+                justify-content: center;
+            }
+            
+            .phone-input-group input[type="tel"] {
+                width: 65px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                box-shadow: none;
+            }
+            
+            .admin-stats {
+                gap: 8px;
+                padding: 12px;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+            
+            .stat-card {
+                min-width: 50px;
+                padding: 8px 6px;
+                flex-shrink: 0;
+            }
+            
+            .stat-number {
+                font-size: 18px !important;
+            }
+            
+            .stat-label {
+                font-size: 11px !important;
+            }
+            
+            .stat-divider {
+                height: 30px;
+                margin: 0 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 메인 페이지 -->
+        <div id="mainPage">
+            <div class="header">
+                <h1>🏠 빌라 인터넷 설치 공지</h1>
+                <p>1Gbps 고속 인터넷 & 유튜브 셋탑박스 업그레이드</p>
+            </div>
+            
+            <div class="notice-card">
+                <div class="notice-header">
+                    <div class="notice-title">📶 인터넷 업그레이드 안내</div>
+                </div>
+                <div class="notice-content">
+                    <div class="upgrade-info">
+                        <h3>🚀 업그레이드 내용</h3>
+                        <p>• 인터넷 속도: 1Gbps로 상향<br>
+                        • 셋탑박스: 유튜브 지원 박스로 교체</p>
+                    </div>
+                    
+                    <div class="schedule-info">
+                        <div class="schedule-date">📅 설치 일정</div>
+                        <p><strong>9월 12일 (금요일)</strong> 및 <strong>9월 13일 (토요일)</strong><br>
+                        이틀에 걸쳐 순차적으로 진행됩니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 설치 방식 선택 -->
+            <div class="notice-card">
+                <div class="notice-header">
+                    <div class="notice-title">📋 설치 방식을 선택해주세요</div>
+                </div>
+                <div class="notice-content">
+                    <div class="radio-group">
+                        <div class="radio-item" onclick="selectMainOption('install')">
+                            <input type="radio" name="mainInstallOption" value="install" id="mainInstall">
+                            <div class="radio-item-content">
+                                <div class="radio-item-title">🏠 재택 설치</div>
+                                <div class="radio-item-desc">설치 당일 집에 있어서 직접 대응</div>
+                            </div>
+                        </div>
+                        
+                        <div class="radio-item" onclick="selectMainOption('reschedule')">
+                            <input type="radio" name="mainInstallOption" value="reschedule" id="mainReschedule">
+                            <div class="radio-item-content">
+                                <div class="radio-item-title">📅 일정 조율</div>
+                                <div class="radio-item-desc">다른 날짜로 개별 일정 조율</div>
+                            </div>
+                        </div>
+                        
+                        <div class="radio-item" onclick="selectMainOption('password')">
+                            <input type="radio" name="mainInstallOption" value="password" id="mainPassword">
+                            <div class="radio-item-content">
+                                <div class="radio-item-title">🔑 비밀번호 공유</div>
+                                <div class="radio-item-desc">집주인 동행하에 설치</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <button class="btn btn-primary" id="applyBtn" onclick="showApplicationForm()" disabled style="opacity: 0.5;">
+                    📝 신청하기
+                </button>
+                <button class="btn btn-secondary" onclick="showLoginPage('view')">
+                    👀 확인/취소하기
+                </button>
+                <button class="btn btn-admin" onclick="showAdminLogin()">
+                    🔧 관리자 페이지
+                </button>
+            </div>
+        </div>
+        
+        <!-- 로그인 페이지 -->
+        <div id="loginPage" class="hidden">
+            <div class="header">
+                <button class="back-btn" onclick="showMainPage()">←</button>
+                <h1 id="loginTitle">로그인</h1>
+            </div>
+            
+            <div class="form-section">
+                <div id="loginAlert"></div>
+                
+                <div class="form-group">
+                    <label for="unitNumber">호수</label>
+                    <input type="text" id="unitNumber" placeholder="예: 101, 201" maxlength="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phoneNumber1">휴대폰 번호</label>
+                    <div class="phone-input-group">
+                        <span class="phone-prefix">010</span>
+                        <span class="phone-separator">-</span>
+                        <input type="tel" id="phoneNumber1" maxlength="4" inputmode="numeric" pattern="[0-9]*" oninput="moveToNext(this, 'phoneNumber2')">
+                        <span class="phone-separator">-</span>
+                        <input type="tel" id="phoneNumber2" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="handleLogin()">
+                    확인
+                </button>
+            </div>
+        </div>
+        
+        <!-- 신청 페이지 -->
+        <div id="applicationPage" class="hidden">
+            <div class="header">
+                <button class="back-btn" onclick="showMainPage()">←</button>
+                <h1 id="applicationTitle">설치 신청</h1>
+            </div>
+            
+            <div class="form-section">
+                <div id="applicationAlert"></div>
+                
+                <!-- 재택 설치 옵션 -->
+                <div id="installForm" class="install-form hidden">
+                    <div class="form-group">
+                        <label>설치 희망 날짜</label>
+                        <div class="radio-group">
+                            <div class="radio-item" onclick="selectInstallDate('friday')">
+                                <input type="radio" name="installDate" value="friday" id="friday">
+                                <div class="radio-item-content">
+                                    <div class="radio-item-title">📅 9월 12일 (금요일)</div>
+                                </div>
+                            </div>
+                            <div class="radio-item" onclick="selectInstallDate('saturday')">
+                                <input type="radio" name="installDate" value="saturday" id="saturday">
+                                <div class="radio-item-content">
+                                    <div class="radio-item-title">📅 9월 13일 (토요일)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 일정 조율 옵션 -->
+                <div id="rescheduleForm" class="install-form hidden">
+                    <div class="form-group">
+                        <label for="preferredDate">희망 설치 날짜</label>
+                        <input type="date" id="preferredDate" min="">
+                    </div>
+                    <div class="form-group">
+                        <label for="preferredTime">희망 시간대</label>
+                        <select id="preferredTime">
+                            <option value="">시간대를 선택해주세요</option>
+                            <option value="morning">오전 (9:00-12:00)</option>
+                            <option value="afternoon">오후 (13:00-17:00)</option>
+                            <option value="evening">저녁 (18:00-20:00)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="rescheduleReason">조율 사유</label>
+                        <textarea id="rescheduleReason" rows="3" placeholder="일정 조율이 필요한 사유를 입력해주세요"></textarea>
+                    </div>
+                </div>
+
+                <!-- 비밀번호 공유 옵션 -->
+                <div id="passwordForm" class="install-form hidden">
+                    <div class="form-group">
+                        <label for="doorPassword">집 출입 비밀번호</label>
+                        <input type="tel" id="doorPassword" placeholder="집 출입용 비밀번호를 입력해주세요 (숫자만)" inputmode="numeric" pattern="[0-9]*">
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordNote">특이사항</label>
+                        <textarea id="passwordNote" rows="3" placeholder="출입 시 주의사항이나 특이사항을 입력해주세요 (선택사항)"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="applicationUnitNumber">호수</label>
+                    <input type="text" id="applicationUnitNumber" placeholder="예: 101, 201" maxlength="10" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="applicationPhoneNumber1">연락처</label>
+                    <div class="phone-input-group">
+                        <span class="phone-prefix">010</span>
+                        <span class="phone-separator">-</span>
+                        <input type="tel" id="applicationPhoneNumber1" maxlength="4" inputmode="numeric" pattern="[0-9]*" required oninput="moveToNext(this, 'applicationPhoneNumber2')">
+                        <span class="phone-separator">-</span>
+                        <input type="tel" id="applicationPhoneNumber2" maxlength="4" inputmode="numeric" pattern="[0-9]*" required>
+                    </div>
+                </div>
+
+                <!-- 개인정보 수집 동의 -->
+                <div class="form-group">
+                    <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; border: 1px solid #dee2e6;">
+                        <h4 style="margin-bottom: 12px; font-size: 16px;">개인정보 수집 및 이용 동의</h4>
+                        <div style="font-size: 14px; line-height: 1.5; color: #495057; margin-bottom: 12px;">
+                            <p><strong>수집항목:</strong> 호수, 연락처, 설치 관련 정보</p>
+                            <p><strong>이용목적:</strong> 인터넷 설치 일정 조율 및 연락</p>
+                            <p><strong>보유기간:</strong> 인터넷 설치 완료 후 즉시 폐기</p>
+                        </div>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="privacyAgree" style="margin-right: 8px; width: auto;">
+                            <span style="font-size: 14px;">개인정보 수집 및 이용에 동의합니다 (필수)</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="submitApplication()">
+                    신청 완료
+                </button>
+            </div>
+        </div>
+        
+        <!-- 신청 확인 페이지 -->
+        <div id="viewPage" class="hidden">
+            <div class="header">
+                <button class="back-btn" onclick="showMainPage()">←</button>
+                <h1>신청 내용 확인</h1>
+            </div>
+            
+            <div class="form-section">
+                <div id="currentApplication"></div>
+                
+                <!-- 안내 메시지 -->
+                <div class="notice-card">
+                    <div class="notice-content">
+                        <div style="background: #e7f3ff; padding: 16px; border-radius: 8px; border-left: 4px solid #007bff; margin-bottom: 16px;">
+                            <h4 style="margin-bottom: 8px; color: #007bff;">📝 변경을 원하시나요?</h4>
+                            <p style="font-size: 14px; line-height: 1.5; margin: 0;">
+                                신청 내용을 변경하시려면 <strong>취소 후 다시 신청</strong>해주세요.<br>
+                                취소 후에는 처음부터 새로 신청하실 수 있습니다.
+                            </p>
+                        </div>
+                        <div id="deadlineInfo" style="background: #fff3cd; padding: 12px; border-radius: 8px; border: 1px solid #ffeaa7; font-size: 14px;">
+                            ⏰ 취소/변경 : 9월 10일(수) 오후 6시 정각까지만 가능합니다.
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="btn btn-primary" onclick="cancelApplication()" style="background: #dc3545; margin-bottom: 12px;">
+                        🗑️ 신청 취소하기
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 관리자 로그인 -->
+        <div id="adminLoginPage" class="hidden">
+            <div class="header">
+                <button class="back-btn" onclick="showMainPage()">←</button>
+                <h1>관리자 로그인</h1>
+            </div>
+            
+            <div class="form-section">
+                <div id="adminLoginAlert"></div>
+                
+                <div class="form-group">
+                    <label for="adminPassword">관리자 비밀번호</label>
+                    <input type="password" id="adminPassword">
+                </div>
+                
+                <button class="btn btn-primary" onclick="adminLogin()">
+                    로그인
+                </button>
+            </div>
+        </div>
+        
+        <!-- 관리자 페이지 -->
+        <div id="adminPage" class="hidden">
+            <div class="header">
+                <button class="back-btn" onclick="showMainPage()">←</button>
+                <h1>관리자 페이지</h1>
+            </div>
+            
+            <div class="form-section">
+                <div class="admin-panel">
+                    <div class="admin-stats">
+                        <div class="stat-card total-stat">
+                            <div class="stat-number" id="totalApplications">0</div>
+                            <div class="stat-label">전체</div>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="installCount">0</div>
+                            <div class="stat-label">재택</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="rescheduleCount">0</div>
+                            <div class="stat-label">조율</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="passwordCount">0</div>
+                            <div class="stat-label">비번</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 층별 필터 -->
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 12px; color: #495057;">층별 필터</h4>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="floor-filter-btn active" onclick="filterByFloor('all')" data-floor="all">
+                                전체
+                            </button>
+                            <button class="floor-filter-btn" onclick="filterByFloor('2')" data-floor="2">
+                                2층
+                            </button>
+                            <button class="floor-filter-btn" onclick="filterByFloor('3')" data-floor="3">
+                                3층
+                            </button>
+                            <button class="floor-filter-btn" onclick="filterByFloor('4')" data-floor="4">
+                                4층
+                            </button>
+                            <button class="floor-filter-btn" onclick="filterByFloor('5')" data-floor="5">
+                                5층
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="application-list" id="applicationList">
+                        <!-- 신청 목록이 여기에 표시됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 로딩 -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>처리 중...</p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Firebase 설정
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+        // Firebase 설정 - 실제 프로젝트 설정으로 교체해야 합니다
+        // Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbu_1gbtSIVUvmmw5RyLYvjaYOG7RdCWw",
+            authDomain: "ppap-ea44a.firebaseapp.com",
+            projectId: "ppap-ea44a",
+            storageBucket: "ppap-ea44a.firebasestorage.app",
+            messagingSenderId: "811949338329",
+            appId: "1:811949338329:web:cda8d43a7aeb825ce258c8",
+            measurementId: "G-6QGZT6Y1TE"
+        };
+
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // 전역 변수
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.query = query;
+        window.where = where;
+        window.orderBy = orderBy;
+        
+        let currentUser = null;
+        let isViewMode = false;
+        let selectedInstallOption = null;
+        let allApplications = []; // 전체 신청 데이터 저장용
+        let currentFloorFilter = 'all'; // 현재 선택된 층 필터
+        
+        // 전화번호 입력 시 자동 포커스 이동
+        window.moveToNext = (current, nextId) => {
+            if (current.value.length === current.maxLength) {
+                const nextInput = document.getElementById(nextId);
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+        };
+
+        // 호수에서 층 추출하는 함수
+        function getFloorFromUnit(unitNumber) {
+            // 호수의 첫 번째 숫자를 층으로 반환
+            const firstDigit = unitNumber.toString().charAt(0);
+            return firstDigit;
+        }
+
+        // 층별 필터 함수
+        window.filterByFloor = (floor) => {
+            currentFloorFilter = floor;
+            
+            // 모든 필터 버튼의 active 클래스 제거
+            document.querySelectorAll('.floor-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 선택된 버튼에 active 클래스 추가
+            document.querySelector(`[data-floor="${floor}"]`).classList.add('active');
+            
+            // 필터링된 데이터로 목록 업데이트
+            let filteredApplications = allApplications;
+            
+            if (floor !== 'all') {
+                filteredApplications = allApplications.filter(app => 
+                    getFloorFromUnit(app.unitNumber) === floor
+                );
+            }
+            
+            displayApplicationList(filteredApplications);
+            // 통계는 전체 데이터 기준으로 유지 (필터 영향 없음)
+        };
+
+        // 전체 통계 업데이트 (필터와 무관하게 전체 데이터 기준)
+        function updateTotalStats(allApplications) {
+            const activeApplications = allApplications.filter(app => app.status !== 'cancelled');
+            const stats = {
+                total: activeApplications.length,
+                install: activeApplications.filter(app => app.installOption === 'install').length,
+                reschedule: activeApplications.filter(app => app.installOption === 'reschedule').length,
+                password: activeApplications.filter(app => app.installOption === 'password').length
+            };
+            
+            document.getElementById('totalApplications').textContent = stats.total;
+            document.getElementById('installCount').textContent = stats.install;
+            document.getElementById('rescheduleCount').textContent = stats.reschedule;
+            document.getElementById('passwordCount').textContent = stats.password;
+        }
+        
+        // PWA 설치
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
+        }
+        
+        // 메인 페이지 옵션 선택
+        window.selectMainOption = (option) => {
+            // 모든 라디오 아이템 선택 해제
+            document.querySelectorAll('#mainPage .radio-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // 선택된 아이템 표시
+            event.currentTarget.classList.add('selected');
+            document.getElementById('main' + option.charAt(0).toUpperCase() + option.slice(1)).checked = true;
+            
+            selectedInstallOption = option;
+            
+            // 신청하기 버튼 활성화
+            const applyBtn = document.getElementById('applyBtn');
+            applyBtn.disabled = false;
+            applyBtn.style.opacity = '1';
+        };
+
+        // 신청 폼 표시
+        window.showApplicationForm = () => {
+            if (!selectedInstallOption) {
+                alert('설치 방식을 먼저 선택해주세요.');
+                return;
+            }
+            
+            hideAllPages();
+            document.getElementById('applicationPage').classList.remove('hidden');
+            
+            // 선택된 옵션에 따라 폼 표시
+            document.querySelectorAll('.install-form').forEach(form => {
+                form.classList.add('hidden');
+            });
+            
+            const titleMap = {
+                'install': '재택 설치 신청',
+                'reschedule': '일정 조율 신청', 
+                'password': '비밀번호 공유 신청'
+            };
+            
+            document.getElementById('applicationTitle').textContent = titleMap[selectedInstallOption];
+            document.getElementById(selectedInstallOption + 'Form').classList.remove('hidden');
+            document.getElementById(selectedInstallOption + 'Form').classList.add('active');
+            
+            // 날짜 최소값 설정
+            const today = new Date();
+            const minDate = today.toISOString().split('T')[0];
+            const preferredDateInput = document.getElementById('preferredDate');
+            if (preferredDateInput) {
+                preferredDateInput.min = minDate;
+            }
+            
+            clearForm('applicationPage');
+        };
+
+        // 페이지 전환 함수들
+        window.showMainPage = () => {
+            hideAllPages();
+            document.getElementById('mainPage').classList.remove('hidden');
+            currentUser = null;
+            isViewMode = false;
+            selectedInstallOption = null;
+            
+            // 메인 페이지 선택 초기화
+            document.querySelectorAll('#mainPage .radio-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            document.querySelectorAll('#mainPage input[type="radio"]').forEach(radio => {
+                radio.checked = false;
+            });
+            
+            const applyBtn = document.getElementById('applyBtn');
+            applyBtn.disabled = true;
+            applyBtn.style.opacity = '0.5';
+        };
+        
+        window.showLoginPage = (mode = 'view') => {
+            hideAllPages();
+            document.getElementById('loginPage').classList.remove('hidden');
+            isViewMode = mode === 'view';
+            document.getElementById('loginTitle').textContent = 
+                isViewMode ? '확인/취소하기' : '설치 신청';
+            clearForm('loginPage');
+        };
+        
+        window.showAdminLogin = () => {
+            hideAllPages();
+            document.getElementById('adminLoginPage').classList.remove('hidden');
+            clearForm('adminLoginPage');
+        };
+        
+        function hideAllPages() {
+            const pages = ['mainPage', 'loginPage', 'applicationPage', 'viewPage', 'adminLoginPage', 'adminPage'];
+            pages.forEach(page => {
+                document.getElementById(page).classList.add('hidden');
+            });
+            clearAlerts();
+            
+            // 캘린더 섹션도 숨기기
+            const calendarSection = document.getElementById('calendarSection');
+            if (calendarSection) {
+                calendarSection.classList.add('hidden');
+            }
+        }
+        
+        function clearAlerts() {
+            const alerts = ['loginAlert', 'applicationAlert', 'adminLoginAlert'];
+            alerts.forEach(alert => {
+                const element = document.getElementById(alert);
+                if (element) element.innerHTML = '';
+            });
+        }
+        
+        function clearForm(pageId) {
+            const page = document.getElementById(pageId);
+            const inputs = page.querySelectorAll('input, textarea');
+            inputs.forEach(input => input.value = '');
+        }
+        
+        function showAlert(elementId, message, type = 'error') {
+            const alertElement = document.getElementById(elementId);
+            alertElement.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+        
+        function showLoading(show = true) {
+            document.getElementById('loading').classList.toggle('hidden', !show);
+        }
+        
+        // 로그인 처리
+        window.handleLogin = async () => {
+            const unitNumber = document.getElementById('unitNumber').value.trim();
+            const phoneNumber1 = document.getElementById('phoneNumber1').value.trim();
+            const phoneNumber2 = document.getElementById('phoneNumber2').value.trim();
+            
+            if (!unitNumber || !phoneNumber1 || !phoneNumber2) {
+                showAlert('loginAlert', '호수와 휴대폰 번호를 모두 입력해주세요.');
+                return;
+            }
+            
+            // 전화번호 형식 검증 (각각 3-4자리 숫자)
+            if (!/^\d{3,4}$/.test(phoneNumber1) || !/^\d{4}$/.test(phoneNumber2)) {
+                showAlert('loginAlert', '올바른 휴대폰 번호 형식을 입력해주세요.');
+                return;
+            }
+            
+            const cleanPhone = '010' + phoneNumber1 + phoneNumber2;
+            
+            showLoading(true);
+            
+            try {
+                currentUser = { unitNumber, phoneNumber: cleanPhone };
+                
+                if (isViewMode) {
+                    await loadUserApplication();
+                } else {
+                    showApplicationPage();
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('loginAlert', '로그인 중 오류가 발생했습니다.');
+            } finally {
+                showLoading(false);
+            }
+        };
+        
+        // 설치 날짜 선택 (재택 설치용)
+        window.selectInstallDate = (date) => {
+            document.querySelectorAll('#installForm .radio-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            event.currentTarget.classList.add('selected');
+            document.getElementById(date).checked = true;
+        };
+        
+        // 신청 제출
+        window.submitApplication = async () => {
+            // 호수와 연락처 확인
+            const unitNumber = document.getElementById('applicationUnitNumber').value.trim();
+            const phoneNumber1 = document.getElementById('applicationPhoneNumber1').value.trim();
+            const phoneNumber2 = document.getElementById('applicationPhoneNumber2').value.trim();
+            const privacyAgree = document.getElementById('privacyAgree').checked;
+            
+            if (!unitNumber || !phoneNumber1 || !phoneNumber2) {
+                showAlert('applicationAlert', '호수와 연락처를 모두 입력해주세요.');
+                return;
+            }
+            
+            // 전화번호 형식 검증 (각각 3-4자리, 4자리 숫자)
+            if (!/^\d{3,4}$/.test(phoneNumber1) || !/^\d{4}$/.test(phoneNumber2)) {
+                showAlert('applicationAlert', '올바른 연락처 형식을 입력해주세요.');
+                return;
+            }
+            
+            const cleanPhone = '010' + phoneNumber1 + phoneNumber2;
+            
+            if (!privacyAgree) {
+                showAlert('applicationAlert', '개인정보 수집 및 이용에 동의해주세요.');
+                return;
+            }
+            
+            let applicationData = {
+                unitNumber: unitNumber,
+                phoneNumber: cleanPhone, // 정리된 전화번호 사용
+                installOption: selectedInstallOption,
+                timestamp: new Date(),
+                status: 'pending'
+            };
+            
+            // 설치 방식별 데이터 수집
+            if (selectedInstallOption === 'install') {
+                const installDate = document.querySelector('input[name="installDate"]:checked');
+                if (!installDate) {
+                    showAlert('applicationAlert', '설치 희망 날짜를 선택해주세요.');
+                    return;
+                }
+                applicationData.installDate = installDate.value;
+                applicationData.installDateText = installDate.value === 'friday' ? '9월 12일 (금요일)' : '9월 13일 (토요일)';
+            } else if (selectedInstallOption === 'reschedule') {
+                const preferredDate = document.getElementById('preferredDate').value;
+                const preferredTime = document.getElementById('preferredTime').value;
+                const rescheduleReason = document.getElementById('rescheduleReason').value.trim();
+                
+                if (!preferredDate || !preferredTime || !rescheduleReason) {
+                    showAlert('applicationAlert', '희망 날짜, 시간대, 조율 사유를 모두 입력해주세요.');
+                    return;
+                }
+                
+                applicationData.preferredDate = preferredDate;
+                applicationData.preferredTime = preferredTime;
+                applicationData.rescheduleReason = rescheduleReason;
+            } else if (selectedInstallOption === 'password') {
+                const doorPassword = document.getElementById('doorPassword').value.trim();
+                const passwordNote = document.getElementById('passwordNote').value.trim();
+                
+                if (!doorPassword) {
+                    showAlert('applicationAlert', '집 출입 비밀번호를 입력해주세요.');
+                    return;
+                }
+                
+                applicationData.doorPassword = doorPassword;
+                applicationData.passwordNote = passwordNote;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // 기존 신청이 있는지 확인 (호수와 연락처로)
+                const q = query(
+                    collection(db, 'applications'),
+                    where('unitNumber', '==', unitNumber),
+                    where('phoneNumber', '==', cleanPhone)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    // 새 신청
+                    await addDoc(collection(db, 'applications'), applicationData);
+                    showAlert('applicationAlert', '신청이 완료되었습니다!', 'success');
+                } else {
+                    // 기존 신청 업데이트
+                    const docRef = querySnapshot.docs[0].ref;
+                    await updateDoc(docRef, applicationData);
+                    showAlert('applicationAlert', '신청이 완료되었습니다!', 'success');
+                }
+                
+                setTimeout(() => {
+                    showMainPage();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Submit error:', error);
+                showAlert('applicationAlert', '신청 중 오류가 발생했습니다.');
+            } finally {
+                showLoading(false);
+            }
+        };
+        
+        // 사용자 신청 내용 로드
+        async function loadUserApplication() {
+            try {
+                const q = query(
+                    collection(db, 'applications'),
+                    where('unitNumber', '==', currentUser.unitNumber),
+                    where('phoneNumber', '==', currentUser.phoneNumber)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    showAlert('loginAlert', '신청 내역이 없습니다. 먼저 신청해주세요.');
+                    return;
+                }
+                
+                const applicationData = querySnapshot.docs[0].data();
+                showViewPage(applicationData);
+                
+            } catch (error) {
+                console.error('Load application error:', error);
+                showAlert('loginAlert', '신청 내용을 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+        
+        function showViewPage(data) {
+            hideAllPages();
+            document.getElementById('viewPage').classList.remove('hidden');
+            
+            const optionNames = {
+                'install': '🏠 재택 설치',
+                'reschedule': '📅 일정 조율',
+                'password': '🔑 비밀번호 공유'
+            };
+            
+            let html = `
+                <div class="notice-card">
+                    <div class="notice-header">
+                        <div class="notice-title">${data.unitNumber}호 신청 내용</div>
+                    </div>
+                    <div class="notice-content">
+                        <div class="form-group">
+                            <label>선택한 설치 방법</label>
+                            <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; font-weight: 500;">
+                                ${optionNames[data.installOption]}
+                            </div>
+                        </div>
+            `;
+            
+            // 설치 방법별 상세 정보 표시
+            if (data.installOption === 'install' && data.installDateText) {
+                html += `
+                    <div class="form-group">
+                        <label>선택한 설치 날짜</label>
+                        <div style="padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                            ${data.installDateText}
+                        </div>
+                    </div>
+                `;
+            } else if (data.installOption === 'reschedule') {
+                if (data.preferredDate) {
+                    const timeNames = {
+                        'morning': '오전 (9:00-12:00)',
+                        'afternoon': '오후 (13:00-17:00)',
+                        'evening': '저녁 (18:00-20:00)'
+                    };
+                    html += `
+                        <div class="form-group">
+                            <label>희망 설치 날짜</label>
+                            <div style="padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                                ${data.preferredDate} ${timeNames[data.preferredTime] || ''}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>조율 사유</label>
+                            <div style="padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                                ${data.rescheduleReason}
+                            </div>
+                        </div>
+                    `;
+                }
+            } else if (data.installOption === 'password') {
+                if (data.doorPassword) {
+                    html += `
+                        <div class="form-group">
+                            <label>집 출입 비밀번호</label>
+                            <div style="padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                                ${data.doorPassword}
+                            </div>
+                        </div>
+                    `;
+                    if (data.passwordNote) {
+                        html += `
+                            <div class="form-group">
+                                <label>특이사항</label>
+                                <div style="padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                                    ${data.passwordNote}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            }
+            
+            html += `
+                        <div class="form-group">
+                            <label>연락처</label>
+                            <div style="padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                                ${data.phoneNumber}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('currentApplication').innerHTML = html;
+            
+            // 마감 시간에 따른 안내 메시지 업데이트
+            updateDeadlineMessage();
+        }
+        
+        // 마감 시간에 따른 안내 메시지 업데이트
+        function updateDeadlineMessage() {
+            const now = new Date();
+            const sept10_6pm = new Date(2025, 8, 10, 18, 0); // 2025년 9월 10일 오후 6시
+            
+            // 디버깅용 콘솔 출력
+            console.log('현재 시간:', now.toLocaleString('ko-KR'));
+            console.log('마감 시간:', sept10_6pm.toLocaleString('ko-KR'));
+            console.log('마감 여부:', now > sept10_6pm);
+            
+            const deadlineInfo = document.getElementById('deadlineInfo');
+            
+            if (now > sept10_6pm) {
+                // 취소/변경 마감
+                deadlineInfo.innerHTML = '🚫 취소/변경 : 9월 10일(수) 오후 6시 정각까지만 가능했습니다. (마감됨)';
+                deadlineInfo.style.background = '#f8d7da';
+                deadlineInfo.style.borderColor = '#f5c6cb';
+                deadlineInfo.style.color = '#721c24';
+            } else {
+                // 취소/변경 가능
+                deadlineInfo.innerHTML = '⏰ 취소/변경 : 9월 10일(수) 오후 6시 정각까지만 가능합니다.';
+                deadlineInfo.style.background = '#fff3cd';
+                deadlineInfo.style.borderColor = '#ffeaa7';
+                deadlineInfo.style.color = '#856404';
+            }
+        }
+
+        // 변경 가능 시간 체크 (코드로만 처리)
+        function isChangeAllowed() {
+            const now = new Date();
+            const sept10_6pm = new Date(2025, 8, 10, 18, 0); // 2025년 9월 10일 오후 6시
+            return now <= sept10_6pm;
+        }
+        
+        // 신청 취소 기능
+        window.cancelApplication = async () => {
+            // 마감 시간 체크
+            if (!isChangeAllowed()) {
+                alert('취소/변경 가능 시간이 지났습니다.\n(9월 10일 수요일 오후 6시 정각 마감)\n\n추가 문의는 주인 세대에게 따로 문의하세요.');
+                return;
+            }
+            
+            if (!confirm('정말로 신청을 취소하시겠습니까?\n\n취소 후에는 다시 신청하실 수 있습니다.')) {
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // 기존 신청 찾기
+                const q = query(
+                    collection(db, 'applications'),
+                    where('unitNumber', '==', currentUser.unitNumber),
+                    where('phoneNumber', '==', currentUser.phoneNumber)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    const docRef = querySnapshot.docs[0].ref;
+                    const currentData = querySnapshot.docs[0].data();
+                    
+                    // 취소 상태로 업데이트 (삭제하지 않고 상태만 변경)
+                    await updateDoc(docRef, {
+                        ...currentData,
+                        status: 'cancelled',
+                        cancelledAt: new Date(),
+                        cancelledBy: 'user'
+                    });
+                    
+                    alert('신청이 취소되었습니다.\n\n새로운 신청을 원하시면 다시 신청해주세요.');
+                    showMainPage();
+                }
+                
+            } catch (error) {
+                console.error('Cancel application error:', error);
+                alert('취소 처리 중 오류가 발생했습니다.');
+            } finally {
+                showLoading(false);
+            }
+        };
+
+
+        
+        // 관리자 로그인
+        window.adminLogin = () => {
+            const password = document.getElementById('adminPassword').value.trim();
+            const today = new Date();
+            const expectedPassword = String(today.getMonth() + 1).padStart(2, '0') + 
+                                   String(today.getDate()).padStart(2, '0');
+            
+            if (password !== expectedPassword) {
+                showAlert('adminLoginAlert', '비밀번호가 올바르지 않습니다.');
+                return;
+            }
+            
+            loadAdminPage();
+        };
+        
+        // 관리자 페이지 로드
+        async function loadAdminPage() {
+            hideAllPages();
+            document.getElementById('adminPage').classList.remove('hidden');
+            showLoading(true);
+            
+            try {
+                const querySnapshot = await getDocs(collection(db, 'applications'));
+                const applications = [];
+                
+                querySnapshot.forEach((doc) => {
+                    applications.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // 전역 변수에 전체 데이터 저장
+                allApplications = applications;
+                
+                // 현재 필터에 따라 데이터 필터링
+                let filteredApplications = applications;
+                if (currentFloorFilter !== 'all') {
+                    filteredApplications = applications.filter(app => 
+                        getFloorFromUnit(app.unitNumber) === currentFloorFilter
+                    );
+                }
+                
+                // 통계 업데이트 (전체 데이터 기준)
+                updateTotalStats(allApplications);
+                
+                // 신청 목록 표시 (필터링된 데이터)
+                displayApplicationList(filteredApplications);
+                
+            } catch (error) {
+                console.error('Load admin page error:', error);
+                showAlert('adminLoginAlert', '관리자 페이지를 불러오는 중 오류가 발생했습니다.');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function displayApplicationList(applications) {
+            const listElement = document.getElementById('applicationList');
+            
+            if (applications.length === 0) {
+                listElement.innerHTML = '<div style="text-align: center; padding: 40px; color: #6c757d;">신청 내역이 없습니다.</div>';
+                return;
+            }
+            
+            const optionNames = {
+                'install': '재택 설치',
+                'reschedule': '일정 조율',
+                'password': '비번 공유'
+            };
+            
+            const statusClasses = {
+                'install': 'status-install',
+                'reschedule': 'status-reschedule',
+                'password': 'status-password'
+            };
+            
+            let html = '';
+            applications.forEach(app => {
+                const isCancelled = app.status === 'cancelled';
+                const cancelledClass = isCancelled ? ' style="opacity: 0.6; background: #f8f9fa;"' : '';
+                
+                html += `
+                    <div class="application-item"${cancelledClass}>
+                        <div class="application-header">
+                            <div class="application-unit">${app.unitNumber}호 ${isCancelled ? '(취소됨)' : ''}</div>
+                            <div class="application-status ${isCancelled ? 'status-cancelled' : statusClasses[app.installOption]}">
+                                ${isCancelled ? '사용자 취소' : optionNames[app.installOption]}
+                            </div>
+                        </div>
+                        <div style="font-size: 14px; color: #6c757d; margin-bottom: 8px;">
+                            ${app.phoneNumber}
+                        </div>
+                `;
+                
+                // 설치 방법별 세부 정보 표시
+                if (app.installOption === 'install' && app.installDateText) {
+                    html += `
+                        <div style="font-size: 14px; margin-bottom: 4px;">
+                            <strong>희망날짜:</strong> ${app.installDateText}
+                        </div>
+                    `;
+                } else if (app.installOption === 'reschedule') {
+                    if (app.preferredDate) {
+                        const timeNames = {
+                            'morning': '오전 (9:00-12:00)',
+                            'afternoon': '오후 (13:00-17:00)',
+                            'evening': '저녁 (18:00-20:00)'
+                        };
+                        html += `
+                            <div style="font-size: 14px; margin-bottom: 4px;">
+                                <strong>희망날짜:</strong> ${app.preferredDate} ${timeNames[app.preferredTime] || ''}
+                            </div>
+                            <div style="font-size: 14px; margin-bottom: 4px;">
+                                <strong>조율사유:</strong> ${app.rescheduleReason}
+                            </div>
+                        `;
+                    }
+                } else if (app.installOption === 'password') {
+                    if (app.doorPassword) {
+                        html += `
+                            <div style="font-size: 14px; margin-bottom: 4px;">
+                                <strong>집 비밀번호:</strong> ${app.doorPassword}
+                            </div>
+                        `;
+                        if (app.passwordNote) {
+                            html += `
+                                <div style="font-size: 14px; margin-bottom: 4px;">
+                                    <strong>특이사항:</strong> ${app.passwordNote}
+                                </div>
+                            `;
+                        }
+                    }
+                }
+                
+                html += `${isCancelled ? `
+                        <div style="font-size: 12px; color: #6c757d; margin-bottom: 12px;">
+                            취소일: ${app.cancelledAt.toDate().toLocaleString('ko-KR')}
+                        </div>
+                ` : ''}
+                        <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                            ${isCancelled ? `
+                                <div style="text-align: center; padding: 6px 12px; background: #e9ecef; border-radius: 4px; font-size: 12px; color: #6c757d; flex: 1;">
+                                    사용자가 취소한 신청
+                                </div>
+                            ` : ''}
+                            <button class="btn-delete" onclick="deleteApplication('${app.id}', '${app.unitNumber}호', ${isCancelled})" 
+                                    style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                                🗑️ 삭제
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listElement.innerHTML = html;
+        }
+        
+        // 신청 삭제 함수
+        window.deleteApplication = async (applicationId, unitNumber, isCancelled = false) => {
+            let confirmMessage;
+            if (isCancelled) {
+                confirmMessage = `${unitNumber}의 취소된 신청을 정말 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`;
+            } else {
+                confirmMessage = `${unitNumber}의 신청을 정말 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`;
+            }
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const docRef = doc(db, 'applications', applicationId);
+                await deleteDoc(docRef);
+                
+                alert(`${unitNumber} 신청이 삭제되었습니다.`);
+                
+                // 관리자 페이지 새로고침 (현재 필터 유지)
+                loadAdminPage();
+                
+            } catch (error) {
+                console.error('Delete application error:', error);
+                alert('삭제 중 오류가 발생했습니다.');
+            } finally {
+                showLoading(false);
+            }
+        };
+    </script>
+</body>
+</html>
