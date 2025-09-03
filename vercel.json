@@ -3,6 +3,10 @@
       {
         "source": "/",
         "destination": "/pyeon2-snaghea.html"
+      },
+      {
+        "source": "/internet",
+        "destination": "/internet/internet.html"
       }
     ]
   }
